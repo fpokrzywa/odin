@@ -930,7 +930,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
                     <option value="">Loading roles...</option>
                   )}
                   {roles.map(role => (
-                    <option key={role.id} value={role.id}>{role.name}</option>
+                    <option key={role.id} value={(role.id || '').toString()}>{role.name}</option>
                   ))}
                 </select>
                 {roles.length === 0 && (
