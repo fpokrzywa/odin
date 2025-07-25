@@ -28,6 +28,7 @@ function App() {
   const [selectedAssistant, setSelectedAssistant] = useState<{ name: string; id: string } | null>(null);
   const [showProfileOverlay, setShowProfileOverlay] = useState(false);
   const [showSettingsOverlay, setShowSettingsOverlay] = useState(false);
+  const [selectedPromptText, setSelectedPromptText] = useState<string>('');
 
   const handleGetStarted = () => {
     setShowGetStartedModal(true);
@@ -97,8 +98,15 @@ function App() {
   };
 
   const handlePromptSelect = (promptText: string, assistantName: string) => {
-    // Handle prompt selection - you can integrate this with your chat system
-    console.log('Selected prompt:', promptText, 'for assistant:', assistantName);
+    // Set the selected prompt text and assistant
+    setSelectedPromptText(promptText);
+    
+    // Find or create assistant object
+    const assistantId = assistantName.toLowerCase().replace(/\s+/g, '_');
+    setSelectedAssistant({ name: assistantName, id: assistantId });
+    
+    // Navigate to chat page
+    setActiveSection('chat');
   };
 
   const handleCollapseAll = () => {
@@ -277,6 +285,8 @@ function App() {
           <div className="flex-1 flex">
             <ChatPage 
               selectedAssistant={selectedAssistant}
+              selectedPrompt={selectedPromptText}
+              onPromptUsed={() => setSelectedPromptText('')}
               onOpenPromptCatalog={() => setActiveSection('prompt-catalog')}
             />
           </div>

@@ -209,7 +209,6 @@ const PromptCatalogPage: React.FC<PromptCatalogPageProps> = ({ onPromptSelect })
   const handlePromptClick = (prompt: Prompt) => {
     // Use the user field data if available, otherwise fall back to description
     const promptText = prompt.user || prompt.description;
-    // Navigate to chat with the selected assistant and prompt
     onPromptSelect(promptText, prompt.assistant);
   };
 

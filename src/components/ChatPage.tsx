@@ -5,14 +5,14 @@ import PromptCatalog from './PromptCatalog';
 
 interface ChatPageProps {
   selectedAssistant: { name: string; id: string } | null;
-  selectedPrompt?: string;
-  onPromptUsed?: () => void;
+  selectedPrompt: string;
+  onPromptUsed: () => void;
   onOpenPromptCatalog?: () => void;
 }
 
 const ChatPage: React.FC<ChatPageProps> = ({ 
   selectedAssistant,
-  selectedPrompt = '', 
+  selectedPrompt,
   onPromptUsed,
   onOpenPromptCatalog
 }) => {
