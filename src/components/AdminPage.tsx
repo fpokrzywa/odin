@@ -832,18 +832,18 @@ const AdminPage: React.FC<AdminPageProps> = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => openRoleModal(role)}
-                        className="text-orange-600 hover:text-orange-700 p-1"
-                        title="Edit role"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
                         onClick={() => handleDeleteRole(role.id)}
                         className="text-red-600 hover:text-red-700 p-1"
                         title="Delete role"
                       >
                         <Trash2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => openRoleModal(role)}
+                        className="text-orange-600 hover:text-orange-700 p-1"
+                        title="Edit role"
+                      >
+                        <Edit className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
