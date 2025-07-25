@@ -74,8 +74,17 @@ function App() {
 
   const handleSectionChange = (section: string) => {
     setActiveSection(section);
-    // Show main content when a Find Answers section is selected (keep existing functionality)
+    
+    // Load ODIN assistant when Find Answers sections are selected
     const findAnswersSections = ['knowledge-articles', 'organization-chart', 'conference-rooms', 'customer-accounts', 'expense-reports', 'resources', 'guidelines'];
+    if (findAnswersSections.includes(section)) {
+      const odinAssistant = { name: 'ODIN', id: 'odin' };
+      setSelectedAssistant(odinAssistant);
+      setActiveSection('chat');
+      setIsSidebarCollapsed(true);
+    }
+    
+    // Show main content when a Find Answers section is selected (keep existing functionality)
     if (findAnswersSections.includes(section)) {
       setShowMainContent(true);
     } else {
