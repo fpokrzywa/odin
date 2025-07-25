@@ -88,10 +88,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
   // n8n Webhook functions
   const fetchUsersFromWebhook = async () => {
     try {
-      const webhookUrl = import.meta.env.VITE_N8N_GET_USERS_WEBHOOK_URL;
-      if (!webhookUrl) {
-        throw new Error('VITE_N8N_GET_USERS_WEBHOOK_URL not configured in environment variables');
-      }
+      const webhookUrl = '/n8n-proxy/get-users';
       
       console.log('🔄 AdminPage: Fetching users from n8n webhook:', webhookUrl);
       const response = await fetch(webhookUrl, {
@@ -130,10 +127,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
 
   const fetchRolesFromWebhook = async () => {
     try {
-      const webhookUrl = import.meta.env.VITE_N8N_GET_ROLES_WEBHOOK_URL;
-      if (!webhookUrl) {
-        throw new Error('VITE_N8N_GET_ROLES_WEBHOOK_URL not configured in environment variables');
-      }
+      const webhookUrl = '/n8n-proxy/get-roles';
       
       console.log('🔄 AdminPage: Fetching roles from n8n webhook:', webhookUrl);
       const response = await fetch(webhookUrl, {

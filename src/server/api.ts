@@ -12,6 +12,59 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
+// n8n webhook proxy routes
+app.get('/n8n-proxy/get-users', async (req, res) => {
+  try {
+    const webhookUrl = process.env.VITE_N8N_GET_USERS_WEBHOOK_URL;
+    if (!webhookUrl) {
+      return res.status(500).json({ error: 'VITE_N8N_GET_USERS_WEBHOOK_URL not configured' });
+    }
+    
+    const response = await fetch(webhookUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`n8n webhook responded with status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('Error proxying n8n users webhook:', error);
+    res.status(500).json({ error: 'Failed to fetch users from n8n webhook' });
+  }
+});
+
+app.get('/n8n-proxy/get-roles', async (req, res) => {
+  try {
+    const webhookUrl = process.env.VITE_N8N_GET_ROLES_WEBHOOK_URL;
+    if (!webhookUrl) {
+      return res.status(500).json({ error: 'VITE_N8N_GET_ROLES_WEBHOOK_URL not configured' });
+    }
+    
+    const response = await fetch(webhookUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`n8n webhook responded with status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('Error proxying n8n roles webhook:', error);
+    res.status(500).json({ error: 'Failed to fetch roles from n8n webhook' });
+  }
+});
+
 // Initialize database connection with better error handling
 initializeDatabase().catch(error => {
   console.error('Failed to initialize database:', error);
