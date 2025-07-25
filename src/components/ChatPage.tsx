@@ -237,8 +237,13 @@ const ChatPage: React.FC<ChatPageProps> = ({
   }, [pendingAssistantMessage]);
 
   const sendMessageToAssistant = async (assistantName: string, message: string) => {
-    // Find the assistant ID based on the name
-    const assistantId = assistantName.toLowerCase().replace(/\s+/g, '_');
+    console.log('🚀 ChatPage: Sending message to assistant:', assistantName, 'Message:', message);
+    
+    // Find the OpenAI assistant by name
+    const openaiAssistant = openaiAssistants.find(assistant => assistant.name === assistantName);
+    const assistantId = openaiAssistant ? openaiAssistant.id : assistantName.toLowerCase().replace(/\s+/g, '_');
+    
+    console.log('🔍 ChatPage: Found assistant:', { assistantName, assistantId, openaiAssistant });
     
     // Create or switch to a thread for this assistant
     let targetThread = chatService.getAllThreads().find(thread => 
@@ -246,8 +251,11 @@ const ChatPage: React.FC<ChatPageProps> = ({
     );
     
     if (!targetThread) {
+      console.log('🆕 ChatPage: Creating new thread for assistant:', assistantName);
       const threadId = chatService.createThread(assistantId, assistantName);
       targetThread = chatService.getThread(threadId);
+    } else {
+      console.log('🔄 ChatPage: Using existing thread for assistant:', assistantName);
     }
     
     if (targetThread) {
@@ -265,12 +273,15 @@ const ChatPage: React.FC<ChatPageProps> = ({
       }, 100);
       
       try {
+        console.log('📤 ChatPage: Sending message via streaming to thread:', targetThread.id);
         await chatService.sendMessageWithStreaming(message, (chunk) => {
           setStreamingMessage(chunk);
         }, targetThread.id);
         const updatedThread = chatService.getCurrentThread();
         setCurrentThread(updatedThread);
+        console.log('✅ ChatPage: Message sent successfully');
       } catch (err) {
+        console.error('❌ ChatPage: Error sending message:', err);
         setError(err instanceof Error ? err.message : 'Failed to send message');
       } finally {
         setIsLoading(false);
@@ -292,37 +303,28 @@ const ChatPage: React.FC<ChatPageProps> = ({
     }
     
     if (e.key === 'Enter' && !showAssistantDropdown) {
-      // Check if there's a mentioned assistant
-      if (mentionedAssistant && inputValue.trim()) {
-        setPendingAssistantMessage({ assistant: mentionedAssistant, message: inputValue.trim() });
-        setInputValue('');
-        setMentionedAssistant(null);
-        return;
-      }
-      
-      // Check if there's a pinned assistant
-      if (pinnedAssistant && inputValue.trim()) {
-        setPendingAssistantMessage({ assistant: pinnedAssistant, message: inputValue.trim() });
-        setInputValue('');
-        setPinnedAssistant(null);
-        return;
-      }
-      
-      // Check if the message contains an @ mention (fallback)
-      if (!mentionedAssistant && !pinnedAssistant) {
-        const atMentionMatch = inputValue.match(/@(\w+(?:\s+\w+)*)\s+(.+)/);
-        if (atMentionMatch) {
-          const mentionedAssistant = atMentionMatch[1];
-          const messageText = atMentionMatch[2];
-          
-          // Check if the mentioned assistant exists
-          if (availableAssistants.includes(mentionedAssistant)) {
-            setPendingAssistantMessage({ assistant: mentionedAssistant, message: messageText });
-            setInputValue('');
-            return;
-          }
+      // Check if the message contains an @ mention
+      const atMentionMatch = inputValue.match(/@([^@\s]+(?:\s+[^@\s]+)*)\s*(.*)/);
+      if (atMentionMatch) {
+        const mentionedAssistantName = atMentionMatch[1].trim();
+        const messageText = atMentionMatch[2].trim();
+        
+        console.log('🎯 ChatPage: Found @ mention:', { mentionedAssistantName, messageText, availableAssistants });
+        
+        // Check if the mentioned assistant exists in our OpenAI assistants
+        if (availableAssistants.includes(mentionedAssistantName) && messageText) {
+          console.log('✅ ChatPage: Routing message to assistant:', mentionedAssistantName);
+          setPendingAssistantMessage({ assistant: mentionedAssistantName, message: messageText });
+          setInputValue('');
+          return;
+        } else if (!messageText) {
+          console.log('⚠️ ChatPage: No message text after @ mention');
+          return; // Don't send if there's no message after the @ mention
+        } else {
+          console.log('⚠️ ChatPage: Assistant not found in available list:', mentionedAssistantName);
         }
       }
+      
       handleSend();
     }
   };
