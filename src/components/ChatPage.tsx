@@ -38,16 +38,8 @@ const ChatPage: React.FC<ChatPageProps> = ({
   const [mentionedAssistant, setMentionedAssistant] = useState<string | null>(null);
 
   // Available assistants list
-  const [availableAssistants, setAvailableAssistants] = useState<string[]>([
-    getCompanyBotName(),
-    'IT Support', 
-    'HR Support',
-    'Advance Policies Assistant',
-    'Redact Assistant',
-    'ADEPT Assistant',
-    'RFP Assistant',
-    'Resume Assistant'
-  ]);
+  const [availableAssistants, setAvailableAssistants] = useState<string[]>([]);
+  const [openaiAssistants, setOpenaiAssistants] = useState<any[]>([]);
 
   // Load OpenAI assistants to get dynamic list
   useEffect(() => {
@@ -55,25 +47,24 @@ const ChatPage: React.FC<ChatPageProps> = ({
       try {
         const { openaiService } = await import('../services/openaiService');
         const result = await openaiService.listAssistants();
+        console.log('Loaded OpenAI assistants for @ mentions:', result.assistants);
         if (result.assistants.length > 0) {
-          const assistantNames = result.assistants.map(assistant => assistant.name);
-          // Combine default assistants with OpenAI assistants, removing duplicates
-          const defaultAssistants = [
-            getCompanyBotName(),
-            'IT Support', 
-            'HR Support',
-            'Advance Policies Assistant',
-            'Redact Assistant',
-            'ADEPT Assistant',
-            'RFP Assistant',
-            'Resume Assistant'
-          ];
-          const combinedAssistants = [...new Set([...defaultAssistants, ...assistantNames])];
-          setAvailableAssistants(combinedAssistants);
+          const convertedAssistants = result.assistants.map(assistant => 
+            openaiService.convertToInternalFormat(assistant)
+          );
+          setOpenaiAssistants(convertedAssistants);
+          // Only use OpenAI assistant names for @ mentions
+          const assistantNames = convertedAssistants.map(assistant => assistant.name);
+          setAvailableAssistants(assistantNames);
+          console.log('Set available assistants for @ mentions:', assistantNames);
+        } else {
+          console.log('No OpenAI assistants found');
+          setAvailableAssistants([]);
         }
       } catch (error) {
         console.error('Error loading assistants for @ mentions:', error);
-        // Keep default assistants if loading fails
+        // Clear assistants if loading fails
+        setAvailableAssistants([]);
       }
     };
 
@@ -167,9 +158,10 @@ const ChatPage: React.FC<ChatPageProps> = ({
     if (atIndex !== -1 && (atIndex === 0 || value[atIndex - 1] === ' ')) {
       const searchTerm = value.substring(atIndex + 1, cursorPosition).toLowerCase();
       const filtered = availableAssistants.filter(assistant => 
-        assistant !== selectedAssistant?.name && assistant.toLowerCase().includes(searchTerm)
+        assistant.toLowerCase().includes(searchTerm)
       );
       
+      console.log('Filtering assistants:', { searchTerm, filtered, availableAssistants });
       setFilteredAssistants(filtered);
       setAtSymbolPosition(atIndex);
       setShowAssistantDropdown(true);
@@ -707,10 +699,10 @@ const ChatPage: React.FC<ChatPageProps> = ({
                     <button
                       key={assistant}
                       onClick={() => handleAssistantSelect(assistant)}
-                      className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-50 rounded-lg transition-colors"
+                      className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
                     >
-                      <div className="w-6 h-6 bg-pink-100 rounded flex items-center justify-center flex-shrink-0">
-                        <Bot className="w-3 h-3 text-pink-600" />
+                      <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center flex-shrink-0">
+                        <Bot className="w-3 h-3 text-blue-600" />
                       </div>
                       <span className="text-sm text-gray-700">{assistant}</span>
                     </button>
