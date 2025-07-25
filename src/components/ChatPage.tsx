@@ -293,10 +293,16 @@ const ChatPage: React.FC<ChatPageProps> = ({
       } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         e.preventDefault();
         // Could add keyboard navigation here if needed
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        return; // Don't process Enter when dropdown is open
       }
+      return; // Don't process other keys when dropdown is open
     }
     
     if (e.key === 'Enter' && !showAssistantDropdown) {
+      e.preventDefault(); // Prevent form submission
+      
       // Check if the message contains an @ mention
      const atMentionMatch = inputValue.match(/@([A-Za-z0-9\s]+?)\s+(.+)/);
       if (atMentionMatch) {
@@ -323,6 +329,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
         }
       }
       
+      // Regular message sending (no @ mention)
       handleSend();
     }
   };
