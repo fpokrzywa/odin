@@ -387,7 +387,12 @@ const AdminPage: React.FC<AdminPageProps> = () => {
         ? 'Unable to connect to n8n role webhook. Please check your network connection and ensure CORS is configured on your n8n instance.'
         : err.message;
       setError('Failed to fetch roles: ' + errorMessage);
-      setRoles([]);
+      // Set fallback roles to prevent empty state
+      setRoles([
+        { id: 1, name: 'Admin', description: 'Full system access', permissions: '["user_management", "role_management", "system_settings"]', created_at: new Date().toISOString() },
+        { id: 2, name: 'User', description: 'Standard user access', permissions: '["basic_access"]', created_at: new Date().toISOString() },
+        { id: 3, name: 'Manager', description: 'Manager level access', permissions: '["basic_access", "team_management"]', created_at: new Date().toISOString() }
+      ]);
     }
   };
 
