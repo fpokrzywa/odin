@@ -229,9 +229,6 @@ function App() {
             </div>
           </div>
         )}
-        {showMainContent && !isMainContentCollapsed && !isSidebarCollapsed && activeSection !== 'admin' && activeSection !== 'assistants' && activeSection !== 'prompt-catalog' && (
-          <MainContent activeSection={activeSection} />
-        )}
         {showMainContent && !isMainContentCollapsed && !isSidebarCollapsed && activeSection !== 'admin' && activeSection !== 'assistants' && activeSection !== 'prompt-catalog' && activeSection !== 'resources' && activeSection !== 'guidelines' && (
           <MainContent activeSection={activeSection} />
         )}
