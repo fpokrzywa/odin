@@ -89,12 +89,11 @@ const AdminPage: React.FC<AdminPageProps> = () => {
   const fetchUsersFromWebhook = async () => {
     try {
       console.log('🔄 AdminPage: Fetching users from webhook...');
-      const response = await fetch('https://n8n.agenticweaver.com/webhook/get-user-data', {
+      const response = await fetch('http://localhost:3001/api/users', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        mode: 'cors',
       });
 
       if (!response.ok) {
@@ -127,12 +126,11 @@ const AdminPage: React.FC<AdminPageProps> = () => {
   const fetchRolesFromWebhook = async () => {
     try {
       console.log('🔄 AdminPage: Fetching roles from webhook...');
-      const response = await fetch('https://n8n.agenticweaver.com/webhook/get-role-data', {
+      const response = await fetch('http://localhost:3001/api/roles', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        mode: 'cors',
       });
 
       if (!response.ok) {
