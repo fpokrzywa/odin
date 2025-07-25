@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search, Heart, ChevronDown, X, RefreshCw, Edit3, Trash2 } from 'lucide-react';
 import { getCompanyName } from '../utils/companyConfig';
 import { openaiService, type Assistant } from '../services/openaiService';
+import { mongoService } from '../services/mongoService';
 import { getCompanyBotName } from '../utils/companyConfig';
 
 interface Prompt {
