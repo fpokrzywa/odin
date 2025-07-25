@@ -161,7 +161,20 @@ const Sidebar: React.FC<SidebarProps> = ({
     <div className="w-64 bg-slate-800 text-white flex flex-col h-full">
       {/* Header */}
       <div className="p-4 border-b border-slate-700">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <img src="/odin_icon_white.svg" alt="ODIN" className="w-8 h-8" />
+            <h1 className="text-xl font-bold">ODIN</h1>
+          </div>
+          <button
+            onClick={onToggleCollapse}
+            className="p-1 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors"
+            title="Collapse sidebar"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
           <img src="/odin_icon_white.svg" alt="ODIN" className="w-8 h-8" />
           <h1 className="text-xl font-bold">ODIN</h1>
         </div>
