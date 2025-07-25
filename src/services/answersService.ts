@@ -156,7 +156,7 @@ class AnswersService {
       rawItems = [data];
     }
 
-    // Transform items to match our interface
+    // Transform items to match our interface - handle actual webhook structure
     const items = rawItems.map((item: any) => ({
       id: item.id || item._id?.$oid || Math.random().toString(36).substr(2, 9),
       title: item.title || 'Untitled Item',
@@ -166,20 +166,41 @@ class AnswersService {
         title: item.title || 'Knowledge articles',
         description: item.description || 'Find relevant information across all business systems.',
         tryItYourself: {
-          scenario: item.tryItYourself?.scenario || 'Explore the available resources and get answers to your questions.',
+          scenario: item.tryItYourself?.scenario || `Explore ${item.title || 'this section'} to find helpful information and resources.`,
           actions: item.tryItYourself?.actions || [
-            'Ask questions about the policies',
-            'Find information tailored to your needs'
+            `Ask ODIN questions about ${item.title?.toLowerCase() || 'this topic'}`,
+            'Get instant answers and guidance',
+            'Find relevant policies and procedures'
           ]
         },
-        articles: (item.articles || []).map((article: any, articleIndex: number) => ({
+        articles: item.articles ? (item.articles || []).map((article: any, articleIndex: number) => ({
           id: article.id || `article-${articleIndex}`,
           policyName: article.policyName || `Article ${articleIndex + 1}`,
           content: article.content || `Sample content for ${article.policyName?.toLowerCase() || 'this article'}...`,
           category: article.category,
           isExpanded: false
-        })),
-        learnMoreLink: item.learnMoreLink || 'Learn more about Enterprise Search'
+        })) : [
+          // Generate sample articles based on the section type
+          {
+            id: `${item.id}-sample-1`,
+            policyName: `${item.title} - Getting Started`,
+            content: `This section contains helpful information about ${item.title?.toLowerCase() || 'this topic'}. Use ODIN to ask specific questions and get detailed answers.`,
+            isExpanded: false
+          },
+          {
+            id: `${item.id}-sample-2`, 
+            policyName: `${item.title} - Best Practices`,
+            content: `Learn about best practices and common procedures related to ${item.title?.toLowerCase() || 'this area'}. ODIN can provide more specific guidance based on your needs.`,
+            isExpanded: false
+          },
+          {
+            id: `${item.id}-sample-3`,
+            policyName: `${item.title} - Troubleshooting`,
+            content: `Find solutions to common issues and troubleshooting steps for ${item.title?.toLowerCase() || 'this topic'}. Ask ODIN for help with specific problems.`,
+            isExpanded: false
+          }
+        ],
+        learnMoreLink: item.learnMoreLink || `Learn more about ${item.title}`
       }
     }));
 
