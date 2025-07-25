@@ -20,9 +20,9 @@ app.get('/health', (req, res) => {
 // n8n webhook proxy routes
 app.get('/n8n-proxy/get-users', async (req, res) => {
   try {
-    const webhookUrl = process.env.VITE_N8N_GET_USERS_WEBHOOK_URL;
+    const webhookUrl = String(process.env.VITE_N8N_GET_USERS_WEBHOOK_URL || '');
     console.log('🔄 Attempting to fetch users from webhook:', webhookUrl);
-    if (!webhookUrl) {
+    if (!webhookUrl || webhookUrl === '') {
       console.error('❌ VITE_N8N_GET_USERS_WEBHOOK_URL not configured');
       return res.status(500).json({ error: 'VITE_N8N_GET_USERS_WEBHOOK_URL not configured' });
     }
@@ -50,9 +50,9 @@ app.get('/n8n-proxy/get-users', async (req, res) => {
 
 app.get('/n8n-proxy/get-roles', async (req, res) => {
   try {
-    const webhookUrl = process.env.VITE_N8N_GET_ROLES_WEBHOOK_URL;
+    const webhookUrl = String(process.env.VITE_N8N_GET_ROLES_WEBHOOK_URL || '');
     console.log('🔄 Attempting to fetch roles from webhook:', webhookUrl);
-    if (!webhookUrl) {
+    if (!webhookUrl || webhookUrl === '') {
       console.error('❌ VITE_N8N_GET_ROLES_WEBHOOK_URL not configured');
       return res.status(500).json({ error: 'VITE_N8N_GET_ROLES_WEBHOOK_URL not configured' });
     }
