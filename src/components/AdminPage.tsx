@@ -576,7 +576,6 @@ const AdminPage: React.FC<AdminPageProps> = () => {
       (user.first_name && user.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (user.last_name && user.last_name.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    const matchesRole = selectedRole === 'all' || user.role_id.toString() === selectedRole;
     const matchesRole = selectedRole === 'all' || (user.role_id ?? '').toString() === selectedRole;
     
     return matchesSearch && matchesRole;
