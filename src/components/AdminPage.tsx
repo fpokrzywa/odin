@@ -832,7 +832,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
                   <div>
                     <h4 className="text-sm font-medium text-gray-700 mb-2">Permissions:</h4>
                     <div className="flex flex-wrap gap-1">
-                      {JSON.parse(role.permissions).map((permission: string) => (
+                      {JSON.parse(role.permissions || '[]').map((permission: string) => (
                         <span
                           key={permission}
                           className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-orange-100 text-orange-800"
