@@ -90,27 +90,28 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
       if (matchedItem) {
         console.log('✅ Found exact ID match:', matchedItem.id);
         console.log('✅ Matched item data structure:', matchedItem);
-      // Check if the message contains an @ mention
-      const atMentionMatch = inputValue.match(/@([^@\s]+(?:\s+[^@\s]+)*)\s*(.*)/);
-      if (atMentionMatch) {
-        const mentionedAssistantName = atMentionMatch[1].trim();
-        const messageText = atMentionMatch[2].trim();
-        
-        console.log('🎯 MainContent: Found @ mention:', { mentionedAssistantName, messageText, availableAssistants });
-        
-        // Check if the mentioned assistant exists in our OpenAI assistants
-        if (availableAssistants.includes(mentionedAssistantName) && messageText) {
-          console.log('✅ MainContent: Routing message to assistant:', mentionedAssistantName);
-          setPendingAssistantMessage({ assistant: mentionedAssistantName, message: messageText });
-          setInputValue('');
-          return;
-        } else if (!messageText) {
-          console.log('⚠️ MainContent: No message text after @ mention');
-          return; // Don't send if there's no message after the @ mention
-        } else {
-          console.log('⚠️ MainContent: Assistant not found in available list:', mentionedAssistantName);
-        }
       }
+      // Check if the message contains an @ mention
+      // const atMentionMatch = inputValue.match(/@([^@\s]+(?:\s+[^@\s]+)*)\s*(.*)/);
+      // if (atMentionMatch) {
+      //   const mentionedAssistantName = atMentionMatch[1].trim();
+      //   const messageText = atMentionMatch[2].trim();
+        
+      //   console.log('🎯 MainContent: Found @ mention:', { mentionedAssistantName, messageText, availableAssistants });
+        
+      //   // Check if the mentioned assistant exists in our OpenAI assistants
+      //   if (availableAssistants.includes(mentionedAssistantName) && messageText) {
+      //     console.log('✅ MainContent: Routing message to assistant:', mentionedAssistantName);
+      //     setPendingAssistantMessage({ assistant: mentionedAssistantName, message: messageText });
+      //     setInputValue('');
+      //     return;
+      //   } else if (!messageText) {
+      //     console.log('⚠️ MainContent: No message text after @ mention');
+      //     return; // Don't send if there's no message after the @ mention
+      //   } else {
+      //     console.log('⚠️ MainContent: Assistant not found in available list:', mentionedAssistantName);
+      //   }
+      // }
       
       
       setDebugInfo(`Looking for: ${sectionId}, Found: ${matchedItem ? matchedItem.title : 'None'}`);
@@ -367,25 +368,27 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
               <span>Seamless integration with existing systems</span>
             </li>
           </ul>
-    console.log('🚀 MainContent: Sending message to assistant:', assistantName, 'Message:', message);
-    
-    // Find the OpenAI assistant by name
-    const openaiAssistant = openaiAssistants.find(assistant => assistant.name === assistantName);
-    const assistantId = openaiAssistant ? openaiAssistant.id : assistantName.toLowerCase().replace(/\s+/g, '_');
-    
-    console.log('🔍 MainContent: Found assistant:', { assistantName, assistantId, openaiAssistant });
+        </div>
+      </>
     );
+    // console.log('🚀 MainContent: Sending message to assistant:', assistantName, 'Message:', message);
+    
+    // // Find the OpenAI assistant by name
+    // const openaiAssistant = openaiAssistants.find(assistant => assistant.name === assistantName);
+    // const assistantId = openaiAssistant ? openaiAssistant.id : assistantName.toLowerCase().replace(/\s+/g, '_');
+    
+    // console.log('🔍 MainContent: Found assistant:', { assistantName, assistantId, openaiAssistant });
   };
 
   const getContentForSection = () => {
     // Check if this is a Find Answers section that should load from webhook
     const findAnswersSections = ['knowledge-articles', 'organization-chart', 'conference-rooms', 'customer-accounts', 'expense-reports'];
     
-      console.log('🆕 MainContent: Creating new thread for assistant:', assistantName);
+    // console.log('🆕 MainContent: Creating new thread for assistant:', assistantName);
     if (findAnswersSections.includes(activeSection)) {
       return renderKnowledgeArticles();
     } else {
-      console.log('🔄 MainContent: Using existing thread for assistant:', assistantName);
+      // console.log('🔄 MainContent: Using existing thread for assistant:', assistantName);
     }
     
     // Handle other sections with static content
@@ -422,15 +425,15 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         );
       default:
         return (
-        console.log('📤 MainContent: Sending message via streaming to thread:', targetThread.id);
+          // console.log('📤 MainContent: Sending message via streaming to thread:', targetThread.id);
           <div className="text-center py-16">
             <div className="text-gray-500">
               <p className="mb-4">Loading content for: {activeSection}</p>
               <button
                 onClick={() => loadAnswersData(activeSection, true)}
-        console.log('✅ MainContent: Message sent successfully');
+                // console.log('✅ MainContent: Message sent successfully');
                 className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
-        console.error('❌ MainContent: Error sending message:', err);
+                // console.error('❌ MainContent: Error sending message:', err);
               >
                 Retry Loading
               </button>
