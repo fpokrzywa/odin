@@ -89,7 +89,8 @@ const AdminPage: React.FC<AdminPageProps> = () => {
   const fetchUsersFromWebhook = async () => {
     try {
       console.log('🔄 AdminPage: Fetching users from webhook...');
-      const response = await fetch('http://localhost:3001/api/users', {
+      const apiUrl = import.meta.env.VITE_API_URL || '/api';
+      const response = await fetch(`${apiUrl}/users`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -126,7 +127,8 @@ const AdminPage: React.FC<AdminPageProps> = () => {
   const fetchRolesFromWebhook = async () => {
     try {
       console.log('🔄 AdminPage: Fetching roles from webhook...');
-      const response = await fetch('http://localhost:3001/api/roles', {
+      const apiUrl = import.meta.env.VITE_API_URL || '/api';
+      const response = await fetch(`${apiUrl}/roles`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
