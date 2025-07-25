@@ -32,9 +32,10 @@ export interface FindAnswersResponse {
 
 class AnswersService {
   private webhookUrl: string | undefined;
-  private cachedAnswers: FindAnswersResponse | null = null;
+  private cachedItems: FindAnswersResponse | null = null;
+  private cachedItemData: Map<string, AnswersData> = new Map();
   private cacheTimestamp: number = 0;
-  private cacheExpiryMs = 5 * 60 * 1000; // 5 minutes
+  private cacheExpiryMs = 10 * 60 * 1000; // 10 minutes for better performance
 
   constructor() {
     this.webhookUrl = import.meta.env.VITE_N8N_ANSWERS_WEBHOOK_URL;
@@ -42,9 +43,9 @@ class AnswersService {
 
   async getFindAnswersItems(forceRefresh: boolean = false): Promise<FindAnswersResponse> {
     // Check cache first unless force refresh is requested
-    if (!forceRefresh && this.cachedAnswers && (Date.now() - this.cacheTimestamp) < this.cacheExpiryMs) {
+    if (!forceRefresh && this.cachedItems && (Date.now() - this.cacheTimestamp) < this.cacheExpiryMs) {
       console.log('📋 AnswersService: Returning cached answers');
-      return this.cachedAnswers;
+      return this.cachedItems;
     }
 
     try {
@@ -69,8 +70,13 @@ class AnswersService {
         const findAnswersData = this.transformWebhookData(data);
         
         // Cache the results
-        this.cachedAnswers = findAnswersData;
+        this.cachedItems = findAnswersData;
         this.cacheTimestamp = Date.now();
+        
+        // Cache individual item data for faster access
+        findAnswersData.items.forEach(item => {
+          this.cachedItemData.set(item.id, item.data);
+        });
         
         console.log('✅ AnswersService: Successfully loaded answers from webhook');
         return findAnswersData;
@@ -81,8 +87,13 @@ class AnswersService {
       const fallbackData = this.getFallbackData();
       
       // Cache fallback data too
-      this.cachedAnswers = fallbackData;
+      this.cachedItems = fallbackData;
       this.cacheTimestamp = Date.now();
+      
+      // Cache individual item data
+      fallbackData.items.forEach(item => {
+        this.cachedItemData.set(item.id, item.data);
+      });
       
       return fallbackData;
     } catch (error) {
@@ -93,9 +104,41 @@ class AnswersService {
   }
 
   async getAnswersForItem(itemId: string): Promise<AnswersData | null> {
+    // Check cache first for individual item data
+    if (this.cachedItemData.has(itemId) && (Date.now() - this.cacheTimestamp) < this.cacheExpiryMs) {
+      console.log('📋 AnswersService: Returning cached item data for', itemId);
+      return this.cachedItemData.get(itemId) || null;
+    }
+    
+    // If not in cache, load all items and cache them
     const findAnswersData = await this.getFindAnswersItems();
     const item = findAnswersData.items.find(item => item.id === itemId);
-    return item ? item.data : null;
+    
+    if (item) {
+      // Cache this specific item data
+      this.cachedItemData.set(itemId, item.data);
+      return item.data;
+    }
+    
+    return null;
+  }
+  
+  // Method to clear cache if needed
+  clearCache(): void {
+    this.cachedItems = null;
+    this.cachedItemData.clear();
+    this.cacheTimestamp = 0;
+    console.log('🗑️ AnswersService: Cache cleared');
+  }
+  
+  // Method to get cache status
+  getCacheStatus(): { hasCache: boolean; age: number; itemCount: number } {
+    const age = Date.now() - this.cacheTimestamp;
+    return {
+      hasCache: !!this.cachedItems,
+      age: Math.floor(age / 1000), // age in seconds
+      itemCount: this.cachedItemData.size
+    };
   }
 
   private transformWebhookData(data: any): FindAnswersResponse {

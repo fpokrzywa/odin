@@ -29,17 +29,23 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
     }
     
     try {
+      console.log('🔄 MainContent: Loading answers data for section:', sectionId);
       const data = await answersService.getAnswersForItem(sectionId);
       if (!data) {
-        throw new Error(`No data found for section: ${sectionId}`);
+        console.warn('⚠️ MainContent: No data found for section:', sectionId);
+        // Try to get fallback data
+        const fallbackData = await answersService.getAnswersForItem('knowledge-articles');
+        setAnswersData(fallbackData);
+      } else {
+        setAnswersData(data);
+        console.log('✅ MainContent: Successfully loaded data for section:', sectionId);
       }
-      setAnswersData(data);
-      console.log('📦 MainContent: Loaded answers data for', sectionId, ':', data);
       console.log('🔗 MainContent: Webhook connection info:', answersService.getConnectionInfo());
+      console.log('💾 MainContent: Cache status:', answersService.getCacheStatus());
     } catch (error) {
       console.error('❌ MainContent: Error loading answers data for', sectionId, ':', error);
       // Use fallback data for the section
-      const fallbackData = await answersService.getAnswersForItem(sectionId);
+      const fallbackData = await answersService.getAnswersForItem('knowledge-articles');
       setAnswersData(fallbackData);
     } finally {
       setIsLoading(false);
@@ -49,6 +55,8 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
 
   const handleRefresh = () => {
     console.log('🔄 MainContent: Refresh button clicked - forcing data refresh from webhook');
+    // Clear cache before refreshing
+    answersService.clearCache();
     loadAnswersData(activeSection, true);
   };
 
