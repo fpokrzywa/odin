@@ -66,8 +66,14 @@ class AnswersService {
         const data = await response.json();
         console.log('📦 AnswersService: Raw webhook response:', data);
         
+        // Log the structure of the first item to understand the data format
+        if (Array.isArray(data) && data.length > 0) {
+          console.log('📋 AnswersService: First item structure:', data[0]);
+        }
+        
         // Transform the webhook data to match our interface
         const findAnswersData = this.transformWebhookData(data);
+        console.log('🔄 AnswersService: Transformed data:', findAnswersData);
         
         // Cache the results
         this.cachedItems = findAnswersData;

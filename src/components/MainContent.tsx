@@ -39,6 +39,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
       // Get all items from webhook
       const allItems = await answersService.getFindAnswersItems(forceRefresh);
       console.log('📦 MainContent: All items loaded:', allItems.items.length);
+      console.log('📦 MainContent: Raw items data:', allItems.items);
       setDebugInfo(`Loaded ${allItems.items.length} items from webhook`);
       
       // Log all available items for debugging
@@ -55,6 +56,8 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
       matchedItem = allItems.items.find(item => item.id === sectionId);
       if (matchedItem) {
         console.log('✅ Found exact ID match:', matchedItem.id);
+        console.log('✅ Matched item data structure:', matchedItem);
+        console.log('✅ Matched item.data:', matchedItem.data);
       } else {
         // Strategy 2: Convert title to kebab-case and match
         matchedItem = allItems.items.find(item => {
@@ -63,6 +66,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         });
         if (matchedItem) {
           console.log('✅ Found title-to-kebab match:', matchedItem.title, '→', sectionId);
+          console.log('✅ Matched item data structure:', matchedItem);
         } else {
           // Strategy 3: Partial matching
           matchedItem = allItems.items.find(item => 
@@ -72,6 +76,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
           );
           if (matchedItem) {
             console.log('✅ Found partial match:', matchedItem.id, 'for', sectionId);
+            console.log('✅ Matched item data structure:', matchedItem);
           }
         }
       }
@@ -79,6 +84,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
       setDebugInfo(`Looking for: ${sectionId}, Found: ${matchedItem ? matchedItem.title : 'None'}`);
       
       if (matchedItem) {
+        console.log('🎯 MainContent: Setting answers data:', matchedItem.data);
         setAnswersData(matchedItem.data);
         setDebugInfo(`Successfully loaded: ${matchedItem.title}`);
         console.log('✅ MainContent: Successfully loaded data for section:', sectionId);
