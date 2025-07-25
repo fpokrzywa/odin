@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown, ChevronRight, Sparkles, ArrowRight, Users, Video, CreditCard, Receipt, Download, Ticket, Mail, Calendar, Lock, RefreshCw } from 'lucide-react';
 import { answersService, type AnswersData, type AnswerArticle } from '../services/answersService';
 
@@ -13,6 +13,39 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string>('');
+
+  const [availableAssistants, setAvailableAssistants] = useState<string[]>([]);
+  const [openaiAssistants, setOpenaiAssistants] = useState<any[]>([]);
+
+  // Load OpenAI assistants to get dynamic list
+  useEffect(() => {
+    const loadAssistants = async () => {
+      try {
+        const { openaiService } = await import('../services/openaiService');
+        const result = await openaiService.listAssistants();
+        console.log('MainContent: Loaded OpenAI assistants for @ mentions:', result.assistants);
+        if (result.assistants.length > 0) {
+          const convertedAssistants = result.assistants.map(assistant => 
+            openaiService.convertToInternalFormat(assistant)
+          );
+          setOpenaiAssistants(convertedAssistants);
+          // Only use OpenAI assistant names for @ mentions
+          const assistantNames = convertedAssistants.map(assistant => assistant.name);
+          setAvailableAssistants(assistantNames);
+          console.log('MainContent: Set available assistants for @ mentions:', assistantNames);
+        } else {
+          console.log('MainContent: No OpenAI assistants found');
+          setAvailableAssistants([]);
+        }
+      } catch (error) {
+        console.error('MainContent: Error loading assistants for @ mentions:', error);
+        // Clear assistants if loading fails
+        setAvailableAssistants([]);
+      }
+    };
+
+    loadAssistants();
+  }, []);
 
   // Load answers data when component mounts or when activeSection changes
   React.useEffect(() => {
