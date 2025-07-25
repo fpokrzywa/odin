@@ -164,7 +164,17 @@ const AdminPage: React.FC<AdminPageProps> = () => {
       }
 
       console.log(`✅ AdminPage: Successfully loaded ${roles.length} roles from n8n webhook`);
-      return roles.filter(role => role != null);
+      // Sanitize role data to ensure required properties exist
+      return roles
+        .filter(role => role != null)
+        .map(role => ({
+          ...role,
+          id: typeof role.id === 'number' ? role.id : 0,
+          name: typeof role.name === 'string' ? role.name : 'Unnamed Role',
+          description: typeof role.description === 'string' ? role.description : '',
+          permissions: typeof role.permissions === 'string' ? role.permissions : '[]',
+          created_at: typeof role.created_at === 'string' ? role.created_at : new Date().toISOString()
+        }));
     } catch (error) {
       console.error('❌ AdminPage: Error fetching roles from n8n webhook:', error);
       throw error;
