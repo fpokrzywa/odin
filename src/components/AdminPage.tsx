@@ -559,7 +559,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
       setRoleForm({
         name: role.name,
         description: role.description || '',
-        permissions: JSON.parse(role.permissions)
+        permissions: JSON.parse(role.permissions || '[]')
       });
     } else {
       setEditingRole(null);
