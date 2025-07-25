@@ -74,7 +74,30 @@ const PromptCatalogPage: React.FC<PromptCatalogPageProps> = ({ onPromptSelect })
     
     try {
       console.log('🔄 PromptCatalogPage: Loading prompts from webhook, forceRefresh:', forceRefresh);
-      // Use fallback prompts data
+      const mongoPrompts = await mongoService.getPrompts(forceRefresh);
+      console.log('📦 PromptCatalogPage: Loaded prompts from webhook:', mongoPrompts.length);
+      console.log('🔗 PromptCatalogPage: Webhook connection info:', mongoService.getConnectionInfo());
+      
+      const convertedPrompts: Prompt[] = mongoPrompts.map(prompt => ({
+        id: prompt.id,
+        title: prompt.title,
+        description: prompt.description,
+        assistant: prompt.assistant,
+        task: prompt.task,
+        functionalArea: prompt.functionalArea,
+        tags: prompt.tags,
+        user: (prompt as any).user,
+        system: (prompt as any).system,
+        owner: (prompt as any).owner
+      }));
+      
+      setPrompts(convertedPrompts);
+    } catch (error) {
+      console.error('❌ PromptCatalogPage: Error loading prompts from webhook:', error);
+      console.log('🔗 PromptCatalogPage: Webhook connection info:', mongoService.getConnectionInfo());
+      console.log('⚠️ PromptCatalogPage: Using fallback prompt data due to webhook connection issues');
+      
+      // Use fallback prompts data only if webhook fails
       const fallbackPrompts: Prompt[] = [
         {
           "id": "1",
@@ -115,9 +138,6 @@ const PromptCatalogPage: React.FC<PromptCatalogPageProps> = ({ onPromptSelect })
       ];
       
       setPrompts(fallbackPrompts);
-    } catch (error) {
-      console.error('❌ PromptCatalogPage: Error loading prompts:', error);
-      console.log('⚠️ PromptCatalogPage: Using fallback prompt data due to connection issues');
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
