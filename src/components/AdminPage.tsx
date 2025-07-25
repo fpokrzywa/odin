@@ -15,7 +15,29 @@ import {
   EyeOff
 } from 'lucide-react';
 
-import { User, Role } from '../database/mongodb';
+// User and Role interfaces
+interface User {
+  id: number;
+  email: string;
+  password_hash?: string;
+  first_name?: string;
+  last_name?: string;
+  role_id: number;
+  role_name?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at?: string;
+  last_login?: string;
+}
+
+interface Role {
+  id: number;
+  name: string;
+  description?: string;
+  permissions: string;
+  created_at: string;
+  updated_at?: string;
+}
 
 interface AdminPageProps {
 }
@@ -63,45 +85,109 @@ const AdminPage: React.FC<AdminPageProps> = () => {
     'analytics'
   ];
 
-  // API functions
-  const apiCall = async (endpoint: string, options: RequestInit = {}) => {
-    const response = await fetch(`http://localhost:3001/api${endpoint}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      ...options,
-    });
+  // Webhook functions
+  const fetchUsersFromWebhook = async () => {
+    try {
+      console.log('🔄 AdminPage: Fetching users from webhook...');
+      const response = await fetch('https://n8n.agenticweaver.com/webhook/get-user-data', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'API call failed');
+      if (!response.ok) {
+        throw new Error(`Webhook responded with status: ${response.status} - ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('📦 AdminPage: Raw user webhook response:', data);
+      
+      // Handle different response formats
+      let users: User[];
+      if (Array.isArray(data)) {
+        users = data;
+      } else if (data.users && Array.isArray(data.users)) {
+        users = data.users;
+      } else if (data.data && Array.isArray(data.data)) {
+        users = data.data;
+      } else {
+        throw new Error('Invalid response format from user webhook');
+      }
+
+      console.log(`✅ AdminPage: Successfully loaded ${users.length} users from webhook`);
+      return users;
+    } catch (error) {
+      console.error('❌ AdminPage: Error fetching users from webhook:', error);
+      throw error;
     }
+  };
 
-    return response.json();
+  const fetchRolesFromWebhook = async () => {
+    try {
+      console.log('🔄 AdminPage: Fetching roles from webhook...');
+      const response = await fetch('https://n8n.agenticweaver.com/webhook/get-role-data', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Webhook responded with status: ${response.status} - ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('📦 AdminPage: Raw role webhook response:', data);
+      
+      // Handle different response formats
+      let roles: Role[];
+      if (Array.isArray(data)) {
+        roles = data;
+      } else if (data.roles && Array.isArray(data.roles)) {
+        roles = data.roles;
+      } else if (data.data && Array.isArray(data.data)) {
+        roles = data.data;
+      } else {
+        throw new Error('Invalid response format from role webhook');
+      }
+
+      console.log(`✅ AdminPage: Successfully loaded ${roles.length} roles from webhook`);
+      return roles;
+    } catch (error) {
+      console.error('❌ AdminPage: Error fetching roles from webhook:', error);
+      throw error;
+    }
   };
 
   const fetchUsers = async () => {
     try {
-      const data = await apiCall('/users');
-      setUsers(data);
+      const userData = await fetchUsersFromWebhook();
+      setUsers(userData);
     } catch (err: any) {
-      setError('Failed to fetch users: ' + err.message);
+      console.error('Failed to fetch users from webhook:', err);
+      setError('Failed to fetch users from webhook: ' + err.message);
+      // Set empty array as fallback
+      setUsers([]);
     }
   };
 
   const fetchRoles = async () => {
     try {
-      const data = await apiCall('/roles');
-      setRoles(data);
+      const roleData = await fetchRolesFromWebhook();
+      setRoles(roleData);
     } catch (err: any) {
-      setError('Failed to fetch roles: ' + err.message);
+      console.error('Failed to fetch roles from webhook:', err);
+      setError('Failed to fetch roles from webhook: ' + err.message);
+      // Set empty array as fallback
+      setRoles([]);
     }
   };
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
+      setError(''); // Clear any previous errors
       await Promise.all([fetchUsers(), fetchRoles()]);
       setLoading(false);
     };
@@ -122,10 +208,11 @@ const AdminPage: React.FC<AdminPageProps> = () => {
   // User operations
   const handleCreateUser = async () => {
     try {
-      await apiCall('/users', {
-        method: 'POST',
-        body: JSON.stringify(userForm),
-      });
+      // TODO: Implement user creation webhook
+      console.log('User creation not yet implemented with webhook');
+      setError('User creation not yet implemented with webhook integration');
+      return;
+      
       setSuccess('User created successfully');
       setShowUserModal(false);
       resetUserForm();
@@ -144,10 +231,11 @@ const AdminPage: React.FC<AdminPageProps> = () => {
         delete (updateData as any).password;
       }
       
-      await apiCall(`/users/${editingUser.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(updateData),
-      });
+      // TODO: Implement user update webhook
+      console.log('User update not yet implemented with webhook');
+      setError('User update not yet implemented with webhook integration');
+      return;
+      
       setSuccess('User updated successfully');
       setShowUserModal(false);
       setEditingUser(null);
@@ -162,7 +250,11 @@ const AdminPage: React.FC<AdminPageProps> = () => {
     if (!confirm('Are you sure you want to delete this user?')) return;
     
     try {
-      await apiCall(`/users/${id}`, { method: 'DELETE' });
+      // TODO: Implement user deletion webhook
+      console.log('User deletion not yet implemented with webhook');
+      setError('User deletion not yet implemented with webhook integration');
+      return;
+      
       setSuccess('User deleted successfully');
       fetchUsers();
     } catch (err: any) {
@@ -173,10 +265,11 @@ const AdminPage: React.FC<AdminPageProps> = () => {
   // Role operations
   const handleCreateRole = async () => {
     try {
-      await apiCall('/roles', {
-        method: 'POST',
-        body: JSON.stringify(roleForm),
-      });
+      // TODO: Implement role creation webhook
+      console.log('Role creation not yet implemented with webhook');
+      setError('Role creation not yet implemented with webhook integration');
+      return;
+      
       setSuccess('Role created successfully');
       setShowRoleModal(false);
       resetRoleForm();
@@ -190,10 +283,11 @@ const AdminPage: React.FC<AdminPageProps> = () => {
     if (!editingRole) return;
     
     try {
-      await apiCall(`/roles/${editingRole.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(roleForm),
-      });
+      // TODO: Implement role update webhook
+      console.log('Role update not yet implemented with webhook');
+      setError('Role update not yet implemented with webhook integration');
+      return;
+      
       setSuccess('Role updated successfully');
       setShowRoleModal(false);
       setEditingRole(null);
@@ -208,7 +302,11 @@ const AdminPage: React.FC<AdminPageProps> = () => {
     if (!confirm('Are you sure you want to delete this role?')) return;
     
     try {
-      await apiCall(`/roles/${id}`, { method: 'DELETE' });
+      // TODO: Implement role deletion webhook
+      console.log('Role deletion not yet implemented with webhook');
+      setError('Role deletion not yet implemented with webhook integration');
+      return;
+      
       setSuccess('Role deleted successfully');
       fetchRoles();
     } catch (err: any) {
