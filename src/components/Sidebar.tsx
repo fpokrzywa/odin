@@ -40,10 +40,10 @@ const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed = false,
   onToggleCollapse
 }) => {
-  const [isFindAnswersExpanded, setIsFindAnswersExpanded] = useState(true);
-  const [isAutomateTasksExpanded, setIsAutomateTasksExpanded] = useState(true);
+  const [isFindAnswersExpanded, setIsFindAnswersExpanded] = useState(false);
+  const [isAutomateTasksExpanded, setIsAutomateTasksExpanded] = useState(false);
   const [isInformationExpanded, setIsInformationExpanded] = useState(false);
-  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(true);
+  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(false);
 
   const aiToolsItems = [
     { id: 'assistants', label: 'AI Assistants', icon: Bot },
@@ -166,13 +166,15 @@ const Sidebar: React.FC<SidebarProps> = ({
             <img src="/odin_icon_white.svg" alt="ODIN" className="w-8 h-8" />
             <h1 className="text-xl font-bold">ODIN</h1>
           </div>
-          <button
-            onClick={onToggleCollapse}
-            className="p-1 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors"
-            title="Collapse sidebar"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
+          {onToggleCollapse && (
+            <button
+              onClick={onToggleCollapse}
+              className="p-1 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors"
+              title="Collapse sidebar"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
 

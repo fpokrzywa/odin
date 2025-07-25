@@ -104,6 +104,7 @@ function App() {
   };
 
   const handleToggleSidebar = () => {
+    console.log('Toggle sidebar clicked, current state:', isSidebarCollapsed);
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
   // Always show landing page first, then show main app after sign in
