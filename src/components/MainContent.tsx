@@ -218,7 +218,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
   };
 
   return (
-    <div className="w-1/2 bg-gray-50 overflow-auto">
+    <div className="flex-1 bg-gray-50 overflow-auto">
       <div className="max-w-4xl mx-auto p-8">
         {getContentForSection()}
       </div>

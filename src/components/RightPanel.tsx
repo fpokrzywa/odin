@@ -21,7 +21,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
   const [selectedModel, setSelectedModel] = useState('GPT-4o');
 
   return (
-    <div className={`${isExpanded ? 'flex-1' : 'w-1/2'} bg-white border-l border-gray-200 h-screen flex flex-col relative`}>
+    <div className={`${isExpanded ? 'flex-1' : 'flex-1'} bg-white border-l border-gray-200 h-screen flex flex-col relative`}>
       {/* Header with Model Selector */}
       <div className="flex items-center justify-between p-4">
         {isFullScreen && onExpandAll && (

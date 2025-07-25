@@ -81,7 +81,6 @@ function App() {
       const odinAssistant = { name: 'ODIN', id: 'odin' };
       setSelectedAssistant(odinAssistant);
       setActiveSection('chat');
-      setIsSidebarCollapsed(true);
     }
     
     // Show main content when a Find Answers section is selected (keep existing functionality)
