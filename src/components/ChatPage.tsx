@@ -732,6 +732,9 @@ const ChatPage: React.FC<ChatPageProps> = ({
                         console.log('🖱️ ChatPage: Button clicked for assistant:', assistant);
                         handleAssistantSelect(assistant);
                       }}
+                     onMouseDown={(e) => {
+                       e.preventDefault(); // Prevent input blur
+                     }}
                       className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
                     >
                       <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center flex-shrink-0">
