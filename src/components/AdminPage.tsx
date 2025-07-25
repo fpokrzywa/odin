@@ -179,13 +179,20 @@ const AdminPage: React.FC<AdminPageProps> = () => {
         throw new Error('VITE_N8N_CREATE_USER_WEBHOOK_URL not configured');
       }
       
+      // Generate unique ID for the user
+      const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+      const userDataWithId = {
+        ...userData,
+        id: uniqueId
+      };
+      
       console.log('🔄 AdminPage: Creating user via n8n webhook:', webhookUrl);
       const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ data: userData })
+        body: JSON.stringify({ data: userDataWithId })
       });
 
       if (!response.ok) {
@@ -275,13 +282,20 @@ const AdminPage: React.FC<AdminPageProps> = () => {
         throw new Error('VITE_N8N_CREATE_ROLE_WEBHOOK_URL not configured');
       }
       
+      // Generate unique ID for the role
+      const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+      const roleDataWithId = {
+        ...roleData,
+        id: uniqueId
+      };
+      
       console.log('🔄 AdminPage: Creating role via n8n webhook:', webhookUrl);
       const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ data: roleData })
+        body: JSON.stringify({ data: roleDataWithId })
       });
 
       if (!response.ok) {
@@ -387,12 +401,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
         ? 'Unable to connect to n8n role webhook. Please check your network connection and ensure CORS is configured on your n8n instance.'
         : err.message;
       setError('Failed to fetch roles: ' + errorMessage);
-      // Set fallback roles to prevent empty state
-      setRoles([
-        { id: 1, name: 'Admin', description: 'Full system access', permissions: '["user_management", "role_management", "system_settings"]', created_at: new Date().toISOString() },
-        { id: 2, name: 'User', description: 'Standard user access', permissions: '["basic_access"]', created_at: new Date().toISOString() },
-        { id: 3, name: 'Manager', description: 'Manager level access', permissions: '["basic_access", "team_management"]', created_at: new Date().toISOString() }
-      ]);
+      setRoles([]);
     }
   };
 
@@ -418,14 +427,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
   // User operations
   const handleCreateUser = async () => {
     try {
-      // Generate unique ID for new user
-      const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
-      const userDataWithId = {
-        ...userForm,
-        id: uniqueId
-      };
-      
-      await createUserViaWebhook(userDataWithId);
+      await createUserViaWebhook(userForm);
       setSuccess('User created successfully');
       setShowUserModal(false);
       resetUserForm();
@@ -470,11 +472,8 @@ const AdminPage: React.FC<AdminPageProps> = () => {
   // Role operations
   const handleCreateRole = async () => {
     try {
-      // Generate unique ID for new role
-      const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
       const roleData = {
         ...roleForm,
-        id: uniqueId,
         permissions: JSON.stringify(roleForm.permissions)
       };
       
@@ -564,7 +563,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
       setRoleForm({
         name: role.name,
         description: role.description || '',
-        permissions: JSON.parse(role.permissions || '[]')
+        permissions: JSON.parse(role.permissions)
       });
     } else {
       setEditingRole(null);
@@ -709,7 +708,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
                     className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                   >
                     <option value="all">All Roles</option>
-                    {roles.filter(role => role.id != null).map(role => (
+                    {roles.map(role => (
                       <option key={role.id} value={role.id.toString()}>{role.name}</option>
                     ))}
                   </select>
@@ -837,7 +836,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
                   <div>
                     <h4 className="text-sm font-medium text-gray-700 mb-2">Permissions:</h4>
                     <div className="flex flex-wrap gap-1">
-                      {JSON.parse(role.permissions || '[]').map((permission: string) => (
+                      {JSON.parse(role.permissions).map((permission: string) => (
                         <span
                           key={permission}
                           className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-orange-100 text-orange-800"
@@ -944,7 +943,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
                   {roles.length === 0 && (
                     <option value="">Loading roles...</option>
                   )}
-                  {roles.filter(role => role.id != null).map(role => (
+                  {roles.map(role => (
                     <option key={role.id} value={role.id}>{role.name}</option>
                   ))}
                 </select>
