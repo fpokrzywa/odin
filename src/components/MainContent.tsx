@@ -166,6 +166,13 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
     );
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !showAssistantDropdown) {
+      e.preventDefault(); // Prevent form submission
+      handleSend();
+    }
+  };
+
   const renderKnowledgeArticles = () => {
     if (isLoading) {
       return (
