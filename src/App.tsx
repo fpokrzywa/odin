@@ -95,6 +95,8 @@ function App() {
     setSelectedAssistant(assistant);
     // Navigate to chat page when assistant is selected
     setActiveSection('chat');
+    // Collapse sidebar when entering chat page
+    setIsSidebarCollapsed(true);
   };
 
   const handlePromptSelect = (promptText: string, assistantName: string) => {
@@ -107,6 +109,8 @@ function App() {
     
     // Navigate to chat page
     setActiveSection('chat');
+    // Collapse sidebar when entering chat page
+    setIsSidebarCollapsed(true);
   };
 
   const handleCollapseAll = () => {
