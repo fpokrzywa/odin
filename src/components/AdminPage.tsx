@@ -88,9 +88,13 @@ const AdminPage: React.FC<AdminPageProps> = () => {
   // n8n Webhook functions
   const fetchUsersFromWebhook = async () => {
     try {
-      const webhookUrl = '/n8n-proxy/get-users';
+      const webhookUrl = import.meta.env.VITE_N8N_GET_USERS_WEBHOOK_URL;
       
-      console.log('🔄 AdminPage: Fetching users from n8n webhook:', webhookUrl);
+      if (!webhookUrl) {
+        throw new Error('VITE_N8N_GET_USERS_WEBHOOK_URL not configured');
+      }
+      
+      console.log('🔄 AdminPage: Fetching users directly from n8n webhook:', webhookUrl);
       const response = await fetch(webhookUrl, {
         method: 'GET',
         headers: {
@@ -127,9 +131,13 @@ const AdminPage: React.FC<AdminPageProps> = () => {
 
   const fetchRolesFromWebhook = async () => {
     try {
-      const webhookUrl = '/n8n-proxy/get-roles';
+      const webhookUrl = import.meta.env.VITE_N8N_GET_ROLES_WEBHOOK_URL;
       
-      console.log('🔄 AdminPage: Fetching roles from n8n webhook:', webhookUrl);
+      if (!webhookUrl) {
+        throw new Error('VITE_N8N_GET_ROLES_WEBHOOK_URL not configured');
+      }
+      
+      console.log('🔄 AdminPage: Fetching roles directly from n8n webhook:', webhookUrl);
       const response = await fetch(webhookUrl, {
         method: 'GET',
         headers: {
@@ -171,7 +179,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
     } catch (err: any) {
       console.error('❌ AdminPage: Failed to fetch users from n8n webhook:', err);
       const errorMessage = err.message === 'Failed to fetch' 
-        ? 'Unable to connect to n8n user webhook. Please check your network connection and VITE_N8N_GET_USERS_WEBHOOK_URL configuration.'
+        ? 'Unable to connect to n8n user webhook. Please check your network connection and ensure CORS is configured on your n8n instance.'
         : err.message;
       setError('Failed to fetch users: ' + errorMessage);
       // Set empty array as fallback
@@ -186,7 +194,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
     } catch (err: any) {
       console.error('❌ AdminPage: Failed to fetch roles from n8n webhook:', err);
       const errorMessage = err.message === 'Failed to fetch' 
-        ? 'Unable to connect to n8n role webhook. Please check your network connection and VITE_N8N_GET_ROLES_WEBHOOK_URL configuration.'
+        ? 'Unable to connect to n8n role webhook. Please check your network connection and ensure CORS is configured on your n8n instance.'
         : err.message;
       setError('Failed to fetch roles: ' + errorMessage);
       // Set empty array as fallback
