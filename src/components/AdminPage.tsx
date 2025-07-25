@@ -121,7 +121,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
       }
 
       console.log(`✅ AdminPage: Successfully loaded ${users.length} users from n8n webhook`);
-      return users;
+      return users.filter(user => user != null);
     } catch (error) {
       console.error('❌ AdminPage: Error fetching users from n8n webhook:', error);
       throw error;
@@ -164,7 +164,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
       }
 
       console.log(`✅ AdminPage: Successfully loaded ${roles.length} roles from n8n webhook`);
-      return roles;
+      return roles.filter(role => role != null);
     } catch (error) {
       console.error('❌ AdminPage: Error fetching roles from n8n webhook:', error);
       throw error;
