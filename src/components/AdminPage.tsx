@@ -85,12 +85,16 @@ const AdminPage: React.FC<AdminPageProps> = () => {
     'analytics'
   ];
 
-  // Webhook functions
+  // n8n Webhook functions
   const fetchUsersFromWebhook = async () => {
     try {
-      console.log('🔄 AdminPage: Fetching users from webhook...');
-      const apiUrl = import.meta.env.VITE_API_URL || '/api';
-      const response = await fetch(`${apiUrl}/users`, {
+      const webhookUrl = import.meta.env.VITE_N8N_GET_USERS_WEBHOOK_URL;
+      if (!webhookUrl) {
+        throw new Error('VITE_N8N_GET_USERS_WEBHOOK_URL not configured in environment variables');
+      }
+      
+      console.log('🔄 AdminPage: Fetching users from n8n webhook:', webhookUrl);
+      const response = await fetch(webhookUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +102,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Webhook responded with status: ${response.status} - ${response.statusText}`);
+        throw new Error(`n8n webhook responded with status: ${response.status} - ${response.statusText}`);
       }
 
       const data = await response.json();
@@ -113,22 +117,26 @@ const AdminPage: React.FC<AdminPageProps> = () => {
       } else if (data.data && Array.isArray(data.data)) {
         users = data.data;
       } else {
-        throw new Error('Invalid response format from user webhook');
+        throw new Error('Invalid response format from n8n user webhook');
       }
 
-      console.log(`✅ AdminPage: Successfully loaded ${users.length} users from webhook`);
+      console.log(`✅ AdminPage: Successfully loaded ${users.length} users from n8n webhook`);
       return users;
     } catch (error) {
-      console.error('❌ AdminPage: Error fetching users from webhook:', error);
+      console.error('❌ AdminPage: Error fetching users from n8n webhook:', error);
       throw error;
     }
   };
 
   const fetchRolesFromWebhook = async () => {
     try {
-      console.log('🔄 AdminPage: Fetching roles from webhook...');
-      const apiUrl = import.meta.env.VITE_API_URL || '/api';
-      const response = await fetch(`${apiUrl}/roles`, {
+      const webhookUrl = import.meta.env.VITE_N8N_GET_ROLES_WEBHOOK_URL;
+      if (!webhookUrl) {
+        throw new Error('VITE_N8N_GET_ROLES_WEBHOOK_URL not configured in environment variables');
+      }
+      
+      console.log('🔄 AdminPage: Fetching roles from n8n webhook:', webhookUrl);
+      const response = await fetch(webhookUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -136,7 +144,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Webhook responded with status: ${response.status} - ${response.statusText}`);
+        throw new Error(`n8n webhook responded with status: ${response.status} - ${response.statusText}`);
       }
 
       const data = await response.json();
@@ -151,13 +159,13 @@ const AdminPage: React.FC<AdminPageProps> = () => {
       } else if (data.data && Array.isArray(data.data)) {
         roles = data.data;
       } else {
-        throw new Error('Invalid response format from role webhook');
+        throw new Error('Invalid response format from n8n role webhook');
       }
 
-      console.log(`✅ AdminPage: Successfully loaded ${roles.length} roles from webhook`);
+      console.log(`✅ AdminPage: Successfully loaded ${roles.length} roles from n8n webhook`);
       return roles;
     } catch (error) {
-      console.error('❌ AdminPage: Error fetching roles from webhook:', error);
+      console.error('❌ AdminPage: Error fetching roles from n8n webhook:', error);
       throw error;
     }
   };
@@ -167,9 +175,9 @@ const AdminPage: React.FC<AdminPageProps> = () => {
       const userData = await fetchUsersFromWebhook();
       setUsers(userData);
     } catch (err: any) {
-      console.error('❌ AdminPage: Failed to fetch users from webhook:', err);
+      console.error('❌ AdminPage: Failed to fetch users from n8n webhook:', err);
       const errorMessage = err.message === 'Failed to fetch' 
-        ? 'Unable to connect to user data webhook. Please check your network connection and webhook configuration.'
+        ? 'Unable to connect to n8n user webhook. Please check your network connection and VITE_N8N_GET_USERS_WEBHOOK_URL configuration.'
         : err.message;
       setError('Failed to fetch users: ' + errorMessage);
       // Set empty array as fallback
@@ -182,9 +190,9 @@ const AdminPage: React.FC<AdminPageProps> = () => {
       const roleData = await fetchRolesFromWebhook();
       setRoles(roleData);
     } catch (err: any) {
-      console.error('❌ AdminPage: Failed to fetch roles from webhook:', err);
+      console.error('❌ AdminPage: Failed to fetch roles from n8n webhook:', err);
       const errorMessage = err.message === 'Failed to fetch' 
-        ? 'Unable to connect to role data webhook. Please check your network connection and webhook configuration.'
+        ? 'Unable to connect to n8n role webhook. Please check your network connection and VITE_N8N_GET_ROLES_WEBHOOK_URL configuration.'
         : err.message;
       setError('Failed to fetch roles: ' + errorMessage);
       // Set empty array as fallback
