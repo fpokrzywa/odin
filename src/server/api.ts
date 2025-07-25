@@ -1,12 +1,21 @@
 import express from 'express';
 import cors from 'cors';
-import 'dotenv/config';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 const app = express();
 const PORT = 3001;
 
+// Add basic middleware
 app.use(cors());
 app.use(express.json());
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
 
 // n8n webhook proxy routes
 app.get('/n8n-proxy/get-users', async (req, res) => {
@@ -125,12 +134,18 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`API server running on http://localhost:${PORT}`);
+  console.log(`Health check available at http://localhost:${PORT}/health`);
   console.log('Environment check:');
   console.log('  - VITE_N8N_GET_USERS_WEBHOOK_URL:', process.env.VITE_N8N_GET_USERS_WEBHOOK_URL ? '✅ Configured' : '❌ Missing');
   console.log('  - VITE_N8N_GET_ROLES_WEBHOOK_URL:', process.env.VITE_N8N_GET_ROLES_WEBHOOK_URL ? '✅ Configured' : '❌ Missing');
   console.log('n8n proxy routes available at:');
   console.log('  - GET /n8n-proxy/get-users');
   console.log('  - GET /n8n-proxy/get-roles');
+}).on('error', (err) => {
+  console.error('❌ Failed to start server:', err);
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Please kill the existing process or use a different port.`);
+  }
 });
 
 export default app;
