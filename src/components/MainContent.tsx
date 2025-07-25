@@ -12,14 +12,16 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Load answers data when component mounts or when activeSection changes to knowledge-articles
+  // Load answers data when component mounts or when activeSection changes
   React.useEffect(() => {
-    if (activeSection === 'knowledge-articles') {
-      loadAnswersData();
+    // Check if this is a Find Answers section
+    const findAnswersSections = ['knowledge-articles', 'organization-chart', 'conference-rooms', 'customer-accounts', 'expense-reports'];
+    if (findAnswersSections.includes(activeSection)) {
+      loadAnswersData(activeSection);
     }
   }, [activeSection]);
 
-  const loadAnswersData = async (forceRefresh: boolean = false) => {
+  const loadAnswersData = async (sectionId: string, forceRefresh: boolean = false) => {
     if (forceRefresh) {
       setIsRefreshing(true);
     } else {
@@ -27,12 +29,17 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
     }
     
     try {
-      const data = await answersService.getAnswers(forceRefresh);
+      const data = await answersService.getAnswersForItem(sectionId);
+      if (!data) {
+        throw new Error(`No data found for section: ${sectionId}`);
+      }
       setAnswersData(data);
-      console.log('📦 MainContent: Loaded answers data:', data);
+      console.log('📦 MainContent: Loaded answers data for', sectionId, ':', data);
       console.log('🔗 MainContent: Webhook connection info:', answersService.getConnectionInfo());
     } catch (error) {
-      console.error('❌ MainContent: Error loading answers data:', error);
+      console.error('❌ MainContent: Error loading answers data for', sectionId, ':', error);
+      // Set null to trigger error state
+      setAnswersData(null);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -41,7 +48,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
 
   const handleRefresh = () => {
     console.log('🔄 MainContent: Refresh button clicked - forcing data refresh from webhook');
-    loadAnswersData(true);
+    loadAnswersData(activeSection, true);
   };
 
   const toggleArticle = (article: string) => {
@@ -67,7 +74,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         <div className="text-center py-16">
           <p className="text-gray-500">Failed to load knowledge articles</p>
           <button
-            onClick={() => loadAnswersData(true)}
+            onClick={() => loadAnswersData(activeSection, true)}
             className="mt-4 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
           >
             Retry
@@ -214,33 +221,15 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
   };
 
   const getContentForSection = () => {
+    // Check if this is a Find Answers section that should load from webhook
+    const findAnswersSections = ['knowledge-articles', 'organization-chart', 'conference-rooms', 'customer-accounts', 'expense-reports'];
+    
+    if (findAnswersSections.includes(activeSection)) {
+      return renderKnowledgeArticles();
+    }
+    
+    // Handle other sections with static content
     switch (activeSection) {
-      case 'knowledge-articles':
-        return renderKnowledgeArticles();
-      case 'organization-chart':
-        return renderGenericContent(
-          'Organization Chart',
-          'View and navigate your company\'s organizational structure with ease.',
-          Users
-        );
-      case 'conference-rooms':
-        return renderGenericContent(
-          'Conference Rooms',
-          'Find and book available conference rooms for your meetings.',
-          Video
-        );
-      case 'customer-accounts':
-        return renderGenericContent(
-          'Customer Accounts',
-          'Access and manage customer account information and details.',
-          CreditCard
-        );
-      case 'expense-reports':
-        return renderGenericContent(
-          'Expense Reports',
-          'Submit, track, and manage your expense reports efficiently.',
-          Receipt
-        );
       case 'software-apps':
         return renderGenericContent(
           'Get Software Apps',
@@ -272,7 +261,11 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
           Lock
         );
       default:
-        return renderKnowledgeArticles();
+        return (
+          <div className="text-center py-16">
+            <p className="text-gray-500">Section not found</p>
+          </div>
+        );
     }
   };
 

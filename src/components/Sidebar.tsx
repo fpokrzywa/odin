@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Bot, 
   BookOpen, 
@@ -20,6 +20,7 @@ import {
   LogOut,
   ChevronLeft
 } from 'lucide-react';
+import { answersService, type FindAnswersItem } from '../services/answersService';
 
 interface SidebarProps {
   activeSection: string;
@@ -45,19 +46,58 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [isInformationExpanded, setIsInformationExpanded] = useState(false);
   const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(false);
   const [isUserExpanded, setIsUserExpanded] = useState(false);
+  const [findAnswersItems, setFindAnswersItems] = useState<FindAnswersItem[]>([]);
+  const [isLoadingFindAnswers, setIsLoadingFindAnswers] = useState(false);
+
+  // Load Find Answers items from webhook
+  useEffect(() => {
+    const loadFindAnswersItems = async () => {
+      setIsLoadingFindAnswers(true);
+      try {
+        const response = await answersService.getFindAnswersItems();
+        setFindAnswersItems(response.items);
+        console.log('📋 Sidebar: Loaded Find Answers items:', response.items.length);
+      } catch (error) {
+        console.error('❌ Sidebar: Error loading Find Answers items:', error);
+        // Fallback items will be used from the service
+        const fallbackResponse = await answersService.getFindAnswersItems();
+        setFindAnswersItems(fallbackResponse.items);
+      } finally {
+        setIsLoadingFindAnswers(false);
+      }
+    };
+
+    loadFindAnswersItems();
+  }, []);
 
   const aiToolsItems = [
     { id: 'assistants', label: 'AI Assistants', icon: Bot },
     { id: 'prompt-catalog', label: 'Prompt Catalog', icon: BookOpen },
   ];
 
-  const findAnswersItems = [
-    { id: 'knowledge-articles', label: 'Knowledge articles', icon: BookOpen },
-    { id: 'organization-chart', label: 'Organization chart', icon: Users },
-    { id: 'conference-rooms', label: 'Conference rooms', icon: Building },
-    { id: 'customer-accounts', label: 'Customer accounts', icon: UserCheck },
-    { id: 'expense-reports', label: 'Expense reports', icon: Receipt },
-  ];
+  // Map webhook items to sidebar format with icons
+  const findAnswersMenuItems = findAnswersItems.map(item => ({
+    id: item.id,
+    label: item.title,
+    icon: getIconForItem(item.id)
+  }));
+
+  function getIconForItem(itemId: string) {
+    switch (itemId) {
+      case 'knowledge-articles':
+        return BookOpen;
+      case 'organization-chart':
+        return Users;
+      case 'conference-rooms':
+        return Building;
+      case 'customer-accounts':
+        return UserCheck;
+      case 'expense-reports':
+        return Receipt;
+      default:
+        return FileText;
+    }
+  }
 
   const automateTasksItems = [
     { id: 'get-software-apps', label: 'Get software apps', icon: Download },
@@ -250,7 +290,10 @@ const Sidebar: React.FC<SidebarProps> = ({
           </button>
           {isFindAnswersExpanded && (
             <ul className="space-y-1">
-              {findAnswersItems.map((item) => {
+              {isLoadingFindAnswers ? (
+                <li className="px-3 py-2 text-slate-300 text-sm">Loading...</li>
+              ) : (
+                findAnswersMenuItems.map((item) => {
                 const Icon = item.icon;
                 return (
                   <li key={item.id}>
@@ -267,7 +310,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </button>
                   </li>
                 );
-              })}
+                })
+              )}
             </ul>
           )}
         </div>
