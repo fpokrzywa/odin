@@ -56,7 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   const aiToolsItems = [
-    { icon: Users, label: 'AI Assistants', id: 'assistants' },
+    { icon: Users, label: 'AI Assistant Store', id: 'assistants' },
     { icon: Search, label: 'Prompt Catalog', id: 'prompt-catalog' },
   ];
 
