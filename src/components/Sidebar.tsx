@@ -43,8 +43,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     { icon: Video, label: 'Conference rooms', id: 'conference-rooms' },
     { icon: CreditCard, label: 'Customer accounts', id: 'customer-accounts' },
     { icon: Receipt, label: 'Expense reports', id: 'expense-reports' },
-    { icon: BookOpen, label: 'Resources', id: 'resources' },
-    { icon: FileText, label: 'Guidelines', id: 'guidelines' },
   ];
 
   const automateTasksItems = [
@@ -262,6 +260,56 @@ const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Admin Section - Only show for admin users */}
         {isAdmin && (
+        {isInformationExpanded && (
+          <div className="mb-8">
+            <button
+              onClick={handleInformationToggle}
+              className="flex items-center justify-between w-full px-6 py-2 text-xs font-semibold text-gray-300 uppercase tracking-wider hover:text-white transition-colors"
+            >
+              <span>Information</span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+            <nav className="space-y-1 mt-4">
+              <button
+                onClick={() => handleInformationItemClick('resources')}
+                className={`flex items-center px-6 py-2 text-sm font-medium transition-colors w-full text-left ${
+                  activeSection === 'resources'
+                    ? 'bg-orange-500 text-white'
+                    : 'text-gray-300 hover:bg-gray-600 hover:text-white'
+                }`}
+              >
+                <BookOpen className="mr-3 h-4 w-4" />
+                Resources
+              </button>
+              <button
+                onClick={() => handleInformationItemClick('guidelines')}
+                className={`flex items-center px-6 py-2 text-sm font-medium transition-colors w-full text-left ${
+                  activeSection === 'guidelines'
+                    ? 'bg-orange-500 text-white'
+                    : 'text-gray-300 hover:bg-gray-600 hover:text-white'
+                }`}
+              >
+                <FileText className="mr-3 h-4 w-4" />
+                Guidelines
+              </button>
+            </nav>
+          </div>
+        )}
+        
+        {!isInformationExpanded && (
+          <div className="mb-8">
+            <button
+              onClick={handleInformationToggle}
+              className="flex items-center justify-between w-full px-6 py-2 text-xs font-semibold text-gray-300 uppercase tracking-wider hover:text-white transition-colors"
+            >
+              <span>Information</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Admin Section - Only show for admin users */}
+        {isAdmin && (
           <div className="mb-8">
             <button
               onClick={handleAdministrationToggle}
@@ -273,49 +321,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               ) : (
                 <ChevronRight className="w-4 h-4" />
               )}
-            </button>
-            {isAdministrationExpanded && (
-              <nav className="space-y-1 mt-4">
-                <button
-                  onClick={() => handleAdministrationItemClick('admin-panel')}
-                  className={`flex items-center px-6 py-2 text-sm font-medium transition-colors w-full text-left ${
-                    activeSection === 'admin-panel'
-                      ? 'bg-orange-500 text-white'
-                      : 'text-gray-300 hover:bg-gray-600 hover:text-white'
-                  }`}
-                >
-                  <Lock className="mr-3 h-4 w-4" />
-                  Admin Panel
-                </button>
-              </nav>
-            )}
-          </div>
         )}
-      </div>
-
-      {/* Bottom Section */}
-      <div className="p-6 border-t border-gray-600 mt-auto bg-gray-800">
-        <a href="#" className="flex items-center text-sm text-gray-300 hover:text-white transition-colors">
-          {user ? (
-            <div className="w-full">
-              <div className="flex items-center text-sm text-gray-300 mb-2">
-                <Users className="mr-2 h-4 w-4" />
-                <span className="truncate">{user.email}</span>
-              </div>
-              <button 
-                onClick={onSignOut}
-                className="text-xs text-gray-400 hover:text-white transition-colors"
-              >
-                Sign out
-              </button>
-            </div>
-          ) : (
-            <>
-              <Users className="mr-2 h-4 w-4" />
-              Sign in
-            </>
-          )}
-        </a>
       </div>
     </div>
   );
