@@ -380,7 +380,15 @@ const AdminPage: React.FC<AdminPageProps> = () => {
   const fetchUsers = async () => {
     try {
       const userData = await fetchUsersFromWebhook();
-      setUsers(userData);
+      // Map role names to users
+      const usersWithRoleNames = userData.map(user => {
+        const role = roles.find(r => r.id === user.role_id);
+        return {
+          ...user,
+          role_name: role ? role.name : 'Unknown'
+        };
+      });
+      setUsers(usersWithRoleNames);
     } catch (err: any) {
       console.error('❌ AdminPage: Failed to fetch users from n8n webhook:', err);
       const errorMessage = err.message === 'Failed to fetch' 
@@ -409,11 +417,13 @@ const AdminPage: React.FC<AdminPageProps> = () => {
     const loadData = async () => {
       setLoading(true);
       setError('');
-      await Promise.all([fetchUsers(), fetchRoles()]);
+      // First fetch roles, then users (so we can map role names)
+      await fetchRoles();
+      await fetchUsers();
       setLoading(false);
     };
     loadData();
-  }, []);
+  }, [roles.length]); // Re-run when roles are loaded
 
   useEffect(() => {
     if (roles.length > 0 && !editingUser && userForm.role_id === 2) {
