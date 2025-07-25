@@ -33,7 +33,7 @@ const PromptCatalogPage: React.FC<PromptCatalogPageProps> = ({ onPromptSelect })
 
   // Load prompts from fallback data when component mounts
   React.useEffect(() => {
-    loadPrompts();
+    loadPrompts(true); // Force refresh from webhook on initial load
     loadUserProfile();
   }, []);
 
@@ -52,6 +52,7 @@ const PromptCatalogPage: React.FC<PromptCatalogPageProps> = ({ onPromptSelect })
     }
     
     try {
+      console.log('🔄 PromptCatalogPage: Loading prompts from webhook, forceRefresh:', forceRefresh);
       // Use fallback prompts data
       const fallbackPrompts: Prompt[] = [
         {
@@ -94,7 +95,8 @@ const PromptCatalogPage: React.FC<PromptCatalogPageProps> = ({ onPromptSelect })
       
       setPrompts(fallbackPrompts);
     } catch (error) {
-      console.error('Error loading prompts:', error);
+      console.error('❌ PromptCatalogPage: Error loading prompts:', error);
+      console.log('⚠️ PromptCatalogPage: Using fallback prompt data due to connection issues');
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -102,7 +104,7 @@ const PromptCatalogPage: React.FC<PromptCatalogPageProps> = ({ onPromptSelect })
   };
 
   const handleRefresh = () => {
-    console.log('Refresh button clicked - forcing data refresh');
+    console.log('🔄 PromptCatalogPage: Refresh button clicked - forcing data refresh from webhook');
     loadPrompts(true);
   };
 
