@@ -12,6 +12,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<string>('');
 
   // Load answers data when component mounts or when activeSection changes
   React.useEffect(() => {
@@ -30,41 +31,83 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
       setIsLoading(true);
     }
     setError(null);
+    setDebugInfo(`Loading section: ${sectionId}`);
     
     try {
       console.log('🔄 MainContent: Loading answers data for section:', sectionId);
       
-      // First try to get all items and find the one that matches
-      const allItems = await answersService.getFindAnswersItems();
+      // Get all items from webhook
+      const allItems = await answersService.getFindAnswersItems(forceRefresh);
       console.log('📦 MainContent: All items loaded:', allItems.items.length);
+      setDebugInfo(`Loaded ${allItems.items.length} items from webhook`);
       
-      // Try to find the item by ID or title
-      let matchedItem = allItems.items.find(item => 
-        item.id === sectionId || 
-        item.title.toLowerCase().replace(/\s+/g, '-') === sectionId ||
-        item.title.toLowerCase().replace(/\s+/g, '_') === sectionId
-      );
+      // Log all available items for debugging
+      console.log('📋 Available items:', allItems.items.map(item => ({
+        id: item.id,
+        title: item.title,
+        description: item.description
+      })));
       
-      // If not found by exact match, try partial matching
-      if (!matchedItem) {
-        matchedItem = allItems.items.find(item => 
-          item.id.includes(sectionId) || 
-          sectionId.includes(item.id) ||
-          item.title.toLowerCase().includes(sectionId.toLowerCase())
-        );
+      // Try multiple matching strategies
+      let matchedItem = null;
+      
+      // Strategy 1: Exact ID match
+      matchedItem = allItems.items.find(item => item.id === sectionId);
+      if (matchedItem) {
+        console.log('✅ Found exact ID match:', matchedItem.id);
+      } else {
+        // Strategy 2: Convert title to kebab-case and match
+        matchedItem = allItems.items.find(item => {
+          const titleAsId = item.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+          return titleAsId === sectionId;
+        });
+        if (matchedItem) {
+          console.log('✅ Found title-to-kebab match:', matchedItem.title, '→', sectionId);
+        } else {
+          // Strategy 3: Partial matching
+          matchedItem = allItems.items.find(item => 
+            item.id.includes(sectionId) || 
+            sectionId.includes(item.id) ||
+            item.title.toLowerCase().includes(sectionId.toLowerCase())
+          );
+          if (matchedItem) {
+            console.log('✅ Found partial match:', matchedItem.id, 'for', sectionId);
+          }
+        }
       }
       
-      console.log('🔍 MainContent: Looking for section:', sectionId);
-      console.log('🔍 MainContent: Available items:', allItems.items.map(item => ({ id: item.id, title: item.title })));
-      console.log('🔍 MainContent: Matched item:', matchedItem);
+      setDebugInfo(`Looking for: ${sectionId}, Found: ${matchedItem ? matchedItem.title : 'None'}`);
       
       if (matchedItem) {
         setAnswersData(matchedItem.data);
+        setDebugInfo(`Successfully loaded: ${matchedItem.title}`);
         console.log('✅ MainContent: Successfully loaded data for section:', sectionId);
       } else {
-        console.warn('⚠️ MainContent: No data found for section:', sectionId);
-        setError(`No content found for section: ${sectionId}`);
-        setAnswersData(data);
+        // Create fallback data if no match found
+        const fallbackData: AnswersData = {
+          title: `Content for ${sectionId}`,
+          description: 'This content is being loaded from the webhook.',
+          tryItYourself: {
+            scenario: 'This section contains helpful information and resources.',
+            actions: [
+              'Explore the available content',
+              'Ask ODIN questions about this topic'
+            ]
+          },
+          articles: [
+            {
+              id: 'sample-1',
+              policyName: 'Sample Article 1',
+              content: 'This is sample content while we load the real data from the webhook.',
+              isExpanded: false
+            }
+          ],
+          learnMoreLink: 'Learn more about this topic'
+        };
+        
+        setAnswersData(fallbackData);
+        setDebugInfo(`No match found for: ${sectionId}. Available: ${allItems.items.map(i => i.id).join(', ')}`);
+        console.warn('⚠️ MainContent: No data found for section:', sectionId, 'Available:', allItems.items.map(i => i.id));
       }
       
       console.log('🔗 MainContent: Webhook connection info:', answersService.getConnectionInfo());
@@ -72,6 +115,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
     } catch (error) {
       console.error('❌ MainContent: Error loading answers data for', sectionId, ':', error);
       setError(`Error loading content: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setDebugInfo(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setAnswersData(null);
     } finally {
       setIsLoading(false);
@@ -110,7 +154,9 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
           <p className="text-gray-500 mb-4">{error || 'Failed to load knowledge articles'}</p>
           <div className="text-sm text-gray-400 mb-4">
             <p>Section ID: {activeSection}</p>
+            <p>Debug: {debugInfo}</p>
             <p>Webhook configured: {answersService.isWebhookConfigured() ? 'Yes' : 'No'}</p>
+            <p>Connection: {JSON.stringify(answersService.getConnectionInfo())}</p>
           </div>
           <button
             onClick={() => loadAnswersData(activeSection, true)}
