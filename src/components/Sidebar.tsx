@@ -128,6 +128,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       setIsAutomateTasksExpanded(false);
       setIsInformationExpanded(false);
       setIsAdministrationExpanded(false);
+      setIsUserExpanded(false);
     }
   };
 
@@ -138,6 +139,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       setIsFindAnswersExpanded(false);
       setIsInformationExpanded(false);
       setIsAdministrationExpanded(false);
+      setIsUserExpanded(false);
     }
   };
 
@@ -148,6 +150,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       setIsFindAnswersExpanded(false);
       setIsAutomateTasksExpanded(false);
       setIsAdministrationExpanded(false);
+      setIsUserExpanded(false);
     }
   };
 
