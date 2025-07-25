@@ -177,13 +177,21 @@ const ChatPage: React.FC<ChatPageProps> = ({
   };
 
   const handleAssistantSelect = (assistant: string) => {
+    console.log('🎯 ChatPage: Assistant selected:', assistant);
+    console.log('🎯 ChatPage: Current atSymbolPosition:', atSymbolPosition);
+    console.log('🎯 ChatPage: Current inputValue:', inputValue);
+    
     if (atSymbolPosition !== -1) {
       const beforeAt = inputValue.substring(0, atSymbolPosition);
       const afterCursor = inputValue.substring(inputRef.current?.selectionStart || inputValue.length);
       
+      console.log('🎯 ChatPage: beforeAt:', beforeAt);
+      console.log('🎯 ChatPage: afterCursor:', afterCursor);
+      
       // Set the mentioned assistant and clear the @ mention from input
       setMentionedAssistant(assistant);
       const newValue = beforeAt + afterCursor;
+      console.log('🎯 ChatPage: Setting new input value:', newValue.trim());
       setInputValue(newValue.trim());
       
       setShowAssistantDropdown(false);
@@ -193,10 +201,13 @@ const ChatPage: React.FC<ChatPageProps> = ({
       setTimeout(() => {
         if (inputRef.current) {
           const newCursorPosition = beforeAt.length;
+          console.log('🎯 ChatPage: Setting cursor position:', newCursorPosition);
           inputRef.current.focus();
           inputRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
         }
       }, 0);
+    } else {
+      console.warn('⚠️ ChatPage: atSymbolPosition is -1, cannot select assistant');
     }
   };
 
@@ -698,7 +709,12 @@ const ChatPage: React.FC<ChatPageProps> = ({
                   {filteredAssistants.map((assistant) => (
                     <button
                       key={assistant}
-                      onClick={() => handleAssistantSelect(assistant)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('🖱️ ChatPage: Button clicked for assistant:', assistant);
+                        handleAssistantSelect(assistant);
+                      }}
                       className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
                     >
                       <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center flex-shrink-0">

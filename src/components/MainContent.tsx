@@ -294,7 +294,12 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
                     <ChevronDown className="w-5 h-5 text-gray-400" />
                   ) : (
                     <ChevronRight className="w-5 h-5 text-gray-400" />
-                  )}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('🖱️ MainContent: Button clicked for assistant:', assistant);
+                        handleAssistantSelect(assistant);
+                      }}
                 </button>
                 
                 {expandedArticles.includes(article.id) && (
