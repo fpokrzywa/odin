@@ -694,7 +694,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
                     className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                   >
                     <option value="all">All Roles</option>
-                    {roles.map(role => (
+                    {roles.filter(role => role && typeof role.id === 'number').map(role => (
                       <option key={role.id} value={role.id.toString()}>{role.name}</option>
                     ))}
                   </select>
@@ -929,7 +929,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
                   {roles.length === 0 && (
                     <option value="">Loading roles...</option>
                   )}
-                  {roles.map(role => (
+                  {roles.filter(role => role && typeof role.id === 'number').map(role => (
                     <option key={role.id} value={role.id}>{role.name}</option>
                   ))}
                 </select>
