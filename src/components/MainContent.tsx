@@ -11,6 +11,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
   const [answersData, setAnswersData] = useState<AnswersData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Load answers data when component mounts or when activeSection changes
   React.useEffect(() => {
@@ -28,22 +29,49 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
     } else {
       setIsLoading(true);
     }
+    setError(null);
     
     try {
       console.log('🔄 MainContent: Loading answers data for section:', sectionId);
-      const data = await answersService.getAnswersForItem(sectionId);
-      if (!data) {
-        console.warn('⚠️ MainContent: No data found for section:', sectionId);
-        // Set null to show section not found
-        setAnswersData(null);
-      } else {
-        setAnswersData(data);
-        console.log('✅ MainContent: Successfully loaded data for section:', sectionId);
+      
+      // First try to get all items and find the one that matches
+      const allItems = await answersService.getFindAnswersItems();
+      console.log('📦 MainContent: All items loaded:', allItems.items.length);
+      
+      // Try to find the item by ID or title
+      let matchedItem = allItems.items.find(item => 
+        item.id === sectionId || 
+        item.title.toLowerCase().replace(/\s+/g, '-') === sectionId ||
+        item.title.toLowerCase().replace(/\s+/g, '_') === sectionId
+      );
+      
+      // If not found by exact match, try partial matching
+      if (!matchedItem) {
+        matchedItem = allItems.items.find(item => 
+          item.id.includes(sectionId) || 
+          sectionId.includes(item.id) ||
+          item.title.toLowerCase().includes(sectionId.toLowerCase())
+        );
       }
+      
+      console.log('🔍 MainContent: Looking for section:', sectionId);
+      console.log('🔍 MainContent: Available items:', allItems.items.map(item => ({ id: item.id, title: item.title })));
+      console.log('🔍 MainContent: Matched item:', matchedItem);
+      
+      if (matchedItem) {
+        setAnswersData(matchedItem.data);
+        console.log('✅ MainContent: Successfully loaded data for section:', sectionId);
+      } else {
+        console.warn('⚠️ MainContent: No data found for section:', sectionId);
+        setError(`No content found for section: ${sectionId}`);
+        setAnswersData(data);
+      }
+      
       console.log('🔗 MainContent: Webhook connection info:', answersService.getConnectionInfo());
       console.log('💾 MainContent: Cache status:', answersService.getCacheStatus());
     } catch (error) {
       console.error('❌ MainContent: Error loading answers data for', sectionId, ':', error);
+      setError(`Error loading content: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setAnswersData(null);
     } finally {
       setIsLoading(false);
@@ -76,10 +104,14 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
       );
     }
 
-    if (!answersData) {
+    if (error || !answersData) {
       return (
         <div className="text-center py-16">
-          <p className="text-gray-500">Failed to load knowledge articles</p>
+          <p className="text-gray-500 mb-4">{error || 'Failed to load knowledge articles'}</p>
+          <div className="text-sm text-gray-400 mb-4">
+            <p>Section ID: {activeSection}</p>
+            <p>Webhook configured: {answersService.isWebhookConfigured() ? 'Yes' : 'No'}</p>
+          </div>
           <button
             onClick={() => loadAnswersData(activeSection, true)}
             className="mt-4 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
