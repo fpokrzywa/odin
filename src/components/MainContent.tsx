@@ -110,17 +110,17 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-lg p-6 mb-8">
           <div className="flex items-start space-x-3 mb-4">
             <Sparkles className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
-            <h2 className="text-lg font-semibold text-orange-900">{answersData.tryItSection.title}</h2>
+            <h2 className="text-lg font-semibold text-orange-900">Try it yourself!</h2>
           </div>
           
           <div className="text-gray-700 mb-4">
-            <p className="mb-4">{answersData.tryItSection.description}</p>
+            <p className="mb-4">{answersData.tryItYourself.scenario}</p>
             
             <ul className="space-y-2 ml-4">
-              {answersData.tryItSection.bulletPoints.map((point, index) => (
+              {answersData.tryItYourself.actions.map((action, index) => (
                 <li key={index} className="flex items-start">
                   <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span>{point}</span>
+                  <span>{action}</span>
                 </li>
               ))}
             </ul>
@@ -130,17 +130,17 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         {/* Articles Section */}
         <div className="mb-8">
           <h3 className="text-xl font-semibold text-gray-900 mb-6">
-            {answersData.articlesSection.title}
+            Here are the sample articles that power the answers about your questions
           </h3>
           
           <div className="space-y-3">
-            {answersData.articlesSection.articles.map((article) => (
+            {answersData.articles.map((article) => (
               <div key={article.id} className="bg-white border border-gray-200 rounded-lg">
                 <button
                   onClick={() => toggleArticle(article.id)}
                   className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
                 >
-                  <span className="font-medium text-gray-900">{article.title}</span>
+                  <span className="font-medium text-gray-900">{article.policyName}</span>
                   {expandedArticles.includes(article.id) ? (
                     <ChevronDown className="w-5 h-5 text-gray-400" />
                   ) : (
@@ -164,7 +164,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         {answersData.learnMoreLink && (
           <div className="flex items-center space-x-2 text-orange-600 hover:text-orange-700 transition-colors cursor-pointer">
             <ArrowRight className="w-4 h-4" />
-            <span className="font-medium">{answersData.learnMoreLink.text}</span>
+            <span className="font-medium">{answersData.learnMoreLink}</span>
           </div>
         )}
       </>

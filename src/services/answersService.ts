@@ -1,7 +1,7 @@
 // Service for handling Find Answers data from n8n webhook
 export interface AnswerArticle {
   id: string;
-  title: string;
+  policyName: string;
   content: string;
   category?: string;
   isExpanded?: boolean;
@@ -18,19 +18,12 @@ export interface FindAnswersItem {
 export interface AnswersData {
   title: string;
   description: string;
-  tryItSection: {
-    title: string;
-    description: string;
-    bulletPoints: string[];
+  tryItYourself: {
+    scenario: string;
+    actions: string[];
   };
-  articlesSection: {
-    title: string;
-    articles: AnswerArticle[];
-  };
-  learnMoreLink?: {
-    text: string;
-    url: string;
-  };
+  articles: AnswerArticle[];
+  learnMoreLink?: string;
 }
 
 export interface FindAnswersResponse {
@@ -106,50 +99,44 @@ class AnswersService {
   }
 
   private transformWebhookData(data: any): FindAnswersResponse {
-    // Handle different response formats from n8n/webhook
-    let rawData: any;
+    // Handle the actual webhook data structure
+    let rawItems: any[];
     
     if (Array.isArray(data)) {
-      rawData = { items: data };
-    } else if (data.items) {
-      rawData = data;
-    } else if (data.data) {
-      rawData = data.data;
+      rawItems = data;
+    } else if (data.items && Array.isArray(data.items)) {
+      rawItems = data.items;
+    } else if (data.data && Array.isArray(data.data)) {
+      rawItems = data.data;
     } else {
-      rawData = data;
+      // Single item response
+      rawItems = [data];
     }
 
-    // Transform items to our expected format
-    const items = (rawData.items || []).map((item: any, index: number) => ({
-      id: item.id || `item-${index}`,
-      title: item.title || `Item ${index + 1}`,
+    // Transform items to match our interface
+    const items = rawItems.map((item: any) => ({
+      id: item.id || item._id?.$oid || Math.random().toString(36).substr(2, 9),
+      title: item.title || 'Untitled Item',
       description: item.description || '',
       icon: item.icon,
       data: {
-        title: item.data?.title || item.title || 'Knowledge articles',
-        description: item.data?.description || item.description || 'Find relevant information across all business systems.',
-        tryItSection: {
-          title: item.data?.tryItSection?.title || 'Try it yourself!',
-          description: item.data?.tryItSection?.description || 'Explore the available resources and get answers to your questions.',
-          bulletPoints: item.data?.tryItSection?.bulletPoints || [
+        title: item.title || 'Knowledge articles',
+        description: item.description || 'Find relevant information across all business systems.',
+        tryItYourself: {
+          scenario: item.tryItYourself?.scenario || 'Explore the available resources and get answers to your questions.',
+          actions: item.tryItYourself?.actions || [
             'Ask questions about the policies',
             'Find information tailored to your needs'
           ]
         },
-        articlesSection: {
-          title: item.data?.articlesSection?.title || 'Here are the sample articles that power the answers about your questions',
-          articles: (item.data?.articlesSection?.articles || item.data?.articles || []).map((article: any, articleIndex: number) => ({
-            id: article.id || `article-${articleIndex}`,
-            title: article.title || `Article ${articleIndex + 1}`,
-            content: article.content || `Sample content for ${article.title?.toLowerCase() || 'this article'}...`,
-            category: article.category,
-            isExpanded: false
-          }))
-        },
-        learnMoreLink: item.data?.learnMoreLink || {
-          text: 'Learn more about Enterprise Search',
-          url: '#'
-        }
+        articles: (item.articles || []).map((article: any, articleIndex: number) => ({
+          id: article.id || `article-${articleIndex}`,
+          policyName: article.policyName || `Article ${articleIndex + 1}`,
+          content: article.content || `Sample content for ${article.policyName?.toLowerCase() || 'this article'}...`,
+          category: article.category,
+          isExpanded: false
+        })),
+        learnMoreLink: item.learnMoreLink || 'Learn more about Enterprise Search'
       }
     }));
 
@@ -166,59 +153,52 @@ class AnswersService {
           data: {
             title: 'Knowledge articles',
             description: 'Moveworks quickly answers employee questions on any topic by finding relevant information across all the business systems.',
-            tryItSection: {
-              title: 'Try it yourself!',
-              description: 'Imagine you are an employee at BannerTech. You are curious about company policies and benefits. Here\'s what you can do with Moveworks:',
-              bulletPoints: [
+            tryItYourself: {
+              scenario: 'Imagine you are an employee at BannerTech. You are curious about company policies and benefits. Here\'s what you can do with Moveworks:',
+              actions: [
                 'Ask questions about the policies',
                 'Find information tailored to your needs. e.g. Can I take a two-week vacation based on my PTO balance?'
               ]
             },
-            articlesSection: {
-              title: 'Here are the sample articles that power the answers about your questions',
-              articles: [
-                {
-                  id: 'us-leave',
-                  title: 'US Leave Policies',
-                  content: 'Sample content for us leave policies...',
-                  isExpanded: false
-                },
-                {
-                  id: 'india-leave',
-                  title: 'India Leave Policies',
-                  content: 'Sample content for india leave policies...',
-                  isExpanded: false
-                },
-                {
-                  id: 'laptop-refresh',
-                  title: 'BannerTech Laptop Refresh Policy',
-                  content: 'Sample content for bannertech laptop refresh policy...',
-                  isExpanded: false
-                },
-                {
-                  id: 'troubleshooting-printers',
-                  title: 'Troubleshooting Printers',
-                  content: 'Sample content for troubleshooting printers...',
-                  isExpanded: false
-                },
-                {
-                  id: 'travel-expense',
-                  title: 'Global Travel & Expense Policy',
-                  content: 'Sample content for global travel & expense policy...',
-                  isExpanded: false
-                },
-                {
-                  id: 'workday-update',
-                  title: 'How to Update Personal Information in Workday',
-                  content: 'Sample content for how to update personal information in workday...',
-                  isExpanded: false
-                }
-              ]
-            },
-            learnMoreLink: {
-              text: 'Learn more about Enterprise Search',
-              url: '#'
-            }
+            articles: [
+              {
+                id: 'us-leave',
+                policyName: 'US Leave Policies',
+                content: 'Sample content for us leave policies...',
+                isExpanded: false
+              },
+              {
+                id: 'india-leave',
+                policyName: 'India Leave Policies',
+                content: 'Sample content for india leave policies...',
+                isExpanded: false
+              },
+              {
+                id: 'laptop-refresh',
+                policyName: 'BannerTech Laptop Refresh Policy',
+                content: 'Sample content for bannertech laptop refresh policy...',
+                isExpanded: false
+              },
+              {
+                id: 'troubleshooting-printers',
+                policyName: 'Troubleshooting Printers',
+                content: 'Sample content for troubleshooting printers...',
+                isExpanded: false
+              },
+              {
+                id: 'travel-expense',
+                policyName: 'Global Travel & Expense Policy',
+                content: 'Sample content for global travel & expense policy...',
+                isExpanded: false
+              },
+              {
+                id: 'workday-update',
+                policyName: 'How to Update Personal Information in Workday',
+                content: 'Sample content for how to update personal information in workday...',
+                isExpanded: false
+              }
+            ],
+            learnMoreLink: 'Learn more about Enterprise Search'
           }
         },
         {
@@ -228,22 +208,15 @@ class AnswersService {
           data: {
             title: 'Organization Chart',
             description: 'View and navigate your company\'s organizational structure with ease.',
-            tryItSection: {
-              title: 'Coming Soon!',
-              description: 'This feature is currently being developed.',
-              bulletPoints: [
+            tryItYourself: {
+              scenario: 'This feature is currently being developed.',
+              actions: [
                 'Intuitive interface for easy navigation',
                 'Real-time updates and notifications'
               ]
             },
-            articlesSection: {
-              title: 'Related Resources',
-              articles: []
-            },
-            learnMoreLink: {
-              text: 'Learn more about Organization Management',
-              url: '#'
-            }
+            articles: [],
+            learnMoreLink: 'Learn more about Organization Management'
           }
         },
         {
@@ -253,22 +226,15 @@ class AnswersService {
           data: {
             title: 'Conference Rooms',
             description: 'Find and book available conference rooms for your meetings.',
-            tryItSection: {
-              title: 'Coming Soon!',
-              description: 'This feature is currently being developed.',
-              bulletPoints: [
+            tryItYourself: {
+              scenario: 'This feature is currently being developed.',
+              actions: [
                 'Real-time room availability',
                 'Easy booking interface'
               ]
             },
-            articlesSection: {
-              title: 'Related Resources',
-              articles: []
-            },
-            learnMoreLink: {
-              text: 'Learn more about Room Booking',
-              url: '#'
-            }
+            articles: [],
+            learnMoreLink: 'Learn more about Room Booking'
           }
         },
         {
@@ -278,22 +244,15 @@ class AnswersService {
           data: {
             title: 'Customer Accounts',
             description: 'Access and manage customer account information and details.',
-            tryItSection: {
-              title: 'Coming Soon!',
-              description: 'This feature is currently being developed.',
-              bulletPoints: [
+            tryItYourself: {
+              scenario: 'This feature is currently being developed.',
+              actions: [
                 'Comprehensive customer data',
                 'Secure access controls'
               ]
             },
-            articlesSection: {
-              title: 'Related Resources',
-              articles: []
-            },
-            learnMoreLink: {
-              text: 'Learn more about Customer Management',
-              url: '#'
-            }
+            articles: [],
+            learnMoreLink: 'Learn more about Customer Management'
           }
         },
         {
@@ -303,22 +262,15 @@ class AnswersService {
           data: {
             title: 'Expense Reports',
             description: 'Submit, track, and manage your expense reports efficiently.',
-            tryItSection: {
-              title: 'Coming Soon!',
-              description: 'This feature is currently being developed.',
-              bulletPoints: [
+            tryItYourself: {
+              scenario: 'This feature is currently being developed.',
+              actions: [
                 'Easy expense submission',
                 'Real-time tracking'
               ]
             },
-            articlesSection: {
-              title: 'Related Resources',
-              articles: []
-            },
-            learnMoreLink: {
-              text: 'Learn more about Expense Management',
-              url: '#'
-            }
+            articles: [],
+            learnMoreLink: 'Learn more about Expense Management'
           }
         }
       ]
