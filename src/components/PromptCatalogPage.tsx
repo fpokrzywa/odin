@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Heart, ChevronDown, X, RefreshCw, Edit3, Trash2 } from 'lucide-react';
 import { getCompanyName } from '../utils/companyConfig';
+import { openaiService, type Assistant } from '../services/openaiService';
 import { getCompanyBotName } from '../utils/companyConfig';
 
 interface Prompt {
@@ -29,11 +30,14 @@ const PromptCatalogPage: React.FC<PromptCatalogPageProps> = ({ onPromptSelect })
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [openaiAssistants, setOpenaiAssistants] = useState<Assistant[]>([]);
+  const [isLoadingAssistants, setIsLoadingAssistants] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
 
   // Load prompts from fallback data when component mounts
   React.useEffect(() => {
     loadPrompts(true); // Force refresh from webhook on initial load
+    loadOpenAIAssistants();
     loadUserProfile();
   }, []);
 
@@ -41,6 +45,23 @@ const PromptCatalogPage: React.FC<PromptCatalogPageProps> = ({ onPromptSelect })
     const savedProfile = localStorage.getItem('userProfile');
     if (savedProfile) {
       setUserProfile(JSON.parse(savedProfile));
+    }
+  };
+
+  const loadOpenAIAssistants = async () => {
+    setIsLoadingAssistants(true);
+    try {
+      const result = await openaiService.listAssistants();
+      const convertedAssistants = result.assistants.map(assistant => 
+        openaiService.convertToInternalFormat(assistant)
+      );
+      setOpenaiAssistants(convertedAssistants);
+      console.log('Loaded OpenAI assistants for PromptCatalogPage:', convertedAssistants.length);
+    } catch (error) {
+      console.error('Error loading OpenAI assistants for PromptCatalogPage:', error);
+      setOpenaiAssistants([]);
+    } finally {
+      setIsLoadingAssistants(false);
     }
   };
 
@@ -120,7 +141,10 @@ const PromptCatalogPage: React.FC<PromptCatalogPageProps> = ({ onPromptSelect })
     'Resume Assistant'
   ];
 
-  const availableAssistants = defaultAssistants;
+  // Use OpenAI assistants if available, otherwise use default list
+  const availableAssistants = openaiAssistants.length > 0 
+    ? openaiAssistants.map(assistant => assistant.name)
+    : defaultAssistants;
 
   // Filter prompts based on active tab
   const getFilteredPrompts = () => {

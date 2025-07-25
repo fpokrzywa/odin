@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Search, Heart, ExternalLink, ChevronDown } from 'lucide-react';
 import { mongoService, type MongoPrompt } from '../services/mongoService';
+import { openaiService, type Assistant } from '../services/openaiService';
 import { getCompanyName } from '../utils/companyConfig';
 import { getCompanyBotName } from '../utils/companyConfig';
 
@@ -36,6 +37,8 @@ const PromptCatalog: React.FC<PromptCatalogProps> = ({
   const [selectedFunctionalArea, setSelectedFunctionalArea] = useState('Select Functional Area...');
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [openaiAssistants, setOpenaiAssistants] = useState<Assistant[]>([]);
+  const [isLoadingAssistants, setIsLoadingAssistants] = useState(false);
 
   // Set the filter to the selected assistant when the overlay opens
   React.useEffect(() => {
@@ -75,11 +78,30 @@ const PromptCatalog: React.FC<PromptCatalogProps> = ({
       }
     };
 
+    const loadOpenAIAssistants = async () => {
+      if (isOpen) {
+        setIsLoadingAssistants(true);
+        try {
+          const result = await openaiService.listAssistants();
+          const convertedAssistants = result.assistants.map(assistant => 
+            openaiService.convertToInternalFormat(assistant)
+          );
+          setOpenaiAssistants(convertedAssistants);
+          console.log('Loaded OpenAI assistants for PromptCatalog:', convertedAssistants.length);
+        } catch (error) {
+          console.error('Error loading OpenAI assistants for PromptCatalog:', error);
+          setOpenaiAssistants([]);
+        } finally {
+          setIsLoadingAssistants(false);
+        }
+      }
+    };
     loadPrompts();
+    loadOpenAIAssistants();
   }, [isOpen]);
 
-   // All available assistants from the assistants page
-  const availableAssistants = [
+  // Default assistants as fallback
+  const defaultAssistants = [
     getCompanyBotName(),
     'IT Support',
     'HR Support',
@@ -91,6 +113,10 @@ const PromptCatalog: React.FC<PromptCatalogProps> = ({
     'Resume Assistant'
   ];
 
+  // Use OpenAI assistants if available, otherwise use default list
+  const availableAssistants = openaiAssistants.length > 0 
+    ? openaiAssistants.map(assistant => assistant.name)
+    : defaultAssistants;
   const filteredPrompts = prompts.filter(prompt => {
     const matchesSearch = prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          prompt.description.toLowerCase().includes(searchQuery.toLowerCase());
