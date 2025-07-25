@@ -232,32 +232,32 @@ function App() {
         {showMainContent && !isMainContentCollapsed && !isSidebarCollapsed && activeSection !== 'admin' && activeSection !== 'assistants' && activeSection !== 'prompt-catalog' && (
           <MainContent activeSection={activeSection} />
         )}
-        {activeSection === 'resources' && !isMainContentCollapsed && !isSidebarCollapsed && (
+        {activeSection === 'resources' && (
           <div className="flex-1 flex">
             <ResourcesPage />
           </div>
         )}
-        {activeSection === 'guidelines' && !isMainContentCollapsed && !isSidebarCollapsed && (
+        {activeSection === 'guidelines' && (
           <div className="flex-1 flex">
             <GuidelinesPage />
           </div>
         )}
-        {activeSection === 'admin' && !isMainContentCollapsed && !isSidebarCollapsed && (
+        {activeSection === 'admin' && (
           <div className="flex-1 flex">
             <AdminPage />
           </div>
         )}
-        {activeSection === 'assistants' && !isMainContentCollapsed && !isSidebarCollapsed && (
+        {activeSection === 'assistants' && (
           <div className="flex-1 flex">
             <AssistantsPage onAssistantSelect={handleAssistantSelect} />
           </div>
         )}
-        {activeSection === 'prompt-catalog' && !isMainContentCollapsed && !isSidebarCollapsed && (
+        {activeSection === 'prompt-catalog' && (
           <div className="flex-1 flex">
             <PromptCatalogPage onPromptSelect={handlePromptSelect} />
           </div>
         )}
-        {(activeSection === 'admin' || activeSection === 'assistants' || activeSection === 'prompt-catalog' || activeSection === 'resources' || activeSection === 'guidelines') && !isMainContentCollapsed && !isSidebarCollapsed ? null : (
+        {(activeSection === 'admin' || activeSection === 'assistants' || activeSection === 'prompt-catalog' || activeSection === 'resources' || activeSection === 'guidelines') ? null : (
           <RightPanel 
             isExpanded={!showMainContent || isSidebarCollapsed || activeSection === 'assistants' || activeSection === 'prompt-catalog' || activeSection === 'resources' || activeSection === 'guidelines'} 
             isFullScreen={isSidebarCollapsed}
