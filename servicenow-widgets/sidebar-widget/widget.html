@@ -1,0 +1,58 @@
+<div class="sidebar-widget">
+  <div class="sidebar-header">
+    <div class="logo-section">
+      <button class="logo-btn" ng-click="c.toggleMainContent()">
+        <div class="logo-icon">
+          <span class="glyphicon glyphicon-chevron-right"></span>
+        </div>
+        <span class="logo-text">Weaver</span>
+        <span class="playground-text">PLAYGROUND</span>
+      </button>
+      <button class="collapse-btn" ng-click="c.collapseAll()" title="Collapse sidebar">
+        <span class="glyphicon glyphicon-menu-hamburger"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="sidebar-content">
+    <!-- Find Answers Section -->
+    <div class="nav-section">
+      <h3 class="section-title">FIND ANSWERS</h3>
+      <nav class="nav-items">
+        <button ng-repeat="item in c.findAnswersItems" 
+                ng-click="c.setActiveSection(item.id)"
+                class="nav-item"
+                ng-class="{'active': c.data.activeSection === item.id}">
+          <span class="glyphicon" ng-class="item.icon"></span>
+          {{item.label}}
+        </button>
+      </nav>
+    </div>
+
+    <!-- Automate Tasks Section -->
+    <div class="nav-section">
+      <h3 class="section-title">AUTOMATE TASKS</h3>
+      <nav class="nav-items">
+        <button ng-repeat="item in c.automateTasksItems" 
+                ng-click="c.setActiveSection(item.id)"
+                class="nav-item"
+                ng-class="{'active': c.data.activeSection === item.id}">
+          <span class="glyphicon" ng-class="item.icon"></span>
+          {{item.label}}
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Bottom Section -->
+  <div class="sidebar-footer">
+    <div class="contact-section">
+      <p class="contact-text">Reach out to experience it live in your environment.</p>
+      <button class="btn btn-primary contact-btn">Contact Sales</button>
+    </div>
+    <a href="#" class="signin-link">
+      <span class="glyphicon glyphicon-user"></span>
+      Sign in
+    </a>
+  </div>
+</div>

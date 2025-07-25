@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_page">
+    <sp_page action="INSERT_OR_UPDATE">
+        <id>agentic_weaver_portal</id>
+        <title>Agentic Weaver Portal</title>
+        <css>
+            .portal-container {
+                display: flex;
+                height: 100vh;
+                background-color: #f3f4f6;
+            }
+            
+            .sidebar-container {
+                flex-shrink: 0;
+            }
+            
+            .main-container {
+                flex-shrink: 0;
+            }
+            
+            .right-container {
+                flex: 1;
+            }
+            
+            @media (max-width: 768px) {
+                .portal-container {
+                    flex-direction: column;
+                }
+                
+                .sidebar-container,
+                .main-container,
+                .right-container {
+                    width: 100% !important;
+                    flex: none;
+                }
+            }
+        </css>
+        <internal>false</internal>
+        <public>true</public>
+        <roles/>
+    </sp_page>
+</record_update>

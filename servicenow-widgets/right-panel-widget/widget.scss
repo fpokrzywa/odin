@@ -1,0 +1,218 @@
+.right-panel-widget {
+  width: 50%;
+  background-color: white;
+  border-left: 1px solid #e5e7eb;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  
+  &.expanded {
+    flex: 1;
+  }
+  
+  .panel-header {
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    
+    .expand-btn {
+      padding: 8px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+      
+      &:hover {
+        background-color: #f3f4f6;
+      }
+      
+      .glyphicon {
+        color: #4b5563;
+        font-size: 16px;
+      }
+    }
+  }
+  
+  .branding-section {
+    text-align: center;
+    padding: 32px;
+    
+    &.expanded {
+      padding: 64px;
+    }
+    
+    &.full-screen {
+      padding-top: 32px;
+    }
+    
+    .logo-container {
+      margin-bottom: 24px;
+      
+      .brand-logo {
+        width: 64px;
+        height: 64px;
+        object-fit: contain;
+        margin: 0 auto;
+        
+        &.large {
+          width: 96px;
+          height: 96px;
+        }
+      }
+    }
+    
+    .brand-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #111827;
+      margin-bottom: 8px;
+      
+      &.large {
+        font-size: 36px;
+      }
+    }
+    
+    .brand-description {
+      color: #374151;
+      font-size: 14px;
+      line-height: 1.6;
+      
+      &.large {
+        font-size: 18px;
+        max-width: 384px;
+        margin: 0 auto;
+      }
+    }
+  }
+  
+  .prompts-section {
+    padding: 0 24px;
+    margin-bottom: 24px;
+    
+    &.expanded {
+      padding: 0 64px;
+      max-width: 512px;
+      margin: 0 auto 24px auto;
+      width: 100%;
+    }
+    
+    .prompts-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background-color: #fff7ed;
+      border: 1px solid #fdba74;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      
+      &:hover {
+        background-color: #fed7aa;
+      }
+      
+      &.large {
+        padding: 16px;
+        font-size: 18px;
+      }
+      
+      .prompts-label {
+        font-weight: 500;
+        color: #9a3412;
+      }
+      
+      .glyphicon {
+        color: #ea580c;
+        font-size: 14px;
+        
+        &.large {
+          font-size: 16px;
+        }
+      }
+    }
+    
+    .prompts-list {
+      margin-top: 12px;
+      
+      .prompt-item {
+        padding: 12px 16px;
+        background-color: white;
+        border: 1px solid #fdba74;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        color: #374151;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-size: 14px;
+        
+        &:hover {
+          background-color: #fff7ed;
+        }
+        
+        &.large {
+          padding: 16px;
+          font-size: 16px;
+        }
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+  
+  .search-section {
+    padding: 0 24px 32px 24px;
+    margin-top: auto;
+    
+    &.expanded {
+      padding: 0 64px 32px 64px;
+      max-width: 512px;
+      margin: auto auto 32px auto;
+      width: 100%;
+    }
+    
+    .search-container {
+      position: relative;
+      
+      .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 14px;
+        
+        &.large {
+          font-size: 16px;
+          left: 16px;
+        }
+      }
+      
+      .search-input {
+        width: 100%;
+        padding: 12px 16px 12px 40px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+        transition: all 0.3s;
+        
+        &:focus {
+          border-color: #f97316;
+          box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+        }
+        
+        &.large {
+          padding: 16px 24px 16px 48px;
+          font-size: 18px;
+        }
+        
+        &::placeholder {
+          color: #9ca3af;
+        }
+      }
+    }
+  }
+}

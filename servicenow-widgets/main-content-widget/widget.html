@@ -1,0 +1,114 @@
+<div class="main-content-widget" ng-show="!c.data.isCollapsed">
+  <div class="content-container">
+    <!-- Knowledge Articles Content -->
+    <div ng-if="c.data.activeSection === 'knowledge-articles'">
+      <div class="content-header">
+        <h1 class="main-title">Knowledge articles</h1>
+        <p class="main-description">
+          Moveworks quickly answers employee questions on any topic by finding relevant information
+          across all the business systems.
+        </p>
+      </div>
+
+      <!-- Try it yourself section -->
+      <div class="try-section">
+        <div class="try-header">
+          <span class="glyphicon glyphicon-star try-icon"></span>
+          <h2 class="try-title">Try it yourself!</h2>
+        </div>
+        
+        <div class="try-content">
+          <p class="try-description">
+            Imagine you are an employee at BannerTech. You are curious about company policies
+            and benefits. Here's what you can do with Moveworks:
+          </p>
+          
+          <ul class="try-list">
+            <li class="try-item">
+              <span class="bullet"></span>
+              <span>Ask questions about the policies</span>
+            </li>
+            <li class="try-item">
+              <span class="bullet"></span>
+              <span>Find information tailored to your needs. e.g. Can I take a two-week vacation based on my PTO balance?</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Articles Section -->
+      <div class="articles-section">
+        <h3 class="articles-title">
+          Here are the sample articles that power the answers about your questions
+        </h3>
+        
+        <div class="articles-list">
+          <div ng-repeat="article in c.knowledgeArticles" class="article-item">
+            <button class="article-header" ng-click="c.toggleArticle(article.id)">
+              <span class="article-title">{{article.title}}</span>
+              <span class="glyphicon" 
+                    ng-class="c.isArticleExpanded(article.id) ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'">
+              </span>
+            </button>
+            
+            <div ng-if="c.isArticleExpanded(article.id)" class="article-content">
+              <div class="article-body">
+                <p>Sample content for {{article.title.toLowerCase()}}...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Learn More Link -->
+      <div class="learn-more">
+        <span class="glyphicon glyphicon-arrow-right learn-more-icon"></span>
+        <span class="learn-more-text">Learn more about Enterprise Search</span>
+      </div>
+    </div>
+
+    <!-- Generic Content for Other Sections -->
+    <div ng-if="c.data.activeSection !== 'knowledge-articles'">
+      <div class="content-header">
+        <div class="generic-header">
+          <span class="glyphicon generic-icon" ng-class="c.getCurrentSectionIcon()"></span>
+          <h1 class="main-title">{{c.getCurrentSectionTitle()}}</h1>
+        </div>
+        <p class="main-description">
+          {{c.getCurrentSectionDescription()}}
+        </p>
+      </div>
+
+      <div class="coming-soon-section">
+        <div class="coming-soon-header">
+          <span class="glyphicon glyphicon-star coming-soon-icon"></span>
+          <h2 class="coming-soon-title">Coming Soon!</h2>
+        </div>
+        
+        <div class="coming-soon-content">
+          <p>
+            This feature is currently being developed. Check back soon for updates and new functionality.
+          </p>
+        </div>
+      </div>
+
+      <div class="features-section">
+        <h3 class="features-title">What you can expect:</h3>
+        <ul class="features-list">
+          <li class="feature-item">
+            <span class="feature-bullet"></span>
+            <span>Intuitive interface for easy navigation</span>
+          </li>
+          <li class="feature-item">
+            <span class="feature-bullet"></span>
+            <span>Real-time updates and notifications</span>
+          </li>
+          <li class="feature-item">
+            <span class="feature-bullet"></span>
+            <span>Seamless integration with existing systems</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

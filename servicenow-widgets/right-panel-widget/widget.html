@@ -1,0 +1,57 @@
+<div class="right-panel-widget" ng-class="{'expanded': c.data.isExpanded, 'full-screen': c.data.isFullScreen}">
+  <!-- Full Screen Header -->
+  <div ng-if="c.data.isFullScreen" class="panel-header">
+    <button class="expand-btn" ng-click="c.expandAll()" title="Expand sidebar">
+      <span class="glyphicon glyphicon-menu-hamburger"></span>
+    </button>
+  </div>
+  
+  <!-- Branding Section -->
+  <div class="branding-section">
+    <div class="logo-container">
+      <img src="/aw_logo_v1_dark.png" 
+           alt="Agentic Weaver Logo" 
+           class="brand-logo"
+           ng-class="{'large': c.data.isExpanded}">
+    </div>
+    
+    <h2 class="brand-title" ng-class="{'large': c.data.isExpanded}">Agentic Weaver</h2>
+    <p class="brand-description" ng-class="{'large': c.data.isExpanded}">
+      Use sample resource on the left to experience AI transformation at work
+    </p>
+  </div>
+
+  <!-- Sample Prompts Section -->
+  <div class="prompts-section">
+    <button class="prompts-toggle" 
+            ng-click="c.toggleSamplePrompts()"
+            ng-class="{'large': c.data.isExpanded}">
+      <span class="prompts-label">Sample prompts</span>
+      <span class="glyphicon" 
+            ng-class="c.data.showSamplePrompts ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'">
+      </span>
+    </button>
+    
+    <div ng-if="c.data.showSamplePrompts" class="prompts-list">
+      <div ng-repeat="prompt in c.samplePrompts" 
+           class="prompt-item"
+           ng-class="{'large': c.data.isExpanded}"
+           ng-click="c.selectPrompt(prompt)">
+        "{{prompt}}"
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Input -->
+  <div class="search-section">
+    <div class="search-container">
+      <span class="glyphicon glyphicon-search search-icon" 
+            ng-class="{'large': c.data.isExpanded}"></span>
+      <input type="text" 
+             ng-model="c.data.searchQuery"
+             placeholder="Search for answers or give me an action"
+             class="search-input"
+             ng-class="{'large': c.data.isExpanded}">
+    </div>
+  </div>
+</div>
