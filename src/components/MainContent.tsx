@@ -15,7 +15,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
   // Load answers data when component mounts or when activeSection changes
   React.useEffect(() => {
     // Check if this is a Find Answers section
-    const findAnswersSections = ['knowledge-articles', 'organization-chart', 'conference-rooms', 'customer-accounts', 'expense-reports'];
+    const findAnswersSections = ['knowledge-articles', 'organization-chart', 'conference-rooms', 'customer-accounts', 'expense-reports', 'it-support-guides', 'hr-onboarding-materials', 'marketing-guidelines', 'sales-playbooks', 'finance-accounting-procedures'];
     if (findAnswersSections.includes(activeSection)) {
       loadAnswersData(activeSection);
     }
@@ -38,8 +38,9 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
       console.log('🔗 MainContent: Webhook connection info:', answersService.getConnectionInfo());
     } catch (error) {
       console.error('❌ MainContent: Error loading answers data for', sectionId, ':', error);
-      // Set null to trigger error state
-      setAnswersData(null);
+      // Use fallback data for the section
+      const fallbackData = await answersService.getAnswersForItem(sectionId);
+      setAnswersData(fallbackData);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
