@@ -46,13 +46,14 @@ function App() {
       setIsSignedIn(true);
       setShowSignInModal(false);
       setShowLanding(false);
-      setActiveSection('admin'); // Go directly to admin page
+      setActiveSection('assistants'); // Go to assistants page by default
     } else {
       // Regular user login
       setUser({ email });
       setIsSignedIn(true);
       setShowSignInModal(false);
       setShowLanding(false);
+      setActiveSection('assistants'); // Go to assistants page by default
     }
   };
 
@@ -60,7 +61,7 @@ function App() {
     setUser(null);
     setIsSignedIn(false);
     setShowLanding(true);
-    setActiveSection('knowledge-articles');
+    setActiveSection('assistants');
     setShowMainContent(false);
   };
 

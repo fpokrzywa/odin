@@ -262,33 +262,45 @@ const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Admin Section - Only show for admin users */}
         {isAdmin && (
+        {isInformationExpanded && (
+          <div className="mb-8">
+            <nav className="space-y-1 mt-4">
+              <button
+                onClick={() => handleInformationItemClick('resources')}
+                className={`flex items-center px-6 py-2 text-sm font-medium transition-colors w-full text-left ${
+                  activeSection === 'resources'
+                    ? 'bg-orange-500 text-white'
+                    : 'text-gray-300 hover:bg-gray-600 hover:text-white'
+                }`}
+              >
+                <BookOpen className="mr-3 h-4 w-4" />
+                Resources
+              </button>
+              <button
+                onClick={() => handleInformationItemClick('guidelines')}
+                className={`flex items-center px-6 py-2 text-sm font-medium transition-colors w-full text-left ${
+                  activeSection === 'guidelines'
+                    ? 'bg-orange-500 text-white'
+                    : 'text-gray-300 hover:bg-gray-600 hover:text-white'
+                }`}
+              >
+                <FileText className="mr-3 h-4 w-4" />
+                Guidelines
+              </button>
+            </nav>
+          </div>
+        )}
+
+        {/* Information Section Header - Always Visible */}
+        {!isInformationExpanded && (
           <div className="mb-8">
             <button
-              onClick={handleAdministrationToggle}
+              onClick={handleInformationToggle}
               className="flex items-center justify-between w-full px-6 py-2 text-xs font-semibold text-gray-300 uppercase tracking-wider hover:text-white transition-colors"
             >
-              <span>Administration</span>
-              {isAdministrationExpanded ? (
-                <ChevronDown className="w-4 h-4" />
-              ) : (
-                <ChevronRight className="w-4 h-4" />
-              )}
+              <span>Information</span>
+              <ChevronRight className="w-4 h-4" />
             </button>
-            {isAdministrationExpanded && (
-              <nav className="space-y-1 mt-4">
-                <button
-                  onClick={() => handleAdministrationItemClick('admin')}
-                  className={`flex items-center px-6 py-2 text-sm font-medium transition-colors w-full text-left ${
-                    activeSection === 'admin'
-                      ? 'bg-orange-500 text-white'
-                      : 'text-gray-300 hover:bg-gray-600 hover:text-white'
-                  }`}
-                >
-                  <Users className="mr-3 h-4 w-4" />
-                  User Management
-                </button>
-              </nav>
-            )}
           </div>
         )}
       </div>
