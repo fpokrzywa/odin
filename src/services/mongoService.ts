@@ -167,6 +167,7 @@ class MongoService {
             owner: prompt.owner || ''
           }
           )
+          )
           console.log(`✅ Successfully loaded ${validatedPrompts.length} prompts from n8n webhook`);
 
           console.log(`✅ Successfully loaded ${validatedPrompts.length} prompts from n8n webhook`);
