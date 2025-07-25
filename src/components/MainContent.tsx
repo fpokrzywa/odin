@@ -14,10 +14,15 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
 
   // Load answers data when component mounts or when activeSection changes
   React.useEffect(() => {
+    console.log('MainContent: activeSection changed to:', activeSection);
     // Check if this is a Find Answers section
-    const findAnswersSections = ['knowledge-articles', 'organization-chart', 'conference-rooms', 'customer-accounts', 'expense-reports', 'it-support-guides', 'hr-onboarding-materials', 'marketing-guidelines', 'sales-playbooks', 'finance-accounting-procedures'];
-    if (findAnswersSections.includes(activeSection)) {
+    // Load data for any section that's not in the excluded list (AI tools, admin sections, etc.)
+    const excludedSections = ['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'];
+    if (activeSection && !excludedSections.includes(activeSection)) {
+      console.log('MainContent: Loading data for Find Answers section:', activeSection);
       loadAnswersData(activeSection);
+    } else {
+      console.log('MainContent: Section excluded from Find Answers loading:', activeSection);
     }
   }, [activeSection]);
 

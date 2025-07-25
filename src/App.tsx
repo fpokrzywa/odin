@@ -303,16 +303,18 @@ function App() {
           </div>
         )}
         {/* Find Answers sections with MainContent and RightPanel */}
-        {!isSidebarCollapsed && (activeSection === 'knowledge-articles' || 
-         activeSection === 'organization-chart' || 
-         activeSection === 'conference-rooms' || 
-         activeSection === 'customer-accounts' || 
-         activeSection === 'expense-reports' ||
-         activeSection === 'it-support-guides' ||
-         activeSection === 'hr-onboarding-materials' ||
-         activeSection === 'marketing-guidelines' ||
-         activeSection === 'sales-playbooks' ||
-         activeSection === 'finance-accounting-procedures') && (
+        {(activeSection === 'knowledge-articles' || 
+          activeSection === 'it-support-guides' ||
+          activeSection === 'hr-onboarding-materials' ||
+          activeSection === 'marketing-guidelines' ||
+          activeSection === 'sales-playbooks' ||
+          activeSection === 'finance-accounting-procedures' ||
+          activeSection === 'organization-chart' || 
+          activeSection === 'conference-rooms' || 
+          activeSection === 'customer-accounts' || 
+          activeSection === 'expense-reports' ||
+          // Handle any other dynamic sections from webhook
+          (activeSection && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection))) && (
           <>
             <MainContent activeSection={activeSection} />
             <RightPanel 

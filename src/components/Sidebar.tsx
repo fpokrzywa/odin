@@ -173,6 +173,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const handleFindAnswersItemClick = (sectionId: string) => {
+    console.log('Find Answers item clicked:', sectionId);
     if (!isFindAnswersExpanded) {
       setIsFindAnswersExpanded(true);
       setIsAutomateTasksExpanded(false);
