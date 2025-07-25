@@ -206,7 +206,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       setIsAutomateTasksExpanded(false);
       setIsAdministrationExpanded(false);
       setIsUserExpanded(false);
-      setIsUserExpanded(false);
     }
     onSectionChange(sectionId);
   };
@@ -217,7 +216,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       setIsFindAnswersExpanded(false);
       setIsAutomateTasksExpanded(false);
       setIsInformationExpanded(false);
-      setIsUserExpanded(false);
       setIsUserExpanded(false);
     }
     onSectionChange(sectionId);
