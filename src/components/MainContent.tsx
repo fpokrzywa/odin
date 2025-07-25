@@ -148,10 +148,10 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
       );
     }
 
-    if (error || !answersData) {
+    if (error) {
       return (
         <div className="text-center py-16">
-          <p className="text-gray-500 mb-4">{error || 'Failed to load knowledge articles'}</p>
+          <p className="text-gray-500 mb-4">{error}</p>
           <div className="text-sm text-gray-400 mb-4">
             <p>Section ID: {activeSection}</p>
             <p>Debug: {debugInfo}</p>
@@ -167,6 +167,28 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         </div>
       );
     }
+
+    if (!answersData) {
+      return (
+        <div className="text-center py-16">
+          <p className="text-gray-500 mb-4">No data available for this section</p>
+          <div className="text-sm text-gray-400 mb-4">
+            <p>Section ID: {activeSection}</p>
+            <p>Debug: {debugInfo}</p>
+            <p>Webhook configured: {answersService.isWebhookConfigured() ? 'Yes' : 'No'}</p>
+            <p>Connection: {JSON.stringify(answersService.getConnectionInfo())}</p>
+          </div>
+          <button
+            onClick={() => loadAnswersData(activeSection, true)}
+            className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      );
+    }
+
+    console.log('🎨 MainContent: Rendering content with data:', answersData);
 
     return (
       <>
@@ -192,7 +214,8 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         </div>
 
         {/* Try it yourself section */}
-        <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-lg p-6 mb-8">
+        {answersData.tryItYourself && (
+          <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-lg p-6 mb-8">
           <div className="flex items-start space-x-3 mb-4">
             <Sparkles className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
             <h2 className="text-lg font-semibold text-orange-900">Try it yourself!</h2>
@@ -210,10 +233,12 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
               ))}
             </ul>
           </div>
-        </div>
+          </div>
+        )}
 
         {/* Articles Section */}
-        <div className="mb-8">
+        {answersData.articles && answersData.articles.length > 0 && (
+          <div className="mb-8">
           <h3 className="text-xl font-semibold text-gray-900 mb-6">
             Here are the sample articles that power the answers about your questions
           </h3>
@@ -243,7 +268,8 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
               </div>
             ))}
           </div>
-        </div>
+          </div>
+        )}
 
         {/* Learn More Link */}
         {answersData.learnMoreLink && (
@@ -252,6 +278,20 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
             <span className="font-medium">{answersData.learnMoreLink}</span>
           </div>
         )}
+
+        {/* Debug Information */}
+        <div className="mt-8 p-4 bg-gray-100 rounded-lg text-sm text-gray-600">
+          <p><strong>Debug Info:</strong> {debugInfo}</p>
+          <p><strong>Section:</strong> {activeSection}</p>
+          <p><strong>Has Data:</strong> {answersData ? 'Yes' : 'No'}</p>
+          {answersData && (
+            <>
+              <p><strong>Title:</strong> {answersData.title}</p>
+              <p><strong>Articles Count:</strong> {answersData.articles?.length || 0}</p>
+              <p><strong>Try It Yourself:</strong> {answersData.tryItYourself ? 'Yes' : 'No'}</p>
+            </>
+          )}
+        </div>
       </>
     );
   };
