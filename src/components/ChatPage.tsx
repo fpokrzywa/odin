@@ -157,12 +157,13 @@ const ChatPage: React.FC<ChatPageProps> = ({
     const atIndex = value.lastIndexOf('@', cursorPosition - 1);
     if (atIndex !== -1 && (atIndex === 0 || value[atIndex - 1] === ' ')) {
       const searchTerm = value.substring(atIndex + 1, cursorPosition).toLowerCase();
+     console.log('🔍 ChatPage: @ detected, searchTerm:', searchTerm, 'availableAssistants:', availableAssistants);
       const filtered = availableAssistants.filter(assistant => 
         assistant !== selectedAssistant?.name && // Exclude current assistant
         assistant.toLowerCase().includes(searchTerm)
       );
       
-      console.log('Filtering assistants:', { searchTerm, filtered, availableAssistants });
+     console.log('🎯 ChatPage: Filtered assistants:', filtered);
       setFilteredAssistants(filtered);
       setAtSymbolPosition(atIndex);
       setShowAssistantDropdown(true);
@@ -181,22 +182,15 @@ const ChatPage: React.FC<ChatPageProps> = ({
     console.log('🎯 ChatPage: Assistant selected:', assistant);
     console.log('🎯 ChatPage: Current atSymbolPosition:', atSymbolPosition);
     console.log('🎯 ChatPage: Current inputValue:', inputValue);
-    console.log('🎯 ChatPage: Current cursor position:', inputRef.current?.selectionStart);
     
     if (atSymbolPosition !== -1) {
-      // Get the current cursor position
-      const cursorPosition = inputRef.current?.selectionStart || inputValue.length;
-      
-      // Find the end of the @ mention (space or end of string)
-      let mentionEnd = cursorPosition;
-      for (let i = atSymbolPosition + 1; i < inputValue.length; i++) {
-        if (inputValue[i] === ' ') {
-          mentionEnd = i;
-          break;
-        }
-        mentionEnd = i + 1;
-      }
-      
+     // Find where the @ mention should end (next space or end of string)
+     let mentionEnd = atSymbolPosition + 1;
+     while (mentionEnd < inputValue.length && inputValue[mentionEnd] !== ' ') {
+       mentionEnd++;
+     }
+     return; // Don't process Enter when dropdown is open
+     
       const beforeAt = inputValue.substring(0, atSymbolPosition);
       const afterMention = inputValue.substring(mentionEnd);
       
@@ -241,13 +235,13 @@ const ChatPage: React.FC<ChatPageProps> = ({
     
     // Find the OpenAI assistant by name
     const openaiAssistant = openaiAssistants.find(assistant => assistant.name === assistantName);
-    const assistantId = openaiAssistant ? openaiAssistant.id : assistantName.toLowerCase().replace(/\s+/g, '_');
+   const assistantId = openaiAssistant ? openaiAssistant.id : `fallback_${assistantName.toLowerCase().replace(/\s+/g, '_')}`;
     
     console.log('🔍 ChatPage: Found assistant:', { assistantName, assistantId, openaiAssistant });
     
     // Create or switch to a thread for this assistant
     let targetThread = chatService.getAllThreads().find(thread => 
-      thread.assistantName === assistantName
+     thread.assistantId === assistantId || thread.assistantName === assistantName
     );
     
     if (!targetThread) {
@@ -304,7 +298,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
     
     if (e.key === 'Enter' && !showAssistantDropdown) {
       // Check if the message contains an @ mention
-      const atMentionMatch = inputValue.match(/@([^@\s]+(?:\s+[^@\s]+)*)\s*(.*)/);
+     const atMentionMatch = inputValue.match(/@([A-Za-z0-9\s]+?)\s+(.+)/);
       if (atMentionMatch) {
         const mentionedAssistantName = atMentionMatch[1].trim();
         const messageText = atMentionMatch[2].trim();
@@ -314,8 +308,12 @@ const ChatPage: React.FC<ChatPageProps> = ({
         // Check if the mentioned assistant exists in our OpenAI assistants
         if (availableAssistants.includes(mentionedAssistantName) && messageText) {
           console.log('✅ ChatPage: Routing message to assistant:', mentionedAssistantName);
+         // Find the OpenAI assistant to get the real ID
+         const targetAssistant = openaiAssistants.find(a => a.name === mentionedAssistantName);
+         console.log('🔍 ChatPage: Found OpenAI assistant:', targetAssistant);
           setPendingAssistantMessage({ assistant: mentionedAssistantName, message: messageText });
           setInputValue('');
+         setMentionedAssistant(null);
           return;
         } else if (!messageText) {
           console.log('⚠️ ChatPage: No message text after @ mention');
