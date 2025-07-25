@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
+const dotenv = require('dotenv');
 
 // Load environment variables
 dotenv.config();
@@ -146,6 +146,7 @@ app.listen(PORT, () => {
   if (err.code === 'EADDRINUSE') {
     console.error(`Port ${PORT} is already in use. Please kill the existing process or use a different port.`);
   }
+  process.exit(1);
 });
 
-export default app;
+module.exports = app;
