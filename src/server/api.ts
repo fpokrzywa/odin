@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
-import { userOperations, roleOperations, CreateUserData, UpdateUserData, CreateRoleData, UpdateRoleData, initializeDatabase } from '../database/mongodb';
+// import { userOperations, roleOperations, CreateUserData, UpdateUserData, CreateRoleData, UpdateRoleData, initializeDatabase } from '../database/mongodb';
 
 const app = express();
 const PORT = 3001;
@@ -63,10 +63,10 @@ app.get('/n8n-proxy/get-roles', async (req, res) => {
 });
 
 // Initialize database connection with better error handling
-initializeDatabase().catch(error => {
-  console.error('Failed to initialize database:', error);
-  console.error('API server will continue but database operations will fail');
-});
+// initializeDatabase().catch(error => {
+//   console.error('Failed to initialize database:', error);
+//   console.error('API server will continue but database operations will fail');
+// });
 
 // Authentication middleware
 const authenticateAdmin = (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -77,184 +77,56 @@ const authenticateAdmin = (req: express.Request, res: express.Response, next: ex
 
 // User routes
 app.get('/api/users', authenticateAdmin, async (req, res) => {
-  try {
-    const users = await userOperations.getAll();
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch users' });
-  }
+  res.status(501).json({ error: 'User operations not implemented yet' });
 });
 
 app.get('/api/users/:id', authenticateAdmin, async (req, res) => {
-  try {
-    const user = await userOperations.getById(parseInt(req.params.id));
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch user' });
-  }
+  res.status(501).json({ error: 'User operations not implemented yet' });
 });
 
 app.post('/api/users', authenticateAdmin, async (req, res) => {
-  try {
-    const userData: CreateUserData = req.body;
-    
-    // Validate required fields
-    if (!userData.email || !userData.password || !userData.role_id) {
-      return res.status(400).json({ error: 'Email, password, and role are required' });
-    }
-
-    const user = await userOperations.create(userData);
-    res.status(201).json(user);
-  } catch (error: any) {
-    if (error.code === 'SQLITE_CONSTRAINT' || error.message.includes('UNIQUE constraint failed')) {
-      res.status(400).json({ error: 'Email already exists' });
-    } else {
-      res.status(500).json({ error: 'Failed to create user' });
-    }
-  }
+  res.status(501).json({ error: 'User operations not implemented yet' });
 });
 
 app.put('/api/users/:id', authenticateAdmin, async (req, res) => {
-  try {
-    const userData: UpdateUserData = req.body;
-    const user = await userOperations.update(parseInt(req.params.id), userData);
-    
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    res.json(user);
-  } catch (error: any) {
-    if (error.code === 'SQLITE_CONSTRAINT' || error.message.includes('UNIQUE constraint failed')) {
-      res.status(400).json({ error: 'Email already exists' });
-    } else {
-      res.status(500).json({ error: 'Failed to update user' });
-    }
-  }
+  res.status(501).json({ error: 'User operations not implemented yet' });
 });
 
 app.delete('/api/users/:id', authenticateAdmin, async (req, res) => {
-  try {
-    const success = await userOperations.delete(parseInt(req.params.id));
-    if (!success) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    res.json({ message: 'User deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to delete user' });
-  }
+  res.status(501).json({ error: 'User operations not implemented yet' });
 });
 
 // Role routes
 app.get('/api/roles', authenticateAdmin, async (req, res) => {
-  try {
-    const roles = await roleOperations.getAll();
-    res.json(roles);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch roles' });
-  }
+  res.status(501).json({ error: 'Role operations not implemented yet' });
 });
 
 app.get('/api/roles/:id', authenticateAdmin, async (req, res) => {
-  try {
-    const role = await roleOperations.getById(parseInt(req.params.id));
-    if (!role) {
-      return res.status(404).json({ error: 'Role not found' });
-    }
-    res.json(role);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch role' });
-  }
+  res.status(501).json({ error: 'Role operations not implemented yet' });
 });
 
 app.post('/api/roles', authenticateAdmin, async (req, res) => {
-  try {
-    const roleData: CreateRoleData = req.body;
-    
-    if (!roleData.name || !roleData.permissions) {
-      return res.status(400).json({ error: 'Name and permissions are required' });
-    }
-
-    const role = await roleOperations.create(roleData);
-    res.status(201).json(role);
-  } catch (error: any) {
-    if (error.code === 'SQLITE_CONSTRAINT' || error.message.includes('UNIQUE constraint failed')) {
-      res.status(400).json({ error: 'Role name already exists' });
-    } else {
-      res.status(500).json({ error: 'Failed to create role' });
-    }
-  }
+  res.status(501).json({ error: 'Role operations not implemented yet' });
 });
 
 app.put('/api/roles/:id', authenticateAdmin, async (req, res) => {
-  try {
-    const roleData: UpdateRoleData = req.body;
-    const role = await roleOperations.update(parseInt(req.params.id), roleData);
-    
-    if (!role) {
-      return res.status(404).json({ error: 'Role not found' });
-    }
-    
-    res.json(role);
-  } catch (error: any) {
-    if (error.code === 'SQLITE_CONSTRAINT' || error.message.includes('UNIQUE constraint failed')) {
-      res.status(400).json({ error: 'Role name already exists' });
-    } else {
-      res.status(500).json({ error: 'Failed to update role' });
-    }
-  }
+  res.status(501).json({ error: 'Role operations not implemented yet' });
 });
 
 app.delete('/api/roles/:id', authenticateAdmin, async (req, res) => {
-  try {
-    const success = await roleOperations.delete(parseInt(req.params.id));
-    if (!success) {
-      return res.status(404).json({ error: 'Role not found' });
-    }
-    res.json({ message: 'Role deleted successfully' });
-  } catch (error: any) {
-    if (error.message.includes('Cannot delete role')) {
-      res.status(400).json({ error: error.message });
-    } else {
-      res.status(500).json({ error: 'Failed to delete role' });
-    }
-  }
+  res.status(501).json({ error: 'Role operations not implemented yet' });
 });
 
 // Authentication route
 app.post('/api/auth/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
-
-    const user = await userOperations.getByEmail(email);
-    if (!user || !userOperations.verifyPassword(password, user.password_hash)) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    if (!user.is_active) {
-      return res.status(401).json({ error: 'Account is disabled' });
-    }
-
-    // Update last login
-    await userOperations.updateLastLogin(user.id);
-
-    // In a real app, you'd generate a JWT token here
-    const { password_hash, ...userWithoutPassword } = user;
-    res.json({ user: userWithoutPassword, token: 'demo-token' });
-  } catch (error) {
-    res.status(500).json({ error: 'Login failed' });
-  }
+  res.status(501).json({ error: 'Authentication not implemented yet' });
 });
 
 app.listen(PORT, () => {
   console.log(`API server running on http://localhost:${PORT}`);
+  console.log('n8n proxy routes available at:');
+  console.log('  - GET /n8n-proxy/get-users');
+  console.log('  - GET /n8n-proxy/get-roles');
 });
 
 export default app;
