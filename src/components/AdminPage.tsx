@@ -179,13 +179,20 @@ const AdminPage: React.FC<AdminPageProps> = () => {
         throw new Error('VITE_N8N_CREATE_USER_WEBHOOK_URL not configured');
       }
       
+      // Generate unique ID for the user
+      const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+      const userDataWithId = {
+        ...userData,
+        id: uniqueId
+      };
+      
       console.log('🔄 AdminPage: Creating user via n8n webhook:', webhookUrl);
       const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ data: userData })
+        body: JSON.stringify({ data: userDataWithId })
       });
 
       if (!response.ok) {
@@ -275,13 +282,20 @@ const AdminPage: React.FC<AdminPageProps> = () => {
         throw new Error('VITE_N8N_CREATE_ROLE_WEBHOOK_URL not configured');
       }
       
+      // Generate unique ID for the role
+      const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+      const roleDataWithId = {
+        ...roleData,
+        id: uniqueId
+      };
+      
       console.log('🔄 AdminPage: Creating role via n8n webhook:', webhookUrl);
       const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ data: roleData })
+        body: JSON.stringify({ data: roleDataWithId })
       });
 
       if (!response.ok) {
