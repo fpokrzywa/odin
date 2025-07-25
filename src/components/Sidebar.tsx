@@ -175,10 +175,6 @@ const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
       </div>
-          <img src="/odin_icon_white.svg" alt="ODIN" className="w-8 h-8" />
-          <h1 className="text-xl font-bold">ODIN</h1>
-        </div>
-      </div>
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto">
