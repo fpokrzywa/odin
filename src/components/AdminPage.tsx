@@ -76,13 +76,13 @@ const AdminPage: React.FC<AdminPageProps> = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const availablePermissions = [
-    'user_management',
-    'role_management',
-    'system_settings',
-    'basic_access',
-    'team_management',
-    'reporting',
-    'analytics'
+    'User Management',
+    'Role Management',
+    'System Settings',
+    'Basic Access',
+    'Team Management',
+    'Reporting',
+    'Analytics'
   ];
 
   // n8n Webhook functions
