@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:full": "concurrently \"npm run dev\" \"npm run server\"",
+    "server": "ts-node src/server/api.ts",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
