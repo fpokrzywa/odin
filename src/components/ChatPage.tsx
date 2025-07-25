@@ -450,14 +450,17 @@ const ChatPage: React.FC<ChatPageProps> = ({
           </div>
           
           <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
-            {userProfile?.isAdmin && (
-              <select className="px-2 py-1 border border-gray-200 rounded text-xs focus:outline-none focus:ring-2 focus:ring-pink-500 max-w-20 sm:max-w-none sm:px-3 sm:text-sm">
+            {/* Model Dropdown */}
+            <div className="relative">
+              <select className="px-2 py-1 sm:px-3 sm:py-2 border border-gray-200 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white">
                 <option>GPT-4o</option>
                 <option>GPT-4</option>
                 <option>Claude-3.5</option>
                 <option>Gemini Pro</option>
+                <option>o1-preview</option>
+                <option>o1-mini</option>
               </select>
-            )}
+            </div>
             {onOpenPromptCatalog && (
               <button 
                 onClick={onOpenPromptCatalog}

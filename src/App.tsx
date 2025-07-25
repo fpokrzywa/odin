@@ -293,14 +293,6 @@ function App() {
             onClose={() => setActiveSection('assistants')}
           />
         )}
-        {(activeSection === 'admin' || activeSection === 'assistants' || activeSection === 'prompt-catalog' || activeSection === 'resources' || activeSection === 'guidelines') ? null : (
-          <RightPanel 
-            isExpanded={!showMainContent || isSidebarCollapsed || activeSection === 'assistants' || activeSection === 'prompt-catalog' || activeSection === 'resources' || activeSection === 'guidelines' || activeSection === 'chat'} 
-            isFullScreen={isSidebarCollapsed}
-            onExpandAll={handleExpandAll}
-            user={user}
-          />
-        )}
       </div>
       
       {/* Overlay Components */}
