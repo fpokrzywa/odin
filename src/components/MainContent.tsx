@@ -54,7 +54,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
     if (activeSection) {
       console.log('MainContent: Loading data for Find Answers section:', activeSection);
       loadAnswersData(activeSection);
-        assistant.toLowerCase().includes(searchTerm)
+    }
   }, [activeSection]);
 
   const loadAnswersData = async (sectionId: string, forceRefresh: boolean = false) => {
@@ -127,35 +127,19 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
           title: `Content for ${sectionId}`,
           description: 'This content is being loaded from the webhook.',
           tryItYourself: {
-      // Get the current cursor position
-      const cursorPosition = inputRef.current?.selectionStart || inputValue.length;
-      
-      // Find the end of the @ mention (space or end of string)
-      let mentionEnd = cursorPosition;
-      for (let i = atSymbolPosition + 1; i < inputValue.length; i++) {
-        if (inputValue[i] === ' ') {
-          mentionEnd = i;
-          break;
-        }
-        mentionEnd = i + 1;
+            scenario: 'No specific scenario available',
+            actions: ['Check back later for updated content']
+          },
+          articles: [],
+          learnMoreLink: null
+        };
+        setAnswersData(fallbackData);
+        setDebugInfo(`No match found, using fallback data`);
       }
-      
-      const beforeAt = inputValue.substring(0, atSymbolPosition);
-      const afterMention = inputValue.substring(mentionEnd);
-      // Set the mentioned assistant
-      setMentionedAssistant(assistant);
       
       console.log('🔗 MainContent: Webhook connection info:', answersService.getConnectionInfo());
       console.log('💾 MainContent: Cache status:', answersService.getCacheStatus());
       
-      // Focus back to input and set cursor position
-      setTimeout(() => {
-        if (inputRef.current) {
-          const newCursorPosition = beforeAt.length + assistant.length + 2; // +2 for @ and space
-          inputRef.current.focus();
-          inputRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
-        }
-      }, 0);
     } catch (error) {
       console.error('❌ MainContent: Error loading answers data for', sectionId, ':', error);
       setError(`Error loading content: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -260,58 +244,58 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         {/* Try it yourself section */}
         {answersData.tryItYourself && (
           <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-lg p-6 mb-8">
-          <div className="flex items-start space-x-3 mb-4">
-            <Sparkles className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
-            <h2 className="text-lg font-semibold text-orange-900">Try it yourself!</h2>
-          </div>
-          
-          <div className="text-gray-700 mb-4">
-            <p className="mb-4">{answersData.tryItYourself.scenario}</p>
+            <div className="flex items-start space-x-3 mb-4">
+              <Sparkles className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
+              <h2 className="text-lg font-semibold text-orange-900">Try it yourself!</h2>
+            </div>
             
-            <ul className="space-y-2 ml-4">
-              {answersData.tryItYourself.actions.map((action, index) => (
-                <li key={index} className="flex items-start">
-                  <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span>{action}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+            <div className="text-gray-700 mb-4">
+              <p className="mb-4">{answersData.tryItYourself.scenario}</p>
+              
+              <ul className="space-y-2 ml-4">
+                {answersData.tryItYourself.actions.map((action, index) => (
+                  <li key={index} className="flex items-start">
+                    <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span>{action}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         )}
 
         {/* Articles Section */}
         {answersData.articles && answersData.articles.length > 0 && (
           <div className="mb-8">
-          <h3 className="text-xl font-semibold text-gray-900 mb-6">
-            Here are the sample articles that power the answers about your questions
-          </h3>
-          
-          <div className="space-y-3">
-            {answersData.articles.map((article) => (
-              <div key={article.id} className="bg-white border border-gray-200 rounded-lg">
-                <button
-                  onClick={() => toggleArticle(article.id)}
-                  className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
-                >
-                  <span className="font-medium text-gray-900">{article.policyName}</span>
-                  {expandedArticles.includes(article.id) ? (
-                    <ChevronDown className="w-5 h-5 text-gray-400" />
-                  ) : (
-                    <ChevronRight className="w-5 h-5 text-gray-400" />
-                  )}
-                </button>
-                
-                {expandedArticles.includes(article.id) && (
-                  <div className="px-4 pb-4 text-gray-600">
-                    <div className="pt-2 border-t border-gray-100">
-                      <p>{article.content}</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-6">
+              Here are the sample articles that power the answers about your questions
+            </h3>
+            
+            <div className="space-y-3">
+              {answersData.articles.map((article) => (
+                <div key={article.id} className="bg-white border border-gray-200 rounded-lg">
+                  <button
+                    onClick={() => toggleArticle(article.id)}
+                    className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
+                  >
+                    <span className="font-medium text-gray-900">{article.policyName}</span>
+                    {expandedArticles.includes(article.id) ? (
+                      <ChevronDown className="w-5 h-5 text-gray-400" />
+                    ) : (
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    )}
+                  </button>
+                  
+                  {expandedArticles.includes(article.id) && (
+                    <div className="px-4 pb-4 text-gray-600">
+                      <div className="pt-2 border-t border-gray-100">
+                        <p>{article.content}</p>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
