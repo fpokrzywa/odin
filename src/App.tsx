@@ -5,7 +5,10 @@ import GetStartedModal from './components/GetStartedModal';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
 import RightPanel from './components/RightPanel';
-import { Bot, BookOpen, FileText, LogOut } from 'lucide-react';
+import ChatPage from './components/ChatPage';
+import ProfileOverlay from './components/ProfileOverlay';
+import SettingsOverlay from './components/SettingsOverlay';
+import { Bot, BookOpen, FileText, LogOut, User } from 'lucide-react';
 import AdminPage from './components/AdminPage';
 import AssistantsPage from './components/AssistantsPage';
 import PromptCatalogPage from './components/PromptCatalogPage';
@@ -23,6 +26,8 @@ function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [showMainContent, setShowMainContent] = useState(false);
   const [selectedAssistant, setSelectedAssistant] = useState<{ name: string; id: string } | null>(null);
+  const [showProfileOverlay, setShowProfileOverlay] = useState(false);
+  const [showSettingsOverlay, setShowSettingsOverlay] = useState(false);
 
   const handleGetStarted = () => {
     setShowGetStartedModal(true);
@@ -87,8 +92,8 @@ function App() {
 
   const handleAssistantSelect = (assistant: { name: string; id: string }) => {
     setSelectedAssistant(assistant);
-    // You can add navigation to a chat interface here if needed
-    console.log('Selected assistant:', assistant);
+    // Navigate to chat page when assistant is selected
+    setActiveSection('chat');
   };
 
   const handlePromptSelect = (promptText: string, assistantName: string) => {
@@ -214,6 +219,17 @@ function App() {
                 >
                   <FileText className="w-6 h-6" />
                 </button>
+                <button
+                  onClick={() => handleSectionChange('profile')}
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg transition-colors ${
+                    activeSection === 'profile'
+                      ? 'bg-orange-600 text-white'
+                      : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                  }`}
+                  title="Profile"
+                >
+                  <User className="w-6 h-6" />
+                </button>
               </div>
             </nav>
             
@@ -257,15 +273,45 @@ function App() {
             <PromptCatalogPage onPromptSelect={handlePromptSelect} />
           </div>
         )}
+        {activeSection === 'chat' && (
+          <div className="flex-1 flex">
+            <ChatPage 
+              selectedAssistant={selectedAssistant}
+              onOpenPromptCatalog={() => setActiveSection('prompt-catalog')}
+            />
+          </div>
+        )}
+        {activeSection === 'profile' && (
+          <ProfileOverlay 
+            isOpen={true}
+            onClose={() => setActiveSection('assistants')}
+          />
+        )}
+        {activeSection === 'settings' && (
+          <SettingsOverlay 
+            isOpen={true}
+            onClose={() => setActiveSection('assistants')}
+          />
+        )}
         {(activeSection === 'admin' || activeSection === 'assistants' || activeSection === 'prompt-catalog' || activeSection === 'resources' || activeSection === 'guidelines') ? null : (
           <RightPanel 
-            isExpanded={!showMainContent || isSidebarCollapsed || activeSection === 'assistants' || activeSection === 'prompt-catalog' || activeSection === 'resources' || activeSection === 'guidelines'} 
+            isExpanded={!showMainContent || isSidebarCollapsed || activeSection === 'assistants' || activeSection === 'prompt-catalog' || activeSection === 'resources' || activeSection === 'guidelines' || activeSection === 'chat'} 
             isFullScreen={isSidebarCollapsed}
             onExpandAll={handleExpandAll}
             user={user}
           />
         )}
       </div>
+      
+      {/* Overlay Components */}
+      <ProfileOverlay 
+        isOpen={showProfileOverlay}
+        onClose={() => setShowProfileOverlay(false)}
+      />
+      <SettingsOverlay 
+        isOpen={showSettingsOverlay}
+        onClose={() => setShowSettingsOverlay(false)}
+      />
     </>
   );
 }
