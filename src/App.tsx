@@ -6,6 +6,8 @@ import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
 import RightPanel from './components/RightPanel';
 import AdminPage from './components/AdminPage';
+import AssistantsPage from './components/AssistantsPage';
+import PromptCatalogPage from './components/PromptCatalogPage';
 
 function App() {
   const [showLanding, setShowLanding] = useState(true);
@@ -13,10 +15,11 @@ function App() {
   const [showSignInModal, setShowSignInModal] = useState(false);
   const [showGetStartedModal, setShowGetStartedModal] = useState(false);
   const [user, setUser] = useState<{ email: string } | null>(null);
-  const [activeSection, setActiveSection] = useState('knowledge-articles');
+  const [activeSection, setActiveSection] = useState('assistants');
   const [isMainContentCollapsed, setIsMainContentCollapsed] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [showMainContent, setShowMainContent] = useState(false);
+  const [selectedAssistant, setSelectedAssistant] = useState<{ name: string; id: string } | null>(null);
 
   const handleGetStarted = () => {
     setShowGetStartedModal(true);
@@ -61,7 +64,7 @@ function App() {
 
   const handleSectionChange = (section: string) => {
     setActiveSection(section);
-    // Show main content when a Find Answers section is selected
+    // Show main content when a Find Answers section is selected (keep existing functionality)
     const findAnswersSections = ['knowledge-articles', 'organization-chart', 'conference-rooms', 'customer-accounts', 'expense-reports'];
     if (findAnswersSections.includes(section)) {
       setShowMainContent(true);
@@ -76,6 +79,17 @@ function App() {
     if (isSidebarCollapsed) {
       setIsSidebarCollapsed(false);
     }
+  };
+
+  const handleAssistantSelect = (assistant: { name: string; id: string }) => {
+    setSelectedAssistant(assistant);
+    // You can add navigation to a chat interface here if needed
+    console.log('Selected assistant:', assistant);
+  };
+
+  const handlePromptSelect = (promptText: string, assistantName: string) => {
+    // Handle prompt selection - you can integrate this with your chat system
+    console.log('Selected prompt:', promptText, 'for assistant:', assistantName);
   };
 
   const handleCollapseAll = () => {
@@ -121,16 +135,27 @@ function App() {
             onSignOut={handleSignOut}
           />
         )}
-        {showMainContent && !isMainContentCollapsed && !isSidebarCollapsed && activeSection !== 'admin' && (
+        {showMainContent && !isMainContentCollapsed && !isSidebarCollapsed && activeSection !== 'admin' && activeSection !== 'assistants' && activeSection !== 'prompt-catalog' && (
           <MainContent activeSection={activeSection} />
         )}
-        {activeSection === 'admin' && !isMainContentCollapsed && !isSidebarCollapsed ? (
+        {activeSection === 'admin' && !isMainContentCollapsed && !isSidebarCollapsed && (
           <div className="flex-1 flex">
             <AdminPage />
           </div>
-        ) : (
+        )}
+        {activeSection === 'assistants' && !isMainContentCollapsed && !isSidebarCollapsed && (
+          <div className="flex-1 flex">
+            <AssistantsPage onAssistantSelect={handleAssistantSelect} />
+          </div>
+        )}
+        {activeSection === 'prompt-catalog' && !isMainContentCollapsed && !isSidebarCollapsed && (
+          <div className="flex-1 flex">
+            <PromptCatalogPage onPromptSelect={handlePromptSelect} />
+          </div>
+        )}
+        {(activeSection === 'admin' || activeSection === 'assistants' || activeSection === 'prompt-catalog') && !isMainContentCollapsed && !isSidebarCollapsed ? null : (
           <RightPanel 
-            isExpanded={!showMainContent || isSidebarCollapsed} 
+            isExpanded={!showMainContent || isSidebarCollapsed || activeSection === 'assistants' || activeSection === 'prompt-catalog'} 
             isFullScreen={isSidebarCollapsed}
             onExpandAll={handleExpandAll}
             user={user}

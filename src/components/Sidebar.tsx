@@ -50,6 +50,11 @@ const Sidebar: React.FC<SidebarProps> = ({
     { icon: Lock, label: 'Reset password', id: 'reset-password' },
   ];
 
+  const aiToolsItems = [
+    { icon: Users, label: 'AI Assistants', id: 'assistants' },
+    { icon: Search, label: 'Prompt Catalog', id: 'prompt-catalog' },
+  ];
+
   // Check if user is admin
   const isAdmin = user?.email === 'freddie@3cpublish.com';
 
@@ -109,6 +114,29 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Navigation */}
       <div className="flex-1 py-6">
+        {/* AI Tools Section */}
+        <div className="mb-8">
+          <div className="px-6 py-2 text-xs font-semibold text-gray-300 uppercase tracking-wider">
+            AI Tools
+          </div>
+          <nav className="space-y-1 mt-4">
+            {aiToolsItems.map((item) => (
+              <button
+                key={item.label}
+                onClick={() => onSectionChange(item.id)}
+                className={`flex items-center px-6 py-2 text-sm font-medium transition-colors w-full text-left ${
+                  activeSection === item.id
+                    ? 'bg-orange-500 text-white'
+                    : 'text-gray-300 hover:bg-gray-600 hover:text-white'
+                }`}
+              >
+                <item.icon className="mr-3 h-4 w-4" />
+                {item.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+
         {/* Find Answers Section */}
         <div className="mb-8">
           <button
