@@ -48,11 +48,13 @@ const PromptCatalog: React.FC<PromptCatalogProps> = ({
   React.useEffect(() => {
     const loadPrompts = async () => {
       if (isOpen) {
-        console.log('Loading prompts for PromptCatalog overlay');
+        console.log('Loading prompts for PromptCatalog overlay from webhook');
         setIsLoading(true);
         try {
-          const mongoPrompts = await mongoService.getPrompts();
-          console.log('Loaded prompts:', mongoPrompts.length);
+          const mongoPrompts = await mongoService.getPrompts(true); // Force refresh from webhook
+          console.log('Loaded prompts from webhook:', mongoPrompts.length);
+          console.log('Webhook connection info:', mongoService.getConnectionInfo());
+          console.log('Webhook connection info:', mongoService.getConnectionInfo());
           const convertedPrompts: Prompt[] = mongoPrompts.map(prompt => ({
             id: prompt.id,
             title: prompt.title,
@@ -64,7 +66,9 @@ const PromptCatalog: React.FC<PromptCatalogProps> = ({
           }));
           setPrompts(convertedPrompts);
         } catch (error) {
-          console.error('Error loading prompts:', error);
+          console.error('Error loading prompts from webhook:', error);
+          console.log('Webhook connection info:', mongoService.getConnectionInfo());
+          console.log('Webhook connection info:', mongoService.getConnectionInfo());
         } finally {
           setIsLoading(false);
         }

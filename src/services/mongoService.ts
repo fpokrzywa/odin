@@ -83,14 +83,14 @@ class MongoService {
   async getPrompts(forceRefresh: boolean = false): Promise<MongoPrompt[]> {
     // Check cache first unless force refresh is requested
     if (!forceRefresh && this.cachedPrompts && (Date.now() - this.cacheTimestamp) < this.cacheExpiryMs) {
-      console.log('Returning cached prompts');
+      console.log('Returning cached prompts (use forceRefresh=true to fetch from webhook)');
       return this.cachedPrompts;
     }
 
     try {
       // Try to fetch from n8n webhook first
       if (this.n8nConfig.isConfigured && this.n8nConfig.getWebhookUrl) {
-        console.log('Fetching prompts from n8n GET webhook:', this.n8nConfig.getWebhookUrl);
+        console.log('🔗 Fetching prompts from n8n GET webhook:', this.n8nConfig.getWebhookUrl);
         
         try {
           const response = await fetch(this.n8nConfig.getWebhookUrl, {
@@ -101,38 +101,56 @@ class MongoService {
           });
 
           if (!response.ok) {
-            throw new Error(`n8n webhook responded with status: ${response.status}`);
+            throw new Error(`❌ n8n webhook responded with status: ${response.status} - ${response.statusText}`);
           }
 
           const data = await response.json();
+          console.log('📦 Raw webhook response:', data);
+          console.log('📦 Raw webhook response:', data);
           
           // Handle different response formats from n8n/MongoDB
           let prompts: MongoPrompt[];
           if (Array.isArray(data)) {
             // Direct array of prompts
+            console.log('📋 Processing direct array format');
+            console.log('📋 Processing direct array format');
             prompts = data;
           } else if (data.prompts && Array.isArray(data.prompts)) {
             // Wrapped in prompts property
+            console.log('📋 Processing prompts property format');
+            console.log('📋 Processing prompts property format');
             prompts = data.prompts;
           } else if (data.data && Array.isArray(data.data)) {
             // Wrapped in data property
+            console.log('📋 Processing data property format');
+            console.log('📋 Processing data property format');
             prompts = data.data;
           } else if (data && typeof data === 'object') {
             // Check if it's a single prompt object or contains prompt data
             if (data.id && data.title && data.description && data.assistant) {
               // Single prompt object
+              console.log('📋 Processing single prompt object format');
+              console.log('📋 Processing single prompt object format');
               prompts = [data];
             } else {
               // Try to find prompts in nested structure
+              console.log('📋 Searching for prompts in nested structure');
+              console.log('📋 Searching for prompts in nested structure');
               const possibleArrays = Object.values(data).filter(Array.isArray);
               if (possibleArrays.length > 0) {
+                console.log('📋 Found array in nested structure:', possibleArrays[0].length, 'items');
+                console.log('📋 Found array in nested structure:', possibleArrays[0].length, 'items');
                 prompts = possibleArrays[0] as MongoPrompt[];
               } else {
-                throw new Error('No valid prompt array found in response');
+                console.error('❌ Response structure:', Object.keys(data));
+                throw new Error('❌ No valid prompt array found in response. Available keys: ' + Object.keys(data).join(', '));
+                throw new Error('❌ No valid prompt array found in response. Available keys: ' + Object.keys(data).join(', '));
               }
             }
           } else {
-            throw new Error('Invalid response format from n8n webhook');
+            console.error('❌ Invalid response type:', typeof data);
+            throw new Error('❌ Invalid response format from n8n webhook. Expected object or array, got: ' + typeof data);
+            throw new Error('❌ Invalid response format from n8n webhook. Expected object or array, got: ' + typeof data);
           }
 
           // Validate and transform the data to match our interface
@@ -149,9 +167,9 @@ class MongoService {
             owner: prompt.owner || ''
           }
           )
-          )
+          console.log(`✅ Successfully loaded ${validatedPrompts.length} prompts from n8n webhook`);
 
-          console.log(`Successfully loaded ${validatedPrompts.length} prompts from n8n`);
+          console.log(`✅ Successfully loaded ${validatedPrompts.length} prompts from n8n webhook`);
           
           // Cache the results
           this.cachedPrompts = validatedPrompts;
@@ -160,27 +178,37 @@ class MongoService {
         } catch (fetchError) {
           // Handle specific fetch errors
           if (fetchError instanceof TypeError && fetchError.message === 'Failed to fetch') {
-            console.warn('n8n webhook is not accessible. This could be due to:');
-            console.warn('1. n8n server is not running');
-            console.warn('2. Network connectivity issues');
-            console.warn('3. CORS policy blocking the request');
-            console.warn('4. Incorrect webhook URL');
+            console.warn('🚫 n8n webhook is not accessible. This could be due to:');
+            console.warn('   1. n8n server is not running');
+            console.warn('   2. Network connectivity issues');
+            console.warn('   3. CORS policy blocking the request');
+            console.warn('   4. Incorrect webhook URL:', this.n8nConfig.getWebhookUrl);
           } else {
-            console.error('Error fetching from n8n webhook:', fetchError);
+            console.error('❌ Error fetching from n8n webhook:', fetchError);
           }
           throw fetchError;
         }
       }
         
       // Return fallback data when MongoDB is not configured
-      console.log('n8n webhook not configured, using fallback data');
+      console.log('⚠️ n8n webhook not configured, using fallback data');
+      console.log('💡 To use webhook, set these environment variables:');
+      console.log('   - VITE_N8N_GET_WEBHOOK_URL');
+      console.log('   - VITE_N8N_CREATE_WEBHOOK_URL');
+      console.log('   - VITE_N8N_UPDATE_WEBHOOK_URL');
+      console.log('   - VITE_N8N_DELETE_WEBHOOK_URL');
+      console.log('💡 To use webhook, set these environment variables:');
+      console.log('   - VITE_N8N_GET_WEBHOOK_URL');
+      console.log('   - VITE_N8N_CREATE_WEBHOOK_URL');
+      console.log('   - VITE_N8N_UPDATE_WEBHOOK_URL');
+      console.log('   - VITE_N8N_DELETE_WEBHOOK_URL');
       
       // Cache fallback data too
       this.cachedPrompts = FALLBACK_PROMPTS;
       this.cacheTimestamp = Date.now();
       return FALLBACK_PROMPTS;
     } catch (error) {
-      console.log('Falling back to static prompt data');
+      console.log('⚠️ Falling back to static prompt data due to error:', error);
       return FALLBACK_PROMPTS;
     }
   }
