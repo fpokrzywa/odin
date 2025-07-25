@@ -44,6 +44,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [isAutomateTasksExpanded, setIsAutomateTasksExpanded] = useState(false);
   const [isInformationExpanded, setIsInformationExpanded] = useState(false);
   const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(false);
+  const [isUserExpanded, setIsUserExpanded] = useState(false);
 
   const aiToolsItems = [
     { id: 'assistants', label: 'AI Assistants', icon: Bot },
@@ -120,6 +121,17 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
+  const handleUserToggle = () => {
+    const newState = !isUserExpanded;
+    setIsUserExpanded(newState);
+    if (newState) {
+      setIsFindAnswersExpanded(false);
+      setIsAutomateTasksExpanded(false);
+      setIsInformationExpanded(false);
+      setIsAdministrationExpanded(false);
+    }
+  };
+
   const handleFindAnswersItemClick = (sectionId: string) => {
     if (!isFindAnswersExpanded) {
       setIsFindAnswersExpanded(true);
@@ -156,6 +168,17 @@ const Sidebar: React.FC<SidebarProps> = ({
       setIsFindAnswersExpanded(false);
       setIsAutomateTasksExpanded(false);
       setIsInformationExpanded(false);
+    }
+    onSectionChange(sectionId);
+  };
+
+  const handleUserItemClick = (sectionId: string) => {
+    if (!isUserExpanded) {
+      setIsUserExpanded(true);
+      setIsFindAnswersExpanded(false);
+      setIsAutomateTasksExpanded(false);
+      setIsInformationExpanded(false);
+      setIsAdministrationExpanded(false);
     }
     onSectionChange(sectionId);
   };
@@ -331,29 +354,39 @@ const Sidebar: React.FC<SidebarProps> = ({
 
         {/* User Section */}
         <div className="px-4 pb-4">
-          <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-            User
-          </h2>
-          <ul className="space-y-1">
-            {userItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <li key={item.id}>
-                  <button
-                    onClick={() => onSectionChange(item.id)}
-                    className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                      activeSection === item.id
-                        ? 'bg-orange-600 text-white'
-                        : 'text-slate-300 hover:bg-slate-700 hover:text-white'
-                    }`}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span>{item.label}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+          <button
+            onClick={handleUserToggle}
+            className="w-full flex items-center justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 hover:text-slate-300 transition-colors"
+          >
+            <span>User</span>
+            {isUserExpanded ? (
+              <ChevronDown className="w-4 h-4" />
+            ) : (
+              <ChevronRight className="w-4 h-4" />
+            )}
+          </button>
+          {isUserExpanded && (
+            <ul className="space-y-1">
+              {userItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <li key={item.id}>
+                    <button
+                      onClick={() => handleUserItemClick(item.id)}
+                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                        activeSection === item.id
+                          ? 'bg-orange-600 text-white'
+                          : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                      }`}
+                    >
+                      <Icon className="w-5 h-5" />
+                      <span>{item.label}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
         {/* Administration Section - Only show for admin */}
         {isAdmin && (
