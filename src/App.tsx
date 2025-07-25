@@ -282,16 +282,20 @@ function App() {
           </div>
         )}
         {activeSection === 'profile' && (
-          <ProfileOverlay 
-            isOpen={true}
-            onClose={() => setActiveSection('assistants')}
-          />
+          <div className="flex-1 flex">
+            <ProfileOverlay 
+              isOpen={true}
+              onClose={() => setActiveSection('assistants')}
+            />
+          </div>
         )}
         {activeSection === 'settings' && (
-          <SettingsOverlay 
-            isOpen={true}
-            onClose={() => setActiveSection('assistants')}
-          />
+          <div className="flex-1 flex">
+            <SettingsOverlay 
+              isOpen={true}
+              onClose={() => setActiveSection('assistants')}
+            />
+          </div>
         )}
       </div>
       
