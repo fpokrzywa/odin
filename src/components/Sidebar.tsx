@@ -76,24 +76,51 @@ const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   const handleFindAnswersToggle = () => {
-    setIsFindAnswersExpanded(!isFindAnswersExpanded);
+    const newState = !isFindAnswersExpanded;
+    setIsFindAnswersExpanded(newState);
+    if (newState) {
+      setIsAutomateTasksExpanded(false);
+      setIsInformationExpanded(false);
+      setIsAdministrationExpanded(false);
+    }
   };
 
   const handleAutomateTasksToggle = () => {
-    setIsAutomateTasksExpanded(!isAutomateTasksExpanded);
+    const newState = !isAutomateTasksExpanded;
+    setIsAutomateTasksExpanded(newState);
+    if (newState) {
+      setIsFindAnswersExpanded(false);
+      setIsInformationExpanded(false);
+      setIsAdministrationExpanded(false);
+    }
   };
 
   const handleInformationToggle = () => {
-    setIsInformationExpanded(!isInformationExpanded);
+    const newState = !isInformationExpanded;
+    setIsInformationExpanded(newState);
+    if (newState) {
+      setIsFindAnswersExpanded(false);
+      setIsAutomateTasksExpanded(false);
+      setIsAdministrationExpanded(false);
+    }
   };
 
   const handleAdministrationToggle = () => {
-    setIsAdministrationExpanded(!isAdministrationExpanded);
+    const newState = !isAdministrationExpanded;
+    setIsAdministrationExpanded(newState);
+    if (newState) {
+      setIsFindAnswersExpanded(false);
+      setIsAutomateTasksExpanded(false);
+      setIsInformationExpanded(false);
+    }
   };
 
   const handleFindAnswersItemClick = (sectionId: string) => {
     if (!isFindAnswersExpanded) {
       setIsFindAnswersExpanded(true);
+      setIsAutomateTasksExpanded(false);
+      setIsInformationExpanded(false);
+      setIsAdministrationExpanded(false);
     }
     onSectionChange(sectionId);
   };
@@ -101,6 +128,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   const handleAutomateTasksItemClick = (sectionId: string) => {
     if (!isAutomateTasksExpanded) {
       setIsAutomateTasksExpanded(true);
+      setIsFindAnswersExpanded(false);
+      setIsInformationExpanded(false);
+      setIsAdministrationExpanded(false);
     }
     onSectionChange(sectionId);
   };
@@ -108,6 +138,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   const handleInformationItemClick = (sectionId: string) => {
     if (!isInformationExpanded) {
       setIsInformationExpanded(true);
+      setIsFindAnswersExpanded(false);
+      setIsAutomateTasksExpanded(false);
+      setIsAdministrationExpanded(false);
     }
     onSectionChange(sectionId);
   };
@@ -115,6 +148,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   const handleAdministrationItemClick = (sectionId: string) => {
     if (!isAdministrationExpanded) {
       setIsAdministrationExpanded(true);
+      setIsFindAnswersExpanded(false);
+      setIsAutomateTasksExpanded(false);
+      setIsInformationExpanded(false);
     }
     onSectionChange(sectionId);
   };
