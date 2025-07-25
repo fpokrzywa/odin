@@ -317,12 +317,14 @@ function App() {
           (activeSection && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection))) && (
           <>
             <MainContent activeSection={activeSection} />
-            <RightPanel 
-              isExpanded={false}
-              isFullScreen={false}
-              onExpandAll={handleExpandAll}
-              user={user}
-            />
+            <div className="flex-1 flex">
+              <ChatPage 
+                selectedAssistant={{ name: 'ODIN', id: 'odin' }}
+                selectedPrompt=""
+                onPromptUsed={() => {}}
+                onOpenPromptCatalog={() => setActiveSection('prompt-catalog')}
+              />
+            </div>
           </>
         )}
       </div>

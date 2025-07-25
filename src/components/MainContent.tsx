@@ -15,14 +15,10 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
   // Load answers data when component mounts or when activeSection changes
   React.useEffect(() => {
     console.log('MainContent: activeSection changed to:', activeSection);
-    // Check if this is a Find Answers section
-    // Load data for any section that's not in the excluded list (AI tools, admin sections, etc.)
-    const excludedSections = ['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'];
-    if (activeSection && !excludedSections.includes(activeSection)) {
+    // Load data for Find Answers sections
+    if (activeSection) {
       console.log('MainContent: Loading data for Find Answers section:', activeSection);
       loadAnswersData(activeSection);
-    } else {
-      console.log('MainContent: Section excluded from Find Answers loading:', activeSection);
     }
   }, [activeSection]);
 
@@ -38,9 +34,8 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
       const data = await answersService.getAnswersForItem(sectionId);
       if (!data) {
         console.warn('⚠️ MainContent: No data found for section:', sectionId);
-        // Try to get fallback data
-        const fallbackData = await answersService.getAnswersForItem('knowledge-articles');
-        setAnswersData(fallbackData);
+        // Set null to show section not found
+        setAnswersData(null);
       } else {
         setAnswersData(data);
         console.log('✅ MainContent: Successfully loaded data for section:', sectionId);
@@ -49,9 +44,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
       console.log('💾 MainContent: Cache status:', answersService.getCacheStatus());
     } catch (error) {
       console.error('❌ MainContent: Error loading answers data for', sectionId, ':', error);
-      // Use fallback data for the section
-      const fallbackData = await answersService.getAnswersForItem('knowledge-articles');
-      setAnswersData(fallbackData);
+      setAnswersData(null);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -277,7 +270,15 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
       default:
         return (
           <div className="text-center py-16">
-            <p className="text-gray-500">Section not found</p>
+            <div className="text-gray-500">
+              <p className="mb-4">Loading content for: {activeSection}</p>
+              <button
+                onClick={() => loadAnswersData(activeSection, true)}
+                className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+              >
+                Retry Loading
+              </button>
+            </div>
           </div>
         );
     }
