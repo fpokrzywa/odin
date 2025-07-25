@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MessageSquare, HelpCircle, Mic, Send, Search, BarChart3, Image, Paperclip, Copy, Edit3, Bot, X } from 'lucide-react';
 import { chatService, type ChatMessage, type ChatThread } from '../services/chatService';
 import PromptCatalog from './PromptCatalog';
+import { getCompanyBotName } from '../utils/companyConfig';
 
 interface ChatPageProps {
   selectedAssistant: { name: string; id: string } | null;
@@ -34,10 +35,11 @@ const ChatPage: React.FC<ChatPageProps> = ({
   const [pendingAssistantMessage, setPendingAssistantMessage] = useState<{assistant: string, message: string} | null>(null);
   const [pinnedAssistant, setPinnedAssistant] = useState<string | null>(null);
   const [showPromptCatalog, setShowPromptCatalog] = useState(false);
+  const [mentionedAssistant, setMentionedAssistant] = useState<string | null>(null);
 
   // Available assistants list
-  const availableAssistants = [
-    'ODIN',
+  const [availableAssistants, setAvailableAssistants] = useState<string[]>([
+    getCompanyBotName(),
     'IT Support', 
     'HR Support',
     'Advance Policies Assistant',
@@ -45,7 +47,38 @@ const ChatPage: React.FC<ChatPageProps> = ({
     'ADEPT Assistant',
     'RFP Assistant',
     'Resume Assistant'
-  ];
+  ]);
+
+  // Load OpenAI assistants to get dynamic list
+  useEffect(() => {
+    const loadAssistants = async () => {
+      try {
+        const { openaiService } = await import('../services/openaiService');
+        const result = await openaiService.listAssistants();
+        if (result.assistants.length > 0) {
+          const assistantNames = result.assistants.map(assistant => assistant.name);
+          // Combine default assistants with OpenAI assistants, removing duplicates
+          const defaultAssistants = [
+            getCompanyBotName(),
+            'IT Support', 
+            'HR Support',
+            'Advance Policies Assistant',
+            'Redact Assistant',
+            'ADEPT Assistant',
+            'RFP Assistant',
+            'Resume Assistant'
+          ];
+          const combinedAssistants = [...new Set([...defaultAssistants, ...assistantNames])];
+          setAvailableAssistants(combinedAssistants);
+        }
+      } catch (error) {
+        console.error('Error loading assistants for @ mentions:', error);
+        // Keep default assistants if loading fails
+      }
+    };
+
+    loadAssistants();
+  }, []);
 
   // Load user profile from localStorage
   useEffect(() => {
@@ -156,32 +189,22 @@ const ChatPage: React.FC<ChatPageProps> = ({
       const beforeAt = inputValue.substring(0, atSymbolPosition);
       const afterCursor = inputValue.substring(inputRef.current?.selectionStart || inputValue.length);
       
-      // Extract the message part (everything after the assistant mention)
-      const messageAfterAssistant = afterCursor.trim();
-      
-      if (messageAfterAssistant) {
-        // If there's a message after the assistant mention, send it immediately
-        setPendingAssistantMessage({ assistant, message: messageAfterAssistant });
-        setInputValue('');
-        setPinnedAssistant(null);
-      } else {
-        // Pin the assistant and clear the @ mention from input
-        setPinnedAssistant(assistant);
-        const newValue = beforeAt + afterCursor;
-        setInputValue(newValue.trim());
-        
-        // Focus back to input and set cursor position
-        setTimeout(() => {
-          if (inputRef.current) {
-            const newCursorPosition = beforeAt.length;
-            inputRef.current.focus();
-            inputRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
-          }
-        }, 0);
-      }
+      // Set the mentioned assistant and clear the @ mention from input
+      setMentionedAssistant(assistant);
+      const newValue = beforeAt + afterCursor;
+      setInputValue(newValue.trim());
       
       setShowAssistantDropdown(false);
       setAtSymbolPosition(-1);
+      
+      // Focus back to input and set cursor position
+      setTimeout(() => {
+        if (inputRef.current) {
+          const newCursorPosition = beforeAt.length;
+          inputRef.current.focus();
+          inputRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
+        }
+      }, 0);
     }
   };
 
@@ -249,6 +272,14 @@ const ChatPage: React.FC<ChatPageProps> = ({
     }
     
     if (e.key === 'Enter' && !showAssistantDropdown) {
+      // Check if there's a mentioned assistant
+      if (mentionedAssistant && inputValue.trim()) {
+        setPendingAssistantMessage({ assistant: mentionedAssistant, message: inputValue.trim() });
+        setInputValue('');
+        setMentionedAssistant(null);
+        return;
+      }
+      
       // Check if there's a pinned assistant
       if (pinnedAssistant && inputValue.trim()) {
         setPendingAssistantMessage({ assistant: pinnedAssistant, message: inputValue.trim() });
@@ -258,7 +289,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
       }
       
       // Check if the message contains an @ mention (fallback)
-      if (!pinnedAssistant) {
+      if (!mentionedAssistant && !pinnedAssistant) {
         const atMentionMatch = inputValue.match(/@(\w+(?:\s+\w+)*)\s+(.+)/);
         if (atMentionMatch) {
           const mentionedAssistant = atMentionMatch[1];
@@ -689,16 +720,32 @@ const ChatPage: React.FC<ChatPageProps> = ({
             )}
             
             <div className="flex items-center space-x-2 sm:space-x-3 bg-white rounded-lg p-2 sm:p-3 border border-gray-200 shadow-sm">
-              {/* Pinned Assistant Indicator */}
-              {pinnedAssistant && (
+              {/* Mentioned Assistant Indicator */}
+              {mentionedAssistant && (
                 <div className="flex items-center space-x-2 bg-blue-50 border border-blue-200 rounded-full px-3 py-1 text-sm">
                   <div className="w-4 h-4 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
                     <Bot className="w-2.5 h-2.5 text-orange-600" />
                   </div>
-                  <span className="text-orange-700 font-medium">{pinnedAssistant}</span>
+                  <span className="text-orange-700 font-medium">@{mentionedAssistant}</span>
+                  <button
+                    onClick={() => setMentionedAssistant(null)}
+                    className="text-orange-400 hover:text-orange-600 transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+              
+              {/* Pinned Assistant Indicator */}
+              {pinnedAssistant && !mentionedAssistant && (
+                <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-full px-3 py-1 text-sm">
+                  <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Bot className="w-2.5 h-2.5 text-green-600" />
+                  </div>
+                  <span className="text-green-700 font-medium">{pinnedAssistant}</span>
                   <button
                     onClick={() => setPinnedAssistant(null)}
-                    className="text-orange-400 hover:text-orange-600 transition-colors"
+                    className="text-green-400 hover:text-green-600 transition-colors"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -711,7 +758,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
               <input
                 ref={inputRef}
                 type="text"
-                placeholder={pinnedAssistant ? `Message ${pinnedAssistant}...` : "Ask a question..."}
+                placeholder={mentionedAssistant ? `Message @${mentionedAssistant}...` : pinnedAssistant ? `Message ${pinnedAssistant}...` : "Ask a question..."}
                 value={inputValue}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
@@ -726,7 +773,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
               </button>
               <button 
                 onClick={isStreaming ? handleStopStreaming : handleSend}
-                disabled={isLoading && !isStreaming || (!inputValue.trim() && !isStreaming) || (pinnedAssistant && !inputValue.trim())}
+                disabled={isLoading && !isStreaming || (!inputValue.trim() && !isStreaming) || ((pinnedAssistant || mentionedAssistant) && !inputValue.trim())}
                 className={`p-2 sm:p-3 transition-colors flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg ${
                   isStreaming 
                     ? 'text-gray-400 hover:text-gray-600' 
