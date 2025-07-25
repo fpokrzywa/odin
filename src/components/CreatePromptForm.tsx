@@ -13,6 +13,7 @@ const CreatePromptForm: React.FC<CreatePromptFormProps> = ({ isOpen, onClose, on
     title: '',
     description: '',
     prompt: '',
+    system: '',
     category: '',
     tags: [] as string[],
     isPublic: false
@@ -27,6 +28,7 @@ const CreatePromptForm: React.FC<CreatePromptFormProps> = ({ isOpen, onClose, on
         title: editingPrompt.title || '',
         description: editingPrompt.description || '',
         prompt: editingPrompt.user || editingPrompt.description || '',
+        system: editingPrompt.system || '',
         category: editingPrompt.functionalArea || '',
         tags: editingPrompt.tags || [],
         isPublic: false
@@ -36,6 +38,7 @@ const CreatePromptForm: React.FC<CreatePromptFormProps> = ({ isOpen, onClose, on
         title: '',
         description: '',
         prompt: '',
+        system: '',
         category: '',
         tags: [],
         isPublic: false
@@ -112,16 +115,32 @@ const CreatePromptForm: React.FC<CreatePromptFormProps> = ({ isOpen, onClose, on
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Prompt
+              User Message
             </label>
             <textarea
               value={formData.prompt}
               onChange={(e) => setFormData({ ...formData, prompt: e.target.value })}
               rows={6}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-              placeholder="Enter your prompt here..."
+              placeholder="Enter the user message/prompt here..."
               required
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              System Message
+            </label>
+            <textarea
+              value={formData.system}
+              onChange={(e) => setFormData({ ...formData, system: e.target.value })}
+              rows={4}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+              placeholder="Enter system instructions for the AI assistant (optional)..."
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              System messages help define the AI's behavior, role, and response style for this prompt.
+            </p>
           </div>
 
           <div>
