@@ -207,7 +207,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto">
+      <nav className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-slate-800 scrollbar-thumb-slate-600 hover:scrollbar-thumb-slate-500">
         {/* AI Tools Section */}
         <div className="p-4">
           <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
