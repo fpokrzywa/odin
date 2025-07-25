@@ -6,7 +6,6 @@ import {
   Edit, 
   Trash2, 
   Search, 
-  Filter,
   ChevronDown,
   X,
   Check,
@@ -172,6 +171,198 @@ const AdminPage: React.FC<AdminPageProps> = () => {
     }
   };
 
+  const createUserViaWebhook = async (userData: any) => {
+    try {
+      const webhookUrl = import.meta.env.VITE_N8N_CREATE_USER_WEBHOOK_URL;
+      
+      if (!webhookUrl) {
+        throw new Error('VITE_N8N_CREATE_USER_WEBHOOK_URL not configured');
+      }
+      
+      console.log('🔄 AdminPage: Creating user via n8n webhook:', webhookUrl);
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ data: userData })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to create user: ${response.status} - ${response.statusText}`);
+      }
+
+      console.log('✅ AdminPage: Successfully created user via n8n webhook');
+      return true;
+    } catch (error) {
+      console.error('❌ AdminPage: Error creating user via n8n webhook:', error);
+      throw error;
+    }
+  };
+
+  const updateUserViaWebhook = async (userId: number, userData: any) => {
+    try {
+      const webhookUrl = import.meta.env.VITE_N8N_UPDATE_USER_WEBHOOK_URL;
+      
+      if (!webhookUrl) {
+        throw new Error('VITE_N8N_UPDATE_USER_WEBHOOK_URL not configured');
+      }
+      
+      console.log('🔄 AdminPage: Updating user via n8n webhook:', webhookUrl);
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          data: {
+            id: userId,
+            ...userData
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update user: ${response.status} - ${response.statusText}`);
+      }
+
+      console.log('✅ AdminPage: Successfully updated user via n8n webhook');
+      return true;
+    } catch (error) {
+      console.error('❌ AdminPage: Error updating user via n8n webhook:', error);
+      throw error;
+    }
+  };
+
+  const deleteUserViaWebhook = async (userId: number) => {
+    try {
+      const webhookUrl = import.meta.env.VITE_N8N_DELETE_USER_WEBHOOK_URL;
+      
+      if (!webhookUrl) {
+        throw new Error('VITE_N8N_DELETE_USER_WEBHOOK_URL not configured');
+      }
+      
+      console.log('🔄 AdminPage: Deleting user via n8n webhook:', webhookUrl);
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          data: {
+            id: userId
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete user: ${response.status} - ${response.statusText}`);
+      }
+
+      console.log('✅ AdminPage: Successfully deleted user via n8n webhook');
+      return true;
+    } catch (error) {
+      console.error('❌ AdminPage: Error deleting user via n8n webhook:', error);
+      throw error;
+    }
+  };
+
+  const createRoleViaWebhook = async (roleData: any) => {
+    try {
+      const webhookUrl = import.meta.env.VITE_N8N_CREATE_ROLE_WEBHOOK_URL;
+      
+      if (!webhookUrl) {
+        throw new Error('VITE_N8N_CREATE_ROLE_WEBHOOK_URL not configured');
+      }
+      
+      console.log('🔄 AdminPage: Creating role via n8n webhook:', webhookUrl);
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ data: roleData })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to create role: ${response.status} - ${response.statusText}`);
+      }
+
+      console.log('✅ AdminPage: Successfully created role via n8n webhook');
+      return true;
+    } catch (error) {
+      console.error('❌ AdminPage: Error creating role via n8n webhook:', error);
+      throw error;
+    }
+  };
+
+  const updateRoleViaWebhook = async (roleId: number, roleData: any) => {
+    try {
+      const webhookUrl = import.meta.env.VITE_N8N_UPDATE_ROLE_WEBHOOK_URL;
+      
+      if (!webhookUrl) {
+        throw new Error('VITE_N8N_UPDATE_ROLE_WEBHOOK_URL not configured');
+      }
+      
+      console.log('🔄 AdminPage: Updating role via n8n webhook:', webhookUrl);
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          data: {
+            id: roleId,
+            ...roleData
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update role: ${response.status} - ${response.statusText}`);
+      }
+
+      console.log('✅ AdminPage: Successfully updated role via n8n webhook');
+      return true;
+    } catch (error) {
+      console.error('❌ AdminPage: Error updating role via n8n webhook:', error);
+      throw error;
+    }
+  };
+
+  const deleteRoleViaWebhook = async (roleId: number) => {
+    try {
+      const webhookUrl = import.meta.env.VITE_N8N_DELETE_ROLE_WEBHOOK_URL;
+      
+      if (!webhookUrl) {
+        throw new Error('VITE_N8N_DELETE_ROLE_WEBHOOK_URL not configured');
+      }
+      
+      console.log('🔄 AdminPage: Deleting role via n8n webhook:', webhookUrl);
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          data: {
+            id: roleId
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete role: ${response.status} - ${response.statusText}`);
+      }
+
+      console.log('✅ AdminPage: Successfully deleted role via n8n webhook');
+      return true;
+    } catch (error) {
+      console.error('❌ AdminPage: Error deleting role via n8n webhook:', error);
+      throw error;
+    }
+  };
+
   const fetchUsers = async () => {
     try {
       const userData = await fetchUsersFromWebhook();
@@ -182,7 +373,6 @@ const AdminPage: React.FC<AdminPageProps> = () => {
         ? 'Unable to connect to n8n user webhook. Please check your network connection and ensure CORS is configured on your n8n instance.'
         : err.message;
       setError('Failed to fetch users: ' + errorMessage);
-      // Set empty array as fallback
       setUsers([]);
     }
   };
@@ -197,7 +387,6 @@ const AdminPage: React.FC<AdminPageProps> = () => {
         ? 'Unable to connect to n8n role webhook. Please check your network connection and ensure CORS is configured on your n8n instance.'
         : err.message;
       setError('Failed to fetch roles: ' + errorMessage);
-      // Set empty array as fallback
       setRoles([]);
     }
   };
@@ -205,17 +394,15 @@ const AdminPage: React.FC<AdminPageProps> = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      setError(''); // Clear any previous errors
+      setError('');
       await Promise.all([fetchUsers(), fetchRoles()]);
       setLoading(false);
     };
     loadData();
   }, []);
 
-  // Update role_id when roles are loaded and no role is selected
   useEffect(() => {
     if (roles.length > 0 && !editingUser && userForm.role_id === 2) {
-      // Set default role to the first available role if "User" role (id: 2) doesn't exist
       const userRole = roles.find(role => role.id === 2);
       if (!userRole && roles.length > 0) {
         setUserForm(prev => ({ ...prev, role_id: roles[0].id }));
@@ -226,11 +413,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
   // User operations
   const handleCreateUser = async () => {
     try {
-      // TODO: Implement user creation webhook
-      console.log('User creation not yet implemented with webhook');
-      setError('User creation not yet implemented with webhook integration');
-      return;
-      
+      await createUserViaWebhook(userForm);
       setSuccess('User created successfully');
       setShowUserModal(false);
       resetUserForm();
@@ -249,11 +432,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
         delete (updateData as any).password;
       }
       
-      // TODO: Implement user update webhook
-      console.log('User update not yet implemented with webhook');
-      setError('User update not yet implemented with webhook integration');
-      return;
-      
+      await updateUserViaWebhook(editingUser.id, updateData);
       setSuccess('User updated successfully');
       setShowUserModal(false);
       setEditingUser(null);
@@ -268,11 +447,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
     if (!confirm('Are you sure you want to delete this user?')) return;
     
     try {
-      // TODO: Implement user deletion webhook
-      console.log('User deletion not yet implemented with webhook');
-      setError('User deletion not yet implemented with webhook integration');
-      return;
-      
+      await deleteUserViaWebhook(id);
       setSuccess('User deleted successfully');
       fetchUsers();
     } catch (err: any) {
@@ -283,11 +458,12 @@ const AdminPage: React.FC<AdminPageProps> = () => {
   // Role operations
   const handleCreateRole = async () => {
     try {
-      // TODO: Implement role creation webhook
-      console.log('Role creation not yet implemented with webhook');
-      setError('Role creation not yet implemented with webhook integration');
-      return;
+      const roleData = {
+        ...roleForm,
+        permissions: JSON.stringify(roleForm.permissions)
+      };
       
+      await createRoleViaWebhook(roleData);
       setSuccess('Role created successfully');
       setShowRoleModal(false);
       resetRoleForm();
@@ -301,11 +477,12 @@ const AdminPage: React.FC<AdminPageProps> = () => {
     if (!editingRole) return;
     
     try {
-      // TODO: Implement role update webhook
-      console.log('Role update not yet implemented with webhook');
-      setError('Role update not yet implemented with webhook integration');
-      return;
+      const roleData = {
+        ...roleForm,
+        permissions: JSON.stringify(roleForm.permissions)
+      };
       
+      await updateRoleViaWebhook(editingRole.id, roleData);
       setSuccess('Role updated successfully');
       setShowRoleModal(false);
       setEditingRole(null);
@@ -320,11 +497,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
     if (!confirm('Are you sure you want to delete this role?')) return;
     
     try {
-      // TODO: Implement role deletion webhook
-      console.log('Role deletion not yet implemented with webhook');
-      setError('Role deletion not yet implemented with webhook integration');
-      return;
-      
+      await deleteRoleViaWebhook(id);
       setSuccess('Role deleted successfully');
       fetchRoles();
     } catch (err: any) {
