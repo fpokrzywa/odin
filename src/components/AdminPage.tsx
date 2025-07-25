@@ -388,7 +388,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
   // Filter users
   const filteredUsers = users.filter(user => {
     const matchesSearch = 
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.email ?? '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (user.first_name && user.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (user.last_name && user.last_name.toLowerCase().includes(searchTerm.toLowerCase()));
     
