@@ -5,6 +5,7 @@ import GetStartedModal from './components/GetStartedModal';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
 import RightPanel from './components/RightPanel';
+import { Bot, BookOpen, FileText, LogOut } from 'lucide-react';
 import AdminPage from './components/AdminPage';
 import AssistantsPage from './components/AssistantsPage';
 import PromptCatalogPage from './components/PromptCatalogPage';
@@ -105,7 +106,10 @@ function App() {
 
   const handleToggleSidebar = () => {
     console.log('Toggle sidebar clicked, current state:', isSidebarCollapsed);
-    setIsSidebarCollapsed(!isSidebarCollapsed);
+    setIsSidebarCollapsed(prev => {
+      console.log('Toggling sidebar from', prev, 'to', !prev);
+      return !prev;
+    });
   };
   // Always show landing page first, then show main app after sign in
   if (showLanding && !isSignedIn) {
@@ -133,15 +137,98 @@ function App() {
   return (
     <>
       <div className="flex h-screen bg-gray-100">
-        <Sidebar 
-          activeSection={activeSection}
-          onSectionChange={handleSectionChange}
-          onCollapseAll={handleCollapseAll}
-          user={user}
-          onSignOut={handleSignOut}
-          isCollapsed={isSidebarCollapsed}
-          onToggleCollapse={handleToggleSidebar}
-        />
+        {!isSidebarCollapsed && (
+          <Sidebar 
+            activeSection={activeSection}
+            onSectionChange={handleSectionChange}
+            onCollapseAll={handleCollapseAll}
+            user={user}
+            onSignOut={handleSignOut}
+            isCollapsed={isSidebarCollapsed}
+            onToggleCollapse={handleToggleSidebar}
+          />
+        )}
+        {isSidebarCollapsed && (
+          <div className="w-16 bg-slate-800 text-white flex flex-col h-full">
+            {/* Collapsed sidebar with just icons */}
+            <div className="p-4 border-b border-slate-700">
+              <button
+                onClick={handleToggleSidebar}
+                className="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded transition-colors"
+                title="Expand sidebar"
+              >
+                <img src="/odin_icon_white.svg" alt="ODIN" className="w-6 h-6" />
+              </button>
+            </div>
+            
+            {/* Icon navigation */}
+            <nav className="flex-1 overflow-y-auto p-2">
+              <div className="space-y-2">
+                {/* AI Tools Icons */}
+                <button
+                  onClick={() => handleSectionChange('assistants')}
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg transition-colors ${
+                    activeSection === 'assistants'
+                      ? 'bg-orange-600 text-white'
+                      : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                  }`}
+                  title="AI Assistants"
+                >
+                  <Bot className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={() => handleSectionChange('prompt-catalog')}
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg transition-colors ${
+                    activeSection === 'prompt-catalog'
+                      ? 'bg-orange-600 text-white'
+                      : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                  }`}
+                  title="Prompt Catalog"
+                >
+                  <BookOpen className="w-6 h-6" />
+                </button>
+                
+                {/* Divider */}
+                <div className="h-px bg-slate-700 my-2"></div>
+                
+                {/* Other sections as icons */}
+                <button
+                  onClick={() => handleSectionChange('knowledge-articles')}
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg transition-colors ${
+                    activeSection === 'knowledge-articles'
+                      ? 'bg-orange-600 text-white'
+                      : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                  }`}
+                  title="Knowledge Articles"
+                >
+                  <BookOpen className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={() => handleSectionChange('resources')}
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg transition-colors ${
+                    activeSection === 'resources'
+                      ? 'bg-orange-600 text-white'
+                      : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                  }`}
+                  title="Resources"
+                >
+                  <FileText className="w-6 h-6" />
+                </button>
+              </div>
+            </nav>
+            
+            {/* User section */}
+            <div className="p-2 border-t border-slate-700">
+              <button
+                onClick={handleSignOut}
+                className="w-12 h-12 flex items-center justify-center rounded-lg text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
+                title={`Sign out (${user?.email})`}
+              >
+                <LogOut className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
+        )}
         {showMainContent && !isMainContentCollapsed && !isSidebarCollapsed && activeSection !== 'admin' && activeSection !== 'assistants' && activeSection !== 'prompt-catalog' && (
           <MainContent activeSection={activeSection} />
         )}
