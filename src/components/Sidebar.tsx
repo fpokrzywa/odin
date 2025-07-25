@@ -17,7 +17,8 @@ import {
   ChevronRight, 
   FileText,
   User,
-  LogOut
+  LogOut,
+  ChevronLeft
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -26,6 +27,8 @@ interface SidebarProps {
   onCollapseAll: () => void;
   user: { email: string } | null;
   onSignOut: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
@@ -33,7 +36,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   onSectionChange, 
   onCollapseAll, 
   user, 
-  onSignOut 
+  onSignOut,
+  isCollapsed = false,
+  onToggleCollapse
 }) => {
   const [isFindAnswersExpanded, setIsFindAnswersExpanded] = useState(true);
   const [isAutomateTasksExpanded, setIsAutomateTasksExpanded] = useState(true);

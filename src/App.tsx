@@ -103,6 +103,9 @@ function App() {
     setIsSidebarCollapsed(false);
   };
 
+  const handleToggleSidebar = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
+  };
   // Always show landing page first, then show main app after sign in
   if (showLanding && !isSignedIn) {
     return (
@@ -129,15 +132,15 @@ function App() {
   return (
     <>
       <div className="flex h-screen bg-gray-100">
-        {!isSidebarCollapsed && (
-          <Sidebar 
-            activeSection={activeSection}
-            onSectionChange={handleSectionChange}
-            onCollapseAll={handleCollapseAll}
-            user={user}
-            onSignOut={handleSignOut}
-          />
-        )}
+        <Sidebar 
+          activeSection={activeSection}
+          onSectionChange={handleSectionChange}
+          onCollapseAll={handleCollapseAll}
+          user={user}
+          onSignOut={handleSignOut}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={handleToggleSidebar}
+        />
         {showMainContent && !isMainContentCollapsed && !isSidebarCollapsed && activeSection !== 'admin' && activeSection !== 'assistants' && activeSection !== 'prompt-catalog' && (
           <MainContent activeSection={activeSection} />
         )}
