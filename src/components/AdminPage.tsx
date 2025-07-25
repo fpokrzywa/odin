@@ -675,13 +675,22 @@ const AdminPage: React.FC<AdminPageProps> = () => {
                 <h2 className="text-xl font-semibold text-gray-900">User Management</h2>
                 <p className="text-gray-600">Manage user accounts and permissions</p>
               </div>
-              <button
-                onClick={() => openUserModal()}
-                className="flex items-center space-x-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add User</span>
-              </button>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => fetchUsers()}
+                  className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  title="Refresh users"
+                >
+                  <RefreshCw className="w-4 h-4 text-gray-600" />
+                </button>
+                <button
+                  onClick={() => openUserModal()}
+                  className="flex items-center space-x-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add User</span>
+                </button>
+              </div>
             </div>
 
             {/* Users Filters */}
@@ -793,13 +802,22 @@ const AdminPage: React.FC<AdminPageProps> = () => {
                 <h2 className="text-xl font-semibold text-gray-900">Role Management</h2>
                 <p className="text-gray-600">Manage roles and permissions</p>
               </div>
-              <button
-                onClick={() => openRoleModal()}
-                className="flex items-center space-x-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add Role</span>
-              </button>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => fetchRoles()}
+                  className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  title="Refresh roles"
+                >
+                  <RefreshCw className="w-4 h-4 text-gray-600" />
+                </button>
+                <button
+                  onClick={() => openRoleModal()}
+                  className="flex items-center space-x-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Role</span>
+                </button>
+              </div>
             </div>
 
             {/* Roles Grid */}
