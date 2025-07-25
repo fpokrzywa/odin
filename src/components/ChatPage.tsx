@@ -123,14 +123,6 @@ const ChatPage: React.FC<ChatPageProps> = ({
     }
   }, [selectedPrompt]);
 
-  // Clear input when assistant changes
-  useEffect(() => {
-    setInputValue('');
-    if (selectedPrompt && onPromptUsed) {
-      onPromptUsed();
-    }
-  }, [selectedAssistant?.id]);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const cursorPosition = e.target.selectionStart || 0;
