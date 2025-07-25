@@ -207,6 +207,37 @@ const Sidebar: React.FC<SidebarProps> = ({
           )}
         </div>
 
+        {/* Guidelines and Resources Section */}
+        <div className="mb-8">
+          <div className="px-6 py-2 text-xs font-semibold text-gray-300 uppercase tracking-wider">
+            Information
+          </div>
+          <nav className="space-y-1 mt-4">
+            <button
+              onClick={() => onSectionChange('resources')}
+              className={`flex items-center px-6 py-2 text-sm font-medium transition-colors w-full text-left ${
+                activeSection === 'resources'
+                  ? 'bg-orange-500 text-white'
+                  : 'text-gray-300 hover:bg-gray-600 hover:text-white'
+              }`}
+            >
+              <BookOpen className="mr-3 h-4 w-4" />
+              Resources
+            </button>
+            <button
+              onClick={() => onSectionChange('guidelines')}
+              className={`flex items-center px-6 py-2 text-sm font-medium transition-colors w-full text-left ${
+                activeSection === 'guidelines'
+                  ? 'bg-orange-500 text-white'
+                  : 'text-gray-300 hover:bg-gray-600 hover:text-white'
+              }`}
+            >
+              <FileText className="mr-3 h-4 w-4" />
+              Guidelines
+            </button>
+          </nav>
+        </div>
+
         {/* Admin Section - Only show for admin users */}
         {isAdmin && (
           <div className="mb-8">
@@ -242,14 +273,6 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Bottom Section */}
       <div className="p-6 border-t border-gray-600 mt-auto bg-gray-800">
-        <div className="mb-4">
-          <p className="text-xs text-gray-300 mb-3">
-            Reach out to experience it live in your environment.
-          </p>
-          <button className="w-full bg-orange-500 text-white py-2 px-4 rounded font-medium text-sm hover:bg-orange-600 transition-colors">
-            Contact Sales
-          </button>
-        </div>
         <a href="#" className="flex items-center text-sm text-gray-300 hover:text-white transition-colors">
           {user ? (
             <div className="w-full">
