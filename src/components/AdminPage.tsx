@@ -94,6 +94,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        mode: 'cors',
       });
 
       if (!response.ok) {
@@ -131,6 +132,7 @@ const AdminPage: React.FC<AdminPageProps> = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        mode: 'cors',
       });
 
       if (!response.ok) {
@@ -165,8 +167,11 @@ const AdminPage: React.FC<AdminPageProps> = () => {
       const userData = await fetchUsersFromWebhook();
       setUsers(userData);
     } catch (err: any) {
-      console.error('Failed to fetch users from webhook:', err);
-      setError('Failed to fetch users from webhook: ' + err.message);
+      console.error('❌ AdminPage: Failed to fetch users from webhook:', err);
+      const errorMessage = err.message === 'Failed to fetch' 
+        ? 'Unable to connect to user data webhook. Please check your network connection and webhook configuration.'
+        : err.message;
+      setError('Failed to fetch users: ' + errorMessage);
       // Set empty array as fallback
       setUsers([]);
     }
@@ -177,8 +182,11 @@ const AdminPage: React.FC<AdminPageProps> = () => {
       const roleData = await fetchRolesFromWebhook();
       setRoles(roleData);
     } catch (err: any) {
-      console.error('Failed to fetch roles from webhook:', err);
-      setError('Failed to fetch roles from webhook: ' + err.message);
+      console.error('❌ AdminPage: Failed to fetch roles from webhook:', err);
+      const errorMessage = err.message === 'Failed to fetch' 
+        ? 'Unable to connect to role data webhook. Please check your network connection and webhook configuration.'
+        : err.message;
+      setError('Failed to fetch roles: ' + errorMessage);
       // Set empty array as fallback
       setRoles([]);
     }
