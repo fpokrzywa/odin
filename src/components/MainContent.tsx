@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, Sparkles, ArrowRight, Users, Video, CreditCard, Receipt, Download, Ticket, Mail, Calendar, Lock } from 'lucide-react';
+import { ChevronDown, ChevronRight, Sparkles, ArrowRight, Users, Video, CreditCard, Receipt, Download, Ticket, Mail, Calendar, Lock, RefreshCw } from 'lucide-react';
+import { answersService, type AnswersData, type AnswerArticle } from '../services/answersService';
 
 interface MainContentProps {
   activeSection: string;
@@ -7,6 +8,41 @@ interface MainContentProps {
 
 const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
   const [expandedArticles, setExpandedArticles] = useState<string[]>([]);
+  const [answersData, setAnswersData] = useState<AnswersData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Load answers data when component mounts or when activeSection changes to knowledge-articles
+  React.useEffect(() => {
+    if (activeSection === 'knowledge-articles') {
+      loadAnswersData();
+    }
+  }, [activeSection]);
+
+  const loadAnswersData = async (forceRefresh: boolean = false) => {
+    if (forceRefresh) {
+      setIsRefreshing(true);
+    } else {
+      setIsLoading(true);
+    }
+    
+    try {
+      const data = await answersService.getAnswers(forceRefresh);
+      setAnswersData(data);
+      console.log('📦 MainContent: Loaded answers data:', data);
+      console.log('🔗 MainContent: Webhook connection info:', answersService.getConnectionInfo());
+    } catch (error) {
+      console.error('❌ MainContent: Error loading answers data:', error);
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  };
+
+  const handleRefresh = () => {
+    console.log('🔄 MainContent: Refresh button clicked - forcing data refresh from webhook');
+    loadAnswersData(true);
+  };
 
   const toggleArticle = (article: string) => {
     setExpandedArticles(prev =>
@@ -17,77 +53,98 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
   };
 
   const renderKnowledgeArticles = () => {
-    const articles = [
-      'US Leave Policies',
-      'India Leave Policies',
-      'BannerTech Laptop Refresh Policy',
-      'Troubleshooting Printers',
-      'Global Travel & Expense Policy',
-      'How to Update Personal Information in Workday',
-    ];
+    if (isLoading) {
+      return (
+        <div className="text-center py-16">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
+          <p className="text-gray-500">Loading knowledge articles...</p>
+        </div>
+      );
+    }
+
+    if (!answersData) {
+      return (
+        <div className="text-center py-16">
+          <p className="text-gray-500">Failed to load knowledge articles</p>
+          <button
+            onClick={() => loadAnswersData(true)}
+            className="mt-4 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      );
+    }
 
     return (
       <>
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Knowledge articles</h1>
-          <p className="text-gray-600 text-lg leading-relaxed">
-            Moveworks quickly answers employee questions on any topic by finding relevant information
-            across all the business systems.
-          </p>
+        <div className="mb-8 flex items-start justify-between">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">{answersData.title}</h1>
+            <p className="text-gray-600 text-lg leading-relaxed">
+              {answersData.description}
+            </p>
+          </div>
+          <button
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className={`flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 ml-4 ${
+              isRefreshing ? 'cursor-not-allowed' : ''
+            }`}
+            title="Refresh knowledge articles"
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span className="text-sm">Refresh</span>
+          </button>
         </div>
 
         {/* Try it yourself section */}
         <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-lg p-6 mb-8">
           <div className="flex items-start space-x-3 mb-4">
             <Sparkles className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
-            <h2 className="text-lg font-semibold text-orange-900">Try it yourself!</h2>
+            <h2 className="text-lg font-semibold text-orange-900">{answersData.tryItSection.title}</h2>
           </div>
           
           <div className="text-gray-700 mb-4">
-            <p className="mb-4">
-              Imagine you are an employee at BannerTech. You are curious about company policies
-              and benefits. Here's what you can do with Moveworks:
-            </p>
+            <p className="mb-4">{answersData.tryItSection.description}</p>
             
             <ul className="space-y-2 ml-4">
-              <li className="flex items-start">
-                <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                <span>Ask questions about the policies</span>
-              </li>
-              <li className="flex items-start">
-                <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                <span>Find information tailored to your needs. e.g. Can I take a two-week vacation based on my PTO balance?</span>
-              </li>
+              {answersData.tryItSection.bulletPoints.map((point, index) => (
+                <li key={index} className="flex items-start">
+                  <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  <span>{point}</span>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
 
         {/* Articles Section */}
         <div className="mb-8">
-          <h3 className="text-xl font-semi text-gray-900 mb-6">
-            Here are the sample articles that power the answers about your questions
+          <h3 className="text-xl font-semibold text-gray-900 mb-6">
+            {answersData.articlesSection.title}
           </h3>
           
           <div className="space-y-3">
-            {articles.map((article) => (
-              <div key={article} className="bg-white border border-gray-200 rounded-lg">
+            {answersData.articlesSection.articles.map((article) => (
+              <div key={article.id} className="bg-white border border-gray-200 rounded-lg">
                 <button
-                  onClick={() => toggleArticle(article)}
+                  onClick={() => toggleArticle(article.id)}
                   className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
                 >
-                  <span className="font-medium text-gray-900">{article}</span>
-                  {expandedArticles.includes(article) ? (
+                  <span className="font-medium text-gray-900">{article.title}</span>
+                  {expandedArticles.includes(article.id) ? (
                     <ChevronDown className="w-5 h-5 text-gray-400" />
                   ) : (
                     <ChevronRight className="w-5 h-5 text-gray-400" />
                   )}
                 </button>
                 
-                {expandedArticles.includes(article) && (
+                {expandedArticles.includes(article.id) && (
                   <div className="px-4 pb-4 text-gray-600">
                     <div className="pt-2 border-t border-gray-100">
-                      <p>Sample content for {article.toLowerCase()}...</p>
+                      <p>{article.content}</p>
                     </div>
                   </div>
                 )}
@@ -97,10 +154,12 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         </div>
 
         {/* Learn More Link */}
-        <div className="flex items-center space-x-2 text-orange-600 hover:text-orange-700 transition-colors cursor-pointer">
-          <ArrowRight className="w-4 h-4" />
-          <span className="font-medium">Learn more about Enterprise Search</span>
-        </div>
+        {answersData.learnMoreLink && (
+          <div className="flex items-center space-x-2 text-orange-600 hover:text-orange-700 transition-colors cursor-pointer">
+            <ArrowRight className="w-4 h-4" />
+            <span className="font-medium">{answersData.learnMoreLink.text}</span>
+          </div>
+        )}
       </>
     );
   };
