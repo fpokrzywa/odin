@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, HelpCircle, Mic, Send, Search, BarChart3, Image, Paperclip, Copy, Edit3, Bot, X } from 'lucide-react';
 import { chatService, type ChatMessage, type ChatThread } from '../services/chatService';
+import PromptCatalog from './PromptCatalog';
 
 interface ChatPageProps {
   selectedAssistant: { name: string; id: string } | null;
@@ -32,6 +33,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [pendingAssistantMessage, setPendingAssistantMessage] = useState<{assistant: string, message: string} | null>(null);
   const [pinnedAssistant, setPinnedAssistant] = useState<string | null>(null);
+  const [showPromptCatalog, setShowPromptCatalog] = useState(false);
 
   // Available assistants list
   const availableAssistants = [
@@ -416,6 +418,28 @@ const ChatPage: React.FC<ChatPageProps> = ({
     }
   };
 
+  const handleOpenPromptCatalog = () => {
+    setShowPromptCatalog(true);
+  };
+
+  const handlePromptSelect = (promptText: string, assistantName: string) => {
+    setInputValue(promptText);
+    setShowPromptCatalog(false);
+    // Optionally switch to the selected assistant if different
+    if (assistantName !== selectedAssistant?.name) {
+      // You could implement assistant switching here if needed
+      console.log('Selected prompt for different assistant:', assistantName);
+    }
+  };
+
+  const handleOpenFullCatalog = () => {
+    setShowPromptCatalog(false);
+    // Navigate to full prompt catalog page
+    if (onOpenPromptCatalog) {
+      onOpenPromptCatalog();
+    }
+  };
+
   if (!selectedAssistant) {
     return (
       <div className="flex-1 flex items-center justify-center bg-gray-50">
@@ -463,7 +487,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
             </div>
             {onOpenPromptCatalog && (
               <button 
-                onClick={onOpenPromptCatalog}
+                onClick={handleOpenPromptCatalog}
                 className="px-2 py-1 sm:px-4 sm:py-1 bg-orange-600 text-white rounded text-xs sm:text-sm hover:bg-orange-700 transition-colors"
               >
                 Prompts
@@ -739,6 +763,15 @@ const ChatPage: React.FC<ChatPageProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Prompt Catalog Modal */}
+      <PromptCatalog
+        isOpen={showPromptCatalog}
+        onClose={() => setShowPromptCatalog(false)}
+        onPromptSelect={handlePromptSelect}
+        onOpenFullCatalog={handleOpenFullCatalog}
+        selectedAssistant={selectedAssistant?.name}
+      />
     </div>
   );
 };
