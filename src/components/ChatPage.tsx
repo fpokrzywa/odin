@@ -158,6 +158,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
     if (atIndex !== -1 && (atIndex === 0 || value[atIndex - 1] === ' ')) {
       const searchTerm = value.substring(atIndex + 1, cursorPosition).toLowerCase();
       const filtered = availableAssistants.filter(assistant => 
+        assistant !== selectedAssistant?.name && // Exclude current assistant
         assistant.toLowerCase().includes(searchTerm)
       );
       
@@ -180,19 +181,35 @@ const ChatPage: React.FC<ChatPageProps> = ({
     console.log('🎯 ChatPage: Assistant selected:', assistant);
     console.log('🎯 ChatPage: Current atSymbolPosition:', atSymbolPosition);
     console.log('🎯 ChatPage: Current inputValue:', inputValue);
+    console.log('🎯 ChatPage: Current cursor position:', inputRef.current?.selectionStart);
     
     if (atSymbolPosition !== -1) {
+      // Get the current cursor position
+      const cursorPosition = inputRef.current?.selectionStart || inputValue.length;
+      
+      // Find the end of the @ mention (space or end of string)
+      let mentionEnd = cursorPosition;
+      for (let i = atSymbolPosition + 1; i < inputValue.length; i++) {
+        if (inputValue[i] === ' ') {
+          mentionEnd = i;
+          break;
+        }
+        mentionEnd = i + 1;
+      }
+      
       const beforeAt = inputValue.substring(0, atSymbolPosition);
-      const afterCursor = inputValue.substring(inputRef.current?.selectionStart || inputValue.length);
+      const afterMention = inputValue.substring(mentionEnd);
       
       console.log('🎯 ChatPage: beforeAt:', beforeAt);
-      console.log('🎯 ChatPage: afterCursor:', afterCursor);
+      console.log('🎯 ChatPage: afterMention:', afterMention);
       
-      // Set the mentioned assistant and clear the @ mention from input
+      // Create the new input value with @assistant
+      const newValue = beforeAt + `@${assistant} ` + afterMention;
+      console.log('🎯 ChatPage: Setting new input value:', newValue);
+      setInputValue(newValue);
+      
+      // Set the mentioned assistant
       setMentionedAssistant(assistant);
-      const newValue = beforeAt + afterCursor;
-      console.log('🎯 ChatPage: Setting new input value:', newValue.trim());
-      setInputValue(newValue.trim());
       
       setShowAssistantDropdown(false);
       setAtSymbolPosition(-1);
@@ -200,7 +217,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
       // Focus back to input and set cursor position
       setTimeout(() => {
         if (inputRef.current) {
-          const newCursorPosition = beforeAt.length;
+          const newCursorPosition = beforeAt.length + assistant.length + 2; // +2 for @ and space
           console.log('🎯 ChatPage: Setting cursor position:', newCursorPosition);
           inputRef.current.focus();
           inputRef.current.setSelectionRange(newCursorPosition, newCursorPosition);

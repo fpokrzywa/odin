@@ -54,7 +54,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
     if (activeSection) {
       console.log('MainContent: Loading data for Find Answers section:', activeSection);
       loadAnswersData(activeSection);
-    }
+        assistant.toLowerCase().includes(searchTerm)
   }, [activeSection]);
 
   const loadAnswersData = async (sectionId: string, forceRefresh: boolean = false) => {
@@ -127,30 +127,35 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
           title: `Content for ${sectionId}`,
           description: 'This content is being loaded from the webhook.',
           tryItYourself: {
-            scenario: 'This section contains helpful information and resources.',
-            actions: [
-              'Explore the available content',
-              'Ask ODIN questions about this topic'
-            ]
-          },
-          articles: [
-            {
-              id: 'sample-1',
-              policyName: 'Sample Article 1',
-              content: 'This is sample content while we load the real data from the webhook.',
-              isExpanded: false
-            }
-          ],
-          learnMoreLink: 'Learn more about this topic'
-        };
-        
-        setAnswersData(fallbackData);
-        setDebugInfo(`No match found for: ${sectionId}. Available: ${allItems.items.map(i => i.id).join(', ')}`);
-        console.warn('⚠️ MainContent: No data found for section:', sectionId, 'Available:', allItems.items.map(i => i.id));
+      // Get the current cursor position
+      const cursorPosition = inputRef.current?.selectionStart || inputValue.length;
+      
+      // Find the end of the @ mention (space or end of string)
+      let mentionEnd = cursorPosition;
+      for (let i = atSymbolPosition + 1; i < inputValue.length; i++) {
+        if (inputValue[i] === ' ') {
+          mentionEnd = i;
+          break;
+        }
+        mentionEnd = i + 1;
       }
+      
+      const beforeAt = inputValue.substring(0, atSymbolPosition);
+      const afterMention = inputValue.substring(mentionEnd);
+      // Set the mentioned assistant
+      setMentionedAssistant(assistant);
       
       console.log('🔗 MainContent: Webhook connection info:', answersService.getConnectionInfo());
       console.log('💾 MainContent: Cache status:', answersService.getCacheStatus());
+      
+      // Focus back to input and set cursor position
+      setTimeout(() => {
+        if (inputRef.current) {
+          const newCursorPosition = beforeAt.length + assistant.length + 2; // +2 for @ and space
+          inputRef.current.focus();
+          inputRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
+        }
+      }, 0);
     } catch (error) {
       console.error('❌ MainContent: Error loading answers data for', sectionId, ':', error);
       setError(`Error loading content: ${error instanceof Error ? error.message : 'Unknown error'}`);
