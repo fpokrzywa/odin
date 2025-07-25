@@ -8,6 +8,8 @@ import RightPanel from './components/RightPanel';
 import AdminPage from './components/AdminPage';
 import AssistantsPage from './components/AssistantsPage';
 import PromptCatalogPage from './components/PromptCatalogPage';
+import ResourcesPage from './components/ResourcesPage';
+import GuidelinesPage from './components/GuidelinesPage';
 
 function App() {
   const [showLanding, setShowLanding] = useState(true);
@@ -65,7 +67,7 @@ function App() {
   const handleSectionChange = (section: string) => {
     setActiveSection(section);
     // Show main content when a Find Answers section is selected (keep existing functionality)
-    const findAnswersSections = ['knowledge-articles', 'organization-chart', 'conference-rooms', 'customer-accounts', 'expense-reports'];
+    const findAnswersSections = ['knowledge-articles', 'organization-chart', 'conference-rooms', 'customer-accounts', 'expense-reports', 'resources', 'guidelines'];
     if (findAnswersSections.includes(section)) {
       setShowMainContent(true);
     } else {
@@ -138,6 +140,16 @@ function App() {
         {showMainContent && !isMainContentCollapsed && !isSidebarCollapsed && activeSection !== 'admin' && activeSection !== 'assistants' && activeSection !== 'prompt-catalog' && (
           <MainContent activeSection={activeSection} />
         )}
+        {activeSection === 'resources' && !isMainContentCollapsed && !isSidebarCollapsed && (
+          <div className="flex-1 flex">
+            <ResourcesPage />
+          </div>
+        )}
+        {activeSection === 'guidelines' && !isMainContentCollapsed && !isSidebarCollapsed && (
+          <div className="flex-1 flex">
+            <GuidelinesPage />
+          </div>
+        )}
         {activeSection === 'admin' && !isMainContentCollapsed && !isSidebarCollapsed && (
           <div className="flex-1 flex">
             <AdminPage />
@@ -153,9 +165,9 @@ function App() {
             <PromptCatalogPage onPromptSelect={handlePromptSelect} />
           </div>
         )}
-        {(activeSection === 'admin' || activeSection === 'assistants' || activeSection === 'prompt-catalog') && !isMainContentCollapsed && !isSidebarCollapsed ? null : (
+        {(activeSection === 'admin' || activeSection === 'assistants' || activeSection === 'prompt-catalog' || activeSection === 'resources' || activeSection === 'guidelines') && !isMainContentCollapsed && !isSidebarCollapsed ? null : (
           <RightPanel 
-            isExpanded={!showMainContent || isSidebarCollapsed || activeSection === 'assistants' || activeSection === 'prompt-catalog'} 
+            isExpanded={!showMainContent || isSidebarCollapsed || activeSection === 'assistants' || activeSection === 'prompt-catalog' || activeSection === 'resources' || activeSection === 'guidelines'} 
             isFullScreen={isSidebarCollapsed}
             onExpandAll={handleExpandAll}
             user={user}

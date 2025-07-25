@@ -10,6 +10,8 @@ import {
   Mail, 
   Calendar, 
   Lock,
+  BookOpen,
+  FileText,
   ChevronRight,
   ChevronDown,
   Menu
@@ -40,6 +42,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     { icon: Video, label: 'Conference rooms', id: 'conference-rooms' },
     { icon: CreditCard, label: 'Customer accounts', id: 'customer-accounts' },
     { icon: Receipt, label: 'Expense reports', id: 'expense-reports' },
+    { icon: BookOpen, label: 'Resources', id: 'resources' },
+    { icon: FileText, label: 'Guidelines', id: 'guidelines' },
   ];
 
   const automateTasksItems = [
