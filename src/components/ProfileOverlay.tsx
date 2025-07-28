@@ -41,8 +41,6 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
   const [isRefreshingAssistants, setIsRefreshingAssistants] = useState(false);
   const [companies, setCompanies] = useState<Array<{id: string, name: string}>>([]);
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(false);
-  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
-  const [profileError, setProfileError] = useState<string | null>(null);
 
   const loadCompanies = async () => {
     setIsLoadingCompanies(true);
@@ -87,96 +85,6 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const loadUserProfileFromWebhook = async (email: string) => {
-    setIsLoadingProfile(true);
-    setProfileError(null);
-    
-    try {
-      const webhookUrl = import.meta.env.VITE_N8N_GET_USERS_WEBHOOK_URL;
-      if (!webhookUrl) {
-        console.warn('VITE_N8N_GET_USERS_WEBHOOK_URL not configured');
-        return;
-      }
-
-      // Add email as parameter to webhook URL
-      const webhookUrlWithParams = `${webhookUrl}?id=${encodeURIComponent(email)}`;
-      console.log('Loading user profile from webhook:', webhookUrlWithParams);
-      
-      const response = await fetch(webhookUrlWithParams, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Webhook responded with status: ${response.status}`);
-      }
-
-      // Read response as text first to handle empty responses
-      const responseText = await response.text();
-      
-      if (!responseText || responseText.trim() === '') {
-        console.error('User profile webhook returned empty response for user:', email);
-        return;
-      }
-
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error('Failed to parse webhook response as JSON:', parseError);
-        return;
-      }
-      
-      console.log('User profile webhook response received:', data);
-      
-      // Handle single user response or array
-      let user;
-      if (Array.isArray(data)) {
-        // Array response - find matching user
-        user = data.find(u => u.id === email || u.email === email);
-      } else if (data && typeof data === 'object') {
-        // Single user object response
-        if (data.id === email || data.email === email) {
-          user = data;
-        }
-      }
-      
-      if (user) {
-        console.log('User profile loaded successfully from webhook');
-        
-        // Map webhook user data to profile format
-        const webhookProfile = {
-          name: user.firstname && user.lastname ? `${user.firstname} ${user.lastname}` : user.name || profile.name,
-          email: user.email || user.id || profile.email,
-          role: user.role || profile.role,
-          department: user.department || profile.department,
-          company: user.Company || user.company || profile.company,
-          joinDate: user.joinDate || user.created_at || profile.joinDate,
-          hasAcceptedGuidelines: user.hasAcceptedGuidelines !== undefined ? user.hasAcceptedGuidelines : profile.hasAcceptedGuidelines,
-          isAdmin: user.isAdmin !== undefined ? user.isAdmin : profile.isAdmin,
-          lastLogin: user.lastLogin || user.last_login || profile.lastLogin,
-          preferredAssistant: user.preferredAssistant || profile.preferredAssistant
-        };
-        
-        setProfile(webhookProfile);
-        setEditedProfile(webhookProfile);
-        
-        // Save to localStorage for caching
-        localStorage.setItem('userProfile', JSON.stringify(webhookProfile));
-      } else {
-        console.log('User not found in webhook response for email:', email);
-      }
-
-    } catch (error) {
-      console.error('Error loading user profile from webhook:', error);
-      setProfileError('Failed to load user profile from server');
-    } finally {
-      setIsLoadingProfile(false);
-    }
-  };
-
   // Load profile from localStorage on component mount
   useEffect(() => {
     const savedProfile = localStorage.getItem('userProfile');
@@ -184,6 +92,7 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
       const parsedProfile = JSON.parse(savedProfile);
       setProfile(parsedProfile);
       setEditedProfile(parsedProfile);
+      console.log('ProfileOverlay: Loaded cached profile from localStorage:', parsedProfile);
     }
   }, []);
 
@@ -305,27 +214,7 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
             </button>
           </div>
         </div>
-
-        {/* Loading State */}
-        {isLoadingProfile && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <div className="flex items-center space-x-3">
-              <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-              <span className="text-blue-700">Loading profile from server...</span>
-            </div>
-          </div>
-        )}
-
-        {/* Profile Error */}
-        {profileError && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <div className="flex items-center space-x-3">
-              <X className="w-5 h-5 text-red-500" />
-              <span className="text-red-700">{profileError}</span>
-            </div>
-          </div>
-        )}
-
+      <div className="max-w-4xl mx-auto px-6 py-6">
         {/* Content */}
         <div className="space-y-6">
           {/* Profile Information */}
