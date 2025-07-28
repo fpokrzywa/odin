@@ -17,6 +17,28 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string>('');
+  const [userProfile, setUserProfile] = useState<any>(null);
+
+  // Load user profile from localStorage
+  useEffect(() => {
+    const savedProfile = localStorage.getItem('userProfile');
+    if (savedProfile) {
+      setUserProfile(JSON.parse(savedProfile));
+    }
+  }, []);
+
+  // Listen for profile changes
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedProfile = localStorage.getItem('userProfile');
+      if (savedProfile) {
+        setUserProfile(JSON.parse(savedProfile));
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // Load answers data when component mounts or when activeSection changes
   React.useEffect(() => {
@@ -358,32 +380,35 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         )}
 
         {/* Debug Information */}
-        <div className="mt-8">
-          <button
-            onClick={() => setIsDebugExpanded(!isDebugExpanded)}
-            className="flex items-center space-x-2 text-sm text-gray-400 hover:text-gray-600 transition-colors mb-2"
-          >
-            <HelpCircle className="w-4 h-4" />
-            <span>Debug Information</span>
-          </button>
-          
-          {isDebugExpanded && (
-            <div className="p-4 bg-gray-100 rounded-lg text-sm text-gray-600">
-              <p><strong>Debug Info:</strong> {debugInfo}</p>
-              <p><strong>Section:</strong> {activeSection}</p>
-              <p><strong>Assistant ID:</strong> {answersData?.assistantID || 'None (will use ODIN)'}</p>
-              <p><strong>Has Data:</strong> {answersData ? 'Yes' : 'No'}</p>
-              {answersData && (
-                <>
-                  <p><strong>Title:</strong> {answersData.title}</p>
-                  <p><strong>Articles Count:</strong> {answersData.articles?.length || 0}</p>
-                  <p><strong>Try It Yourself:</strong> {answersData.tryItYourself ? 'Yes' : 'No'}</p>
-                  <p><strong>Assistant ID from Data:</strong> {answersData.assistantID || 'Not specified'}</p>
-                </>
-              )}
-            </div>
-          )}
-        </div>
+        {/* Debug Information - Only show for admin users */}
+        {userProfile?.isAdmin && (
+          <div className="mt-8">
+            <button
+              onClick={() => setIsDebugExpanded(!isDebugExpanded)}
+              className="flex items-center space-x-2 text-sm text-gray-400 hover:text-gray-600 transition-colors mb-2"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span>Debug Information</span>
+            </button>
+            
+            {isDebugExpanded && (
+              <div className="p-4 bg-gray-100 rounded-lg text-sm text-gray-600">
+                <p><strong>Debug Info:</strong> {debugInfo}</p>
+                <p><strong>Section:</strong> {activeSection}</p>
+                <p><strong>Assistant ID:</strong> {answersData?.assistantID || 'None (will use ODIN)'}</p>
+                <p><strong>Has Data:</strong> {answersData ? 'Yes' : 'No'}</p>
+                {answersData && (
+                  <>
+                    <p><strong>Title:</strong> {answersData.title}</p>
+                    <p><strong>Articles Count:</strong> {answersData.articles?.length || 0}</p>
+                    <p><strong>Try It Yourself:</strong> {answersData.tryItYourself ? 'Yes' : 'No'}</p>
+                    <p><strong>Assistant ID from Data:</strong> {answersData.assistantID || 'Not specified'}</p>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </>
     );
   };
@@ -604,33 +629,36 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         )}
 
         {/* Debug Information */}
-        <div className="mt-8">
-          <button
-            onClick={() => setIsDebugExpanded(!isDebugExpanded)}
-            className="flex items-center space-x-2 text-sm text-gray-400 hover:text-gray-600 transition-colors mb-2"
-          >
-            <HelpCircle className="w-4 h-4" />
-            <span>Debug Information</span>
-          </button>
-          
-          {isDebugExpanded && (
-            <div className="p-4 bg-gray-100 rounded-lg text-sm text-gray-600">
-              <p><strong>Debug Info:</strong> {debugInfo}</p>
-              <p><strong>Section:</strong> {activeSection}</p>
-              <p><strong>Data Type:</strong> Automate Tasks</p>
-              <p><strong>Webhook URL:</strong> {automationsService.getConnectionInfo().webhookUrl}</p>
-              <p><strong>Webhook Configured:</strong> {automationsService.isWebhookConfigured() ? 'Yes' : 'No'}</p>
-              <p><strong>Has Data:</strong> {automationsData ? 'Yes' : 'No'}</p>
-              {automationsData && (
-                <>
-                  <p><strong>Title:</strong> {automationsData.title}</p>
-                  <p><strong>Agents Count:</strong> {automationsData.agents?.length || 0}</p>
-                  <p><strong>Try It Yourself:</strong> {automationsData.tryItYourself ? 'Yes' : 'No'}</p>
-                </>
-              )}
-            </div>
-          )}
-        </div>
+        {/* Debug Information - Only show for admin users */}
+        {userProfile?.isAdmin && (
+          <div className="mt-8">
+            <button
+              onClick={() => setIsDebugExpanded(!isDebugExpanded)}
+              className="flex items-center space-x-2 text-sm text-gray-400 hover:text-gray-600 transition-colors mb-2"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span>Debug Information</span>
+            </button>
+            
+            {isDebugExpanded && (
+              <div className="p-4 bg-gray-100 rounded-lg text-sm text-gray-600">
+                <p><strong>Debug Info:</strong> {debugInfo}</p>
+                <p><strong>Section:</strong> {activeSection}</p>
+                <p><strong>Data Type:</strong> Automate Tasks</p>
+                <p><strong>Webhook URL:</strong> {automationsService.getConnectionInfo().webhookUrl}</p>
+                <p><strong>Webhook Configured:</strong> {automationsService.isWebhookConfigured() ? 'Yes' : 'No'}</p>
+                <p><strong>Has Data:</strong> {automationsData ? 'Yes' : 'No'}</p>
+                {automationsData && (
+                  <>
+                    <p><strong>Title:</strong> {automationsData.title}</p>
+                    <p><strong>Agents Count:</strong> {automationsData.agents?.length || 0}</p>
+                    <p><strong>Try It Yourself:</strong> {automationsData.tryItYourself ? 'Yes' : 'No'}</p>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </>
     );
   };
