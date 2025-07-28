@@ -3,6 +3,7 @@ import { ChevronRight, ChevronDown, Search, Menu, ChevronUp } from 'lucide-react
 import ModelSelector from './ModelSelector';
 import ChatPage from './ChatPage';
 import { answersService } from '../services/answersService';
+import { automationsService } from '../services/automationsService';
 
 interface RightPanelProps {
   isExpanded?: boolean;
@@ -30,6 +31,22 @@ const RightPanel: React.FC<RightPanelProps> = ({
     const loadAssistantForSection = async () => {
       if (activeSection) {
         try {
+          // First try to load from automations service
+          let automationsData = null;
+          try {
+            automationsData = await automationsService.getAutomationsForItem(activeSection);
+          } catch (error) {
+            console.log('🤖 RightPanel: Not an automation section, trying answers service');
+          }
+          
+          if (automationsData) {
+            console.log('🤖 RightPanel: Found automation data for section:', activeSection);
+            // For automations, we'll use ODIN as default since agents have their own IDs
+            setCurrentAssistant({ name: 'ODIN', id: 'odin' });
+            return;
+          }
+          
+          // If not found in automations, try answers service
           const answersData = await answersService.getAnswersForItem(activeSection);
           if (answersData && answersData.assistantID) {
             console.log('🤖 RightPanel: Found assistantID for section:', activeSection, '→', answersData.assistantID);
@@ -52,9 +69,9 @@ const RightPanel: React.FC<RightPanelProps> = ({
   }, [activeSection]);
 
   // Check if this is a Find Answers section
-  const isFindAnswersSection = activeSection && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection);
+  const isDynamicSection = activeSection && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection);
 
-  if (isFindAnswersSection && currentAssistant) {
+  if (isDynamicSection && currentAssistant) {
     return (
       <div className="flex-1 flex">
         <ChatPage 

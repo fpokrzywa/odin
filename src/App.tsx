@@ -313,7 +313,12 @@ function App() {
           activeSection === 'conference-rooms' || 
           activeSection === 'customer-accounts' || 
           activeSection === 'expense-reports' ||
-          // Handle any other dynamic sections from webhook
+          activeSection === 'get-software-apps' ||
+          activeSection === 'track-support-tickets' ||
+          activeSection === 'manage-email-groups' ||
+          activeSection === 'request-time-off' ||
+          activeSection === 'reset-password' ||
+          // Handle any other dynamic sections from webhooks (Find Answers or Automate Tasks)
           (activeSection && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection))) && (
           <>
             <MainContent 
