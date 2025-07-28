@@ -39,6 +39,8 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
   const [editedProfile, setEditedProfile] = useState<UserProfile>(profile);
   const [openaiAssistants, setOpenaiAssistants] = useState<Assistant[]>([]);
   const [isRefreshingAssistants, setIsRefreshingAssistants] = useState(false);
+  const [companies, setCompanies] = useState<Array<{id: string, name: string}>>([]);
+  const [isLoadingCompanies, setIsLoadingCompanies] = useState(false);
 
   // Load profile from localStorage on component mount
   useEffect(() => {
