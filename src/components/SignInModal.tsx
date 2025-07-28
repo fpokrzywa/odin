@@ -14,6 +14,67 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Function to validate user against webhook
+  const validateUserCredentials = async (email: string, password: string): Promise<boolean> => {
+    const webhookUrl = import.meta.env.VITE_N8N_GET_USERS_WEBHOOK_URL;
+    
+    if (!webhookUrl) {
+      console.warn('VITE_N8N_GET_USERS_WEBHOOK_URL not configured');
+      return false;
+    }
+
+    try {
+      console.log('Validating user credentials against webhook:', webhookUrl);
+      const response = await fetch(webhookUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Webhook responded with status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('User validation webhook response received');
+      
+      // Handle different response formats
+      let users: any[];
+      if (Array.isArray(data)) {
+        users = data;
+      } else if (data.users && Array.isArray(data.users)) {
+        users = data.users;
+      } else if (data.data && Array.isArray(data.data)) {
+        users = data.data;
+      } else {
+        console.error('Invalid response format from user webhook');
+        return false;
+      }
+
+      // Find user with matching email (id field)
+      const user = users.find(u => u.id === email || u.email === email);
+      
+      if (!user) {
+        console.log('User not found in webhook data');
+        return false;
+      }
+
+      // Check password
+      if (user.password === password) {
+        console.log('User credentials validated successfully');
+        return true;
+      } else {
+        console.log('Password does not match');
+        return false;
+      }
+
+    } catch (error) {
+      console.error('Error validating user credentials:', error);
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -36,20 +97,25 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Check for admin credentials
-      if (email === 'freddie@3cpublish.com' && password === 'Appdev2025!') {
+      // Validate credentials against webhook
+      const isValidUser = await validateUserCredentials(email, password);
+      
+      if (isValidUser) {
+        console.log('User authentication successful');
         onSignIn(email, password);
       } else {
-        // For demo purposes, accept any other email/password combination
-        onSignIn(email, password);
+        setError('Invalid email or password. Please check your credentials and try again.');
       }
       
-      // Reset form
-      setEmail('');
-      setPassword('');
-      setShowPassword(false);
+      // Reset form on successful login
+      if (isValidUser) {
+        setEmail('');
+        setPassword('');
+        setShowPassword(false);
+      }
     } catch (err) {
-      setError('Sign in failed. Please try again.');
+      console.error('Authentication error:', err);
+      setError('Authentication failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
