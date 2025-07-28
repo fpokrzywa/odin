@@ -24,15 +24,15 @@ interface ProfileOverlayProps {
 
 const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
   const [profile, setProfile] = useState<UserProfile>({
-    name: 'John Smith',
-    email: 'john.smith@agenticweaver.com',
-    role: 'Senior Data Scientist',
-    department: 'Research & Development',
+    name: '',
+    email: '',
+    role: '',
+    department: '',
     company: getCompanyName(),
-    joinDate: '2023-01-15',
+    joinDate: '',
     hasAcceptedGuidelines: false,
     isAdmin: false,
-    lastLogin: '2024-01-15 09:30 AM',
+    lastLogin: '',
     preferredAssistant: getCompanyBotName()
   });
 
@@ -89,11 +89,20 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
   // Load profile from localStorage on component mount
   useEffect(() => {
     const savedProfile = localStorage.getItem('userProfile');
+    console.log('ProfileOverlay: Loading profile from localStorage:', savedProfile);
     if (savedProfile) {
-      const parsedProfile = JSON.parse(savedProfile);
-      setProfile(parsedProfile);
-      setEditedProfile(parsedProfile);
-      console.log('ProfileOverlay: Loaded cached profile from localStorage:', parsedProfile);
+      try {
+        const parsedProfile = JSON.parse(savedProfile);
+        console.log('ProfileOverlay: Parsed profile data:', parsedProfile);
+        setProfile(parsedProfile);
+        setEditedProfile(parsedProfile);
+        console.log('ProfileOverlay: Successfully loaded cached profile from localStorage');
+      } catch (error) {
+        console.error('ProfileOverlay: Error parsing saved profile:', error);
+        // Keep default empty profile if parsing fails
+      }
+    } else {
+      console.log('ProfileOverlay: No saved profile found in localStorage');
     }
   }, []);
 
