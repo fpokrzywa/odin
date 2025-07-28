@@ -340,10 +340,10 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
                 <h3 className="text-lg font-semibold text-gray-800">Profile Information</h3>
                 <button
                   onClick={() => setIsEditing(!isEditing)}
-                  className="flex items-center space-x-2 px-3 py-1 text-sm text-pink-600 hover:text-pink-700 transition-colors"
+                  className="flex items-center space-x-2 px-3 py-1 text-sm text-orange-600 hover:text-orange-700 transition-colors"
                 >
                   <Settings className="w-4 h-4" />
-                  <span>{isEditing ? 'Cancel' : 'Edit'}</span>
+                  <span>{isEditing ? 'Cancel Edit' : 'Edit'}</span>
                 </button>
               </div>
 
@@ -378,10 +378,19 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <div className="flex items-center space-x-2">
-                    <Mail className="w-4 h-4 text-gray-400" />
-                    <p className="text-gray-900">{profile.email}</p>
-                  </div>
+                  {isEditing ? (
+                    <input
+                      type="email"
+                      value={editedProfile.email}
+                      onChange={(e) => setEditedProfile({ ...editedProfile, email: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <Mail className="w-4 h-4 text-gray-400" />
+                      <p className="text-gray-900">{profile.email}</p>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -453,10 +462,19 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Join Date</label>
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="w-4 h-4 text-gray-400" />
-                    <p className="text-gray-900">{formatDate(profile.joinDate)}</p>
-                  </div>
+                  {isEditing ? (
+                    <input
+                      type="date"
+                      value={profile.joinDate}
+                      onChange={(e) => setEditedProfile({ ...editedProfile, joinDate: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <Calendar className="w-4 h-4 text-gray-400" />
+                      <p className="text-gray-900">{formatDate(profile.joinDate)}</p>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -486,7 +504,7 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
                   </button>
                   <button
                     onClick={handleSave}
-                    className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                    className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                     disabled={isSaving}
                   >
                     {isSaving && (
