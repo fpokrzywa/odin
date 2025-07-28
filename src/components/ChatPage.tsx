@@ -866,20 +866,6 @@ const ChatPage: React.FC<ChatPageProps> = ({
               )}
               
               <button
-              {pinnedAssistant && !mentionedAssistant && (
-                <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-full px-3 py-1 text-sm">
-                  <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-2.5 h-2.5 text-green-600" />
-                  </div>
-                  <span className="text-green-700 font-medium">{pinnedAssistant}</span>
-                  <button
-                    onClick={() => setPinnedAssistant(null)}
-                    className="text-green-400 hover:text-green-600 transition-colors"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              )}
                 onClick={() => {
                   if (fileInputRef.current) {
                     fileInputRef.current.click();
@@ -895,6 +881,21 @@ const ChatPage: React.FC<ChatPageProps> = ({
                   </div>
                 )}
               </button>
+              
+              {pinnedAssistant && !mentionedAssistant && (
+                <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-full px-3 py-1 text-sm">
+                  <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Bot className="w-2.5 h-2.5 text-green-600" />
+                  </div>
+                  <span className="text-green-700 font-medium">{pinnedAssistant}</span>
+                  <button
+                    onClick={() => setPinnedAssistant(null)}
+                    className="text-green-400 hover:text-green-600 transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
               
               {/* Hidden file input */}
               <input
