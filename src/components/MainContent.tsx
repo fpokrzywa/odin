@@ -49,6 +49,8 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         setAnswersData(null); // Clear answers data
         setDebugInfo(`Successfully loaded Automate Tasks: ${automationItem.title}`);
         console.log('✅ MainContent: Successfully loaded Automate Tasks data for section:', sectionId);
+        setIsLoading(false);
+        setIsRefreshing(false);
         return;
       }
     } catch (error) {
