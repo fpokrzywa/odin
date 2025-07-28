@@ -24,8 +24,10 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
     }
 
     try {
-      console.log('Validating user credentials against webhook:', webhookUrl);
-      const response = await fetch(webhookUrl, {
+      // Add email as parameter to webhook URL
+      const webhookUrlWithParams = `${webhookUrl}?id=${encodeURIComponent(email)}`;
+      console.log('Validating user credentials against webhook:', webhookUrlWithParams);
+      const response = await fetch(webhookUrlWithParams, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -40,7 +42,7 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
       const responseText = await response.text();
       
       if (!responseText || responseText.trim() === '') {
-        console.error('User validation webhook returned empty response. Please check webhook configuration.');
+        console.error('User validation webhook returned empty response for user:', email);
         return false;
       }
 
@@ -54,24 +56,20 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
       
       console.log('User validation webhook response received');
       
-      // Handle different response formats
-      let users: any[];
+      // Handle single user response or array
+      let user;
       if (Array.isArray(data)) {
-        users = data;
-      } else if (data.users && Array.isArray(data.users)) {
-        users = data.users;
-      } else if (data.data && Array.isArray(data.data)) {
-        users = data.data;
-      } else {
-        console.error('Invalid response format from user webhook');
-        return false;
+        // Array response - find matching user
+        user = data.find(u => u.id === email || u.email === email);
+      } else if (data && typeof data === 'object') {
+        // Single user object response
+        if (data.id === email || data.email === email) {
+          user = data;
+        }
       }
-
-      // Find user with matching email (id field)
-      const user = users.find(u => u.id === email || u.email === email);
       
       if (!user) {
-        console.log('User not found in webhook data');
+        console.log('User not found in webhook response for email:', email);
         return false;
       }
 
