@@ -242,6 +242,39 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                {isEditing ? (
+                  <div className="flex items-center space-x-2">
+                    <select
+                      value={editedProfile.company}
+                      onChange={(e) => setEditedProfile({ ...editedProfile, company: e.target.value })}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      disabled={isLoadingCompanies}
+                    >
+                      {isLoadingCompanies ? (
+                        <option>Loading companies...</option>
+                      ) : (
+                        companies.map((company) => (
+                          <option key={company.id} value={company.name}>
+                            {company.name}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                    <button
+                      onClick={loadCompanies}
+                      disabled={isLoadingCompanies}
+                      className="p-2 text-gray-400 hover:text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Refresh companies"
+                    >
+                      <RefreshCw className={`w-4 h-4 ${isLoadingCompanies ? 'animate-spin' : ''}`} />
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-gray-900">{profile.company}</p>
+                )}
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Join Date</label>
                 <div className="flex items-center space-x-2">
                   <Calendar className="w-4 h-4 text-gray-400" />
