@@ -318,16 +318,14 @@ function App() {
           <>
             <MainContent 
               activeSection={activeSection} 
-              onAssistantChange={handleAssistantChange}
             />
-            <div className="flex-1 flex">
-              <ChatPage 
-                selectedAssistant={currentFindAnswersAssistant || { name: 'ODIN', id: 'odin' }}
-                selectedPrompt=""
-                onPromptUsed={() => {}}
-                onOpenPromptCatalog={() => setActiveSection('prompt-catalog')}
-              />
-            </div>
+            <RightPanel 
+              isExpanded={isMainContentCollapsed}
+              isFullScreen={isSidebarCollapsed}
+              onExpandAll={handleExpandAll}
+              user={user}
+              activeSection={activeSection}
+            />
           </>
         )}
       </div>

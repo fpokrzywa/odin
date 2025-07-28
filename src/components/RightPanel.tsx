@@ -1,24 +1,71 @@
 import React, { useState } from 'react';
 import { ChevronRight, ChevronDown, Search, Menu, ChevronUp } from 'lucide-react';
 import ModelSelector from './ModelSelector';
+import ChatPage from './ChatPage';
+import { answersService } from '../services/answersService';
 
 interface RightPanelProps {
   isExpanded?: boolean;
   isFullScreen?: boolean;
   onExpandAll?: () => void;
   user?: { email: string } | null;
+  activeSection?: string;
 }
 
 const RightPanel: React.FC<RightPanelProps> = ({ 
   isExpanded = false, 
   isFullScreen = false, 
   onExpandAll,
-  user 
+  user,
+  activeSection
 }) => {
   const [showSamplePrompts, setShowSamplePrompts] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showModelSelector, setShowModelSelector] = useState(false);
   const [selectedModel, setSelectedModel] = useState('GPT-4o');
+  const [currentAssistant, setCurrentAssistant] = useState<{ name: string; id: string } | null>(null);
+
+  // Load assistant data when activeSection changes
+  React.useEffect(() => {
+    const loadAssistantForSection = async () => {
+      if (activeSection) {
+        try {
+          const answersData = await answersService.getAnswersForItem(activeSection);
+          if (answersData && answersData.assistantID) {
+            console.log('🤖 RightPanel: Found assistantID for section:', activeSection, '→', answersData.assistantID);
+            setCurrentAssistant({
+              name: answersData.title || 'Specialized Assistant',
+              id: answersData.assistantID
+            });
+          } else {
+            console.log('🤖 RightPanel: No assistantID found, using ODIN for section:', activeSection);
+            setCurrentAssistant({ name: 'ODIN', id: 'odin' });
+          }
+        } catch (error) {
+          console.error('❌ RightPanel: Error loading assistant for section:', error);
+          setCurrentAssistant({ name: 'ODIN', id: 'odin' });
+        }
+      }
+    };
+
+    loadAssistantForSection();
+  }, [activeSection]);
+
+  // Check if this is a Find Answers section
+  const isFindAnswersSection = activeSection && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection);
+
+  if (isFindAnswersSection && currentAssistant) {
+    return (
+      <div className="flex-1 flex">
+        <ChatPage 
+          selectedAssistant={currentAssistant}
+          selectedPrompt=""
+          onPromptUsed={() => {}}
+          onOpenPromptCatalog={() => {}}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={`${isExpanded ? 'flex-1' : 'flex-1'} bg-white border-l border-gray-200 h-screen flex flex-col relative`}>
