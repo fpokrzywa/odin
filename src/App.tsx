@@ -313,13 +313,8 @@ function App() {
           activeSection === 'conference-rooms' || 
           activeSection === 'customer-accounts' || 
           activeSection === 'expense-reports' ||
-          activeSection === 'get-software-apps' ||
-          activeSection === 'track-support-tickets' ||
-          activeSection === 'manage-email-groups' ||
-          activeSection === 'request-time-off' ||
-          activeSection === 'reset-password' ||
           // Handle any other dynamic sections from webhooks (Find Answers or Automate Tasks)
-          (activeSection && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection))) && (
+          (activeSection && activeSection.startsWith('A1970-') && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection))) && (
           <>
             <MainContent 
               activeSection={activeSection} 
@@ -332,6 +327,21 @@ function App() {
               activeSection={activeSection}
             />
           </>
+        )}
+        
+        {/* Automate Tasks sections with MainContent only */}
+        {(activeSection === 'get-software-apps' ||
+          activeSection === 'track-support-tickets' ||
+          activeSection === 'manage-email-groups' ||
+          activeSection === 'request-time-off' ||
+          activeSection === 'reset-password' ||
+          // Handle dynamic Automate Tasks sections from webhooks (AG prefix)
+          (activeSection && activeSection.startsWith('AG') && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection))) && (
+          <div className="flex-1 flex">
+            <MainContent 
+              activeSection={activeSection} 
+            />
+          </div>
         )}
       </div>
       
