@@ -76,17 +76,28 @@ const Sidebar: React.FC<SidebarProps> = ({
   // Load Automate Tasks items from webhook
   useEffect(() => {
     const loadAutomateTasksItems = async () => {
+      console.log('🔄 Sidebar: Starting to load Automate Tasks items');
       setIsLoadingAutomateTasks(true);
       try {
+        console.log('🔗 Sidebar: Webhook info:', automationsService.getConnectionInfo());
         const response = await automationsService.getAutomateTasksItems();
+        console.log('📦 Sidebar: Received response with', response.items.length, 'items');
         setAutomateTasksItems(response.items);
         console.log('📋 Sidebar: Loaded Automate Tasks items:', response.items.length);
       } catch (error) {
         console.error('❌ Sidebar: Error loading Automate Tasks items:', error);
         // Fallback items will be used from the service
-        const fallbackResponse = await automationsService.getAutomateTasksItems();
-        setAutomateTasksItems(fallbackResponse.items);
+        try {
+          console.log('🔄 Sidebar: Attempting to get fallback data');
+          const fallbackResponse = await automationsService.getAutomateTasksItems();
+          setAutomateTasksItems(fallbackResponse.items);
+          console.log('✅ Sidebar: Loaded fallback data with', fallbackResponse.items.length, 'items');
+        } catch (fallbackError) {
+          console.error('❌ Sidebar: Even fallback failed:', fallbackError);
+          setAutomateTasksItems([]);
+        }
       } finally {
+        console.log('🏁 Sidebar: Finished loading Automate Tasks items');
         setIsLoadingAutomateTasks(false);
       }
     };

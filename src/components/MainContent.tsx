@@ -593,6 +593,8 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
           <p><strong>Debug Info:</strong> {debugInfo}</p>
           <p><strong>Section:</strong> {activeSection}</p>
           <p><strong>Data Type:</strong> Automate Tasks</p>
+          <p><strong>Webhook URL:</strong> {automationsService.getConnectionInfo().webhookUrl}</p>
+          <p><strong>Webhook Configured:</strong> {automationsService.isWebhookConfigured() ? 'Yes' : 'No'}</p>
           <p><strong>Has Data:</strong> {automationsData ? 'Yes' : 'No'}</p>
           {automationsData && (
             <>

@@ -57,52 +57,66 @@ class AutomationsService {
   async getAutomateTasksItems(forceRefresh: boolean = false): Promise<AutomateTasksResponse> {
     // Check cache first unless force refresh is requested
     if (!forceRefresh && this.cachedItems && (Date.now() - this.cacheTimestamp) < this.cacheExpiryMs) {
-      console.log('📋 AutomationsService: Returning cached automations');
+      console.log('📋 AutomationsService: Returning cached automations', this.cachedItems.items.length, 'items');
       return this.cachedItems;
     }
 
     try {
       if (this.webhookUrl) {
-        console.log('🔗 AutomationsService: Fetching automations from n8n webhook:', this.webhookUrl);
+        console.log('🔗 AutomationsService: Attempting to fetch from webhook:', this.webhookUrl);
         
-        const response = await fetch(this.webhookUrl, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+        try {
+          const response = await fetch(this.webhookUrl, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
 
-        if (!response.ok) {
-          throw new Error(`n8n webhook responded with status: ${response.status} - ${response.statusText}`);
-        }
+          if (!response.ok) {
+            throw new Error(`n8n webhook responded with status: ${response.status} - ${response.statusText}`);
+          }
 
-        const data = await response.json();
-        console.log('📦 AutomationsService: Raw webhook response:', data);
-        
-        // Log the structure of the first item to understand the data format
-        if (Array.isArray(data) && data.length > 0) {
-          console.log('📋 AutomationsService: First item structure:', data[0]);
+          const data = await response.json();
+          console.log('📦 AutomationsService: Raw webhook response:', data);
+          
+          // Log the structure of the first item to understand the data format
+          if (Array.isArray(data) && data.length > 0) {
+            console.log('📋 AutomationsService: First item structure:', data[0]);
+          }
+          
+          // Transform the webhook data to match our interface
+          const automateTasksData = this.transformWebhookData(data);
+          console.log('🔄 AutomationsService: Transformed data:', automateTasksData);
+          
+          // Cache the results
+          this.cachedItems = automateTasksData;
+          this.cacheTimestamp = Date.now();
+          
+          // Cache individual item data for faster access
+          automateTasksData.items.forEach(item => {
+            this.cachedItemData.set(item.id, item.data);
+          });
+          
+          console.log('✅ AutomationsService: Successfully loaded automations from webhook');
+          return automateTasksData;
+        } catch (fetchError) {
+          console.error('❌ AutomationsService: Webhook fetch failed:', fetchError);
+          if (fetchError instanceof TypeError && fetchError.message === 'Failed to fetch') {
+            console.warn('🚫 AutomationsService: Network error - webhook not accessible');
+            console.warn('   Possible causes:');
+            console.warn('   1. Webhook URL incorrect:', this.webhookUrl);
+            console.warn('   2. CORS not configured on webhook server');
+            console.warn('   3. Network connectivity issues');
+            console.warn('   4. Webhook server not running');
+          }
+          throw fetchError;
         }
-        
-        // Transform the webhook data to match our interface
-        const automateTasksData = this.transformWebhookData(data);
-        console.log('🔄 AutomationsService: Transformed data:', automateTasksData);
-        
-        // Cache the results
-        this.cachedItems = automateTasksData;
-        this.cacheTimestamp = Date.now();
-        
-        // Cache individual item data for faster access
-        automateTasksData.items.forEach(item => {
-          this.cachedItemData.set(item.id, item.data);
-        });
-        
-        console.log('✅ AutomationsService: Successfully loaded automations from webhook');
-        return automateTasksData;
       }
       
       // Fallback data when webhook is not configured
-      console.log('⚠️ AutomationsService: Webhook not configured, using fallback data');
+      console.log('⚠️ AutomationsService: No webhook URL configured');
+      console.log('💡 AutomationsService: Set VITE_N8N_AUTOMATIONS_WEBHOOK_URL in .env to use webhook');
       const fallbackData = this.getFallbackData();
       
       // Cache fallback data too
@@ -116,8 +130,21 @@ class AutomationsService {
       
       return fallbackData;
     } catch (error) {
-      console.error('❌ AutomationsService: Error fetching from webhook:', error);
-      console.log('⚠️ AutomationsService: Falling back to static data');
+      console.error('❌ AutomationsService: Error in getAutomateTasksItems:', error);
+      console.log('⚠️ AutomationsService: Using fallback data due to error');
+      
+      // Use fallback data when webhook fails
+      const fallbackData = this.getFallbackData();
+      
+      // Cache fallback data
+      this.cachedItems = fallbackData;
+      this.cacheTimestamp = Date.now();
+      
+      // Cache individual item data
+      fallbackData.items.forEach(item => {
+        this.cachedItemData.set(item.id, item.data);
+      });
+      
       return this.getFallbackData();
     }
   }
