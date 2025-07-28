@@ -91,11 +91,11 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
   // Load profile from localStorage on component mount
   useEffect(() => {
     const savedProfile = localStorage.getItem('userProfile');
-    console.log('ProfileOverlay: Loading profile from localStorage:', savedProfile);
+    console.log('🔍 ProfileOverlay: Loading profile from localStorage:', savedProfile);
     if (savedProfile) {
       try {
         const parsedProfile = JSON.parse(savedProfile);
-        console.log('ProfileOverlay: Parsed profile data:', parsedProfile);
+        console.log('📋 ProfileOverlay: Parsed profile data:', parsedProfile);
         
         // Handle both old format (name) and new format (firstName/lastName)
         if (parsedProfile.name && !parsedProfile.firstName && !parsedProfile.lastName) {
@@ -103,17 +103,21 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
           parsedProfile.firstName = nameParts[0] || '';
           parsedProfile.lastName = nameParts.slice(1).join(' ') || '';
           delete parsedProfile.name;
+          console.log('🔄 ProfileOverlay: Migrated old name format to firstName/lastName');
         }
         
         setProfile(parsedProfile);
         setEditedProfile(parsedProfile);
-        console.log('ProfileOverlay: Successfully loaded cached profile from localStorage');
+        console.log('✅ ProfileOverlay: Successfully set profile state:', parsedProfile);
       } catch (error) {
-        console.error('ProfileOverlay: Error parsing saved profile:', error);
+        console.error('❌ ProfileOverlay: Error parsing saved profile:', error);
         // Keep default empty profile if parsing fails
       }
     } else {
-      console.log('ProfileOverlay: No saved profile found in localStorage');
+      console.log('⚠️ ProfileOverlay: No saved profile found in localStorage');
+      
+      // Check if we have any data in localStorage at all
+      console.log('🔍 ProfileOverlay: All localStorage keys:', Object.keys(localStorage));
     }
   }, []);
 

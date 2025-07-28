@@ -181,50 +181,54 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
         return;
       }
       
-      console.log('User profile webhook response received for caching');
+      console.log('🔍 SignInModal: Raw webhook response for profile caching:', data);
       
       // Handle single user response or array
       let user;
       if (Array.isArray(data)) {
         // Array response - find matching user
         user = data.find(u => u.id === email || u.email === email);
+        console.log('🔍 SignInModal: Found user in array:', user);
       } else if (data && typeof data === 'object') {
         // Single user object response
         if (data.id === email || data.email === email) {
           user = data;
+          console.log('🔍 SignInModal: Using single user object:', user);
         }
       }
       
       if (user) {
-        console.log('User profile loaded successfully from webhook for caching');
+        console.log('✅ SignInModal: User profile loaded successfully from webhook for caching:', user);
         
         // Map webhook user data to profile format
         const userProfile = {
-          firstName: user.firstname || '',
-          lastName: user.lastname || '',
+          firstName: user.firstname || user.first_name || '',
+          lastName: user.lastname || user.last_name || '',
           email: user.email || user.id || email,
-          role: user.role || 'User',
+          role: Array.isArray(user.roles) ? user.roles[0] : (user.role || 'User'),
           department: user.department || 'General',
-          company: user.Company || user.company || '',
-          joinDate: user.joinDate || user.created_at || new Date().toISOString().split('T')[0],
+          company: user.Company || user.company || 'Agentic Weaver',
+          joinDate: user.joinDate || user.created_at || user.join_date || '2023-01-15',
           hasAcceptedGuidelines: user.hasAcceptedGuidelines !== undefined ? user.hasAcceptedGuidelines : false,
           isAdmin: user.isAdmin !== undefined ? user.isAdmin : (email === 'freddie@3cpublish.com'),
           lastLogin: new Date().toLocaleString(),
-          preferredAssistant: user.preferredAssistant || 'ODIN'
+          preferredAssistant: user.preferredAssistant || user.preferred_assistant || 'ODIN'
         };
+        
+        console.log('📋 SignInModal: Mapped user profile:', userProfile);
         
         // Cache to localStorage
         localStorage.setItem('userProfile', JSON.stringify(userProfile));
-        console.log('User profile cached to localStorage');
+        console.log('💾 SignInModal: User profile cached to localStorage');
         
         // Trigger storage event to notify other components
         window.dispatchEvent(new Event('storage'));
       } else {
-        console.log('User not found in webhook response for email:', email);
+        console.log('❌ SignInModal: User not found in webhook response for email:', email);
       }
 
     } catch (error) {
-      console.error('Error loading user profile from webhook for caching:', error);
+      console.error('❌ SignInModal: Error loading user profile from webhook for caching:', error);
       // Don't throw error - just log it and continue with login
     }
   };
