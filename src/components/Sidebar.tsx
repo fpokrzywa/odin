@@ -394,7 +394,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             onClick={handleAutomateTasksToggle}
             className="w-full flex items-center justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 hover:text-slate-300 transition-colors"
           >
-            <span>Automate Tasks</span>
+            <span>Automations</span>
             {isAutomateTasksExpanded ? (
               <ChevronDown className="w-4 h-4" />
             ) : (
