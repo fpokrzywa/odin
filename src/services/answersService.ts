@@ -177,43 +177,14 @@ class AnswersService {
         title: item.title || 'Knowledge articles',
         description: item.description || 'Find relevant information across all business systems.',
         tryItYourself: {
-          scenario: item.tryItYourself?.scenario || item.scenario || `Explore ${item.title || 'this section'} to find helpful information and resources.`,
-          actions: item.tryItYourself?.actions || item.actions || [
+          scenario: item.scenario || item.tryItYourself?.scenario || `Explore ${item.title || 'this section'} to find helpful information and resources.`,
+          actions: item.actions || item.tryItYourself?.actions || [
             `Ask ODIN questions about ${item.title?.toLowerCase() || 'this topic'}`,
             'Get instant answers and guidance',
             'Find relevant policies and procedures'
           ]
         },
-        articles: item.articles && Array.isArray(item.articles) ? item.articles.map((article: any, articleIndex: number) => ({
-          id: article.id || article._id || `article-${articleIndex}`,
-          policyName: article.policyName || article.title || article.name || `Article ${articleIndex + 1}`,
-          content: article.content || article.description || article.body || `Sample content for ${article.policyName?.toLowerCase() || 'this article'}...`,
-          category: article.category,
-          isExpanded: false,
-          url: article.url,
-          lastUpdated: article.lastUpdated || article.updated_at,
-          author: article.author
-        })) : [
-          // Generate sample articles based on the section type
-          {
-            id: `${item.id || item._id}-sample-1`,
-            policyName: `${item.title} - Getting Started`,
-            content: `This section contains helpful information about ${item.title?.toLowerCase() || 'this topic'}. Use ODIN to ask specific questions and get detailed answers.`,
-            isExpanded: false
-          },
-          {
-            id: `${item.id || item._id}-sample-2`, 
-            policyName: `${item.title} - Best Practices`,
-            content: `Learn about best practices and common procedures related to ${item.title?.toLowerCase() || 'this area'}. ODIN can provide more specific guidance based on your needs.`,
-            isExpanded: false
-          },
-          {
-            id: `${item.id || item._id}-sample-3`,
-            policyName: `${item.title} - Troubleshooting`,
-            content: `Find solutions to common issues and troubleshooting steps for ${item.title?.toLowerCase() || 'this topic'}. Ask ODIN for help with specific problems.`,
-            isExpanded: false
-          }
-        ],
+        articles: this.processArticles(item),
         learnMoreLink: item.learnMoreLink || `Learn more about ${item.title}`
       }
     }));
@@ -222,6 +193,26 @@ class AnswersService {
     return { items };
   }
 
+  private processArticles(item: any): AnswerArticle[] {
+    // Type 1: Has articles array with detailed article data
+    if (item.articles && Array.isArray(item.articles) && item.articles.length > 0) {
+      console.log('📋 AnswersService: Processing Type 1 - Articles array found:', item.articles.length, 'articles');
+      return item.articles.map((article: any, articleIndex: number) => ({
+        id: article.id || article._id || `article-${articleIndex}`,
+        policyName: article.policyName || article.title || article.name || `Article ${articleIndex + 1}`,
+        content: article.content || article.description || article.body || `Sample content for ${article.policyName?.toLowerCase() || 'this article'}...`,
+        category: article.category,
+        isExpanded: false,
+        url: article.url,
+        lastUpdated: article.lastUpdated || article.updated_at,
+        author: article.author
+      }));
+    }
+    
+    // Type 2: No articles array - return empty array (no articles section will be shown)
+    console.log('📋 AnswersService: Processing Type 2 - No articles array, returning empty articles');
+    return [];
+  }
   private getFallbackData(): FindAnswersResponse {
     return {
       items: [

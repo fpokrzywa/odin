@@ -249,7 +249,31 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
                   {expandedArticles.includes(article.id) && (
                     <div className="px-4 pb-4 text-gray-600">
                       <div className="pt-2 border-t border-gray-100">
-                        <p>{article.content}</p>
+                        <p className="mb-3">{article.content}</p>
+                        {/* Article metadata */}
+                        <div className="flex flex-wrap gap-4 text-xs text-gray-500 mt-3 pt-3 border-t border-gray-100">
+                          {article.category && (
+                            <span className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
+                              {article.category}
+                            </span>
+                          )}
+                          {article.author && (
+                            <span>Author: {article.author}</span>
+                          )}
+                          {article.lastUpdated && (
+                            <span>Updated: {new Date(article.lastUpdated).toLocaleDateString()}</span>
+                          )}
+                          {article.url && (
+                            <a 
+                              href={article.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-orange-600 hover:text-orange-700 underline"
+                            >
+                              View Full Article
+                            </a>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -259,6 +283,22 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
           </div>
         )}
 
+        {/* No Articles Message for Type 2 */}
+        {answersData.articles && answersData.articles.length === 0 && (
+          <div className="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <span className="text-blue-600 text-sm">ℹ️</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-blue-900 mb-2">Contact for More Information</h3>
+                <p className="text-blue-800">
+                  For detailed information and support, please reach out directly using the contact information below.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Learn More Link */}
         {answersData.learnMoreLink && (
           <div className="flex items-center space-x-2 text-orange-600 hover:text-orange-700 transition-colors cursor-pointer">
