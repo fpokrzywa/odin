@@ -90,28 +90,9 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
       if (matchedItem) {
         console.log('✅ Found exact ID match:', matchedItem.id);
         console.log('✅ Matched item data structure:', matchedItem);
+        console.log('✅ Matched item title:', matchedItem.title);
+        console.log('✅ Matched item description:', matchedItem.description);
       }
-      // Check if the message contains an @ mention
-      // const atMentionMatch = inputValue.match(/@([^@\s]+(?:\s+[^@\s]+)*)\s*(.*)/);
-      // if (atMentionMatch) {
-      //   const mentionedAssistantName = atMentionMatch[1].trim();
-      //   const messageText = atMentionMatch[2].trim();
-        
-      //   console.log('🎯 MainContent: Found @ mention:', { mentionedAssistantName, messageText, availableAssistants });
-        
-      //   // Check if the mentioned assistant exists in our OpenAI assistants
-      //   if (availableAssistants.includes(mentionedAssistantName) && messageText) {
-      //     console.log('✅ MainContent: Routing message to assistant:', mentionedAssistantName);
-      //     setPendingAssistantMessage({ assistant: mentionedAssistantName, message: messageText });
-      //     setInputValue('');
-      //     return;
-      //   } else if (!messageText) {
-      //     console.log('⚠️ MainContent: No message text after @ mention');
-      //     return; // Don't send if there's no message after the @ mention
-      //   } else {
-      //     console.log('⚠️ MainContent: Assistant not found in available list:', mentionedAssistantName);
-      //   }
-      // }
       
       
       setDebugInfo(`Looking for: ${sectionId}, Found: ${matchedItem ? matchedItem.title : 'None'}`);
@@ -122,6 +103,8 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         setDebugInfo(`Successfully loaded: ${matchedItem.title}`);
         console.log('✅ MainContent: Successfully loaded data for section:', sectionId);
       } else {
+        console.log('❌ MainContent: No match found for section ID:', sectionId);
+        console.log('📋 MainContent: Available item IDs:', allItems.items.map(item => item.id));
         // Create fallback data if no match found
         const fallbackData: AnswersData = {
           title: `Content for ${sectionId}`,

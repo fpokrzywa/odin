@@ -162,9 +162,9 @@ class AnswersService {
       rawItems = [data];
     }
 
-    // Transform items to match our interface - handle the actual webhook structure from n8n
+    // Transform items to match our interface - handle multiple items from webhook
     const items = rawItems.map((item: any) => ({
-      id: item.id || item._id || Math.random().toString(36).substr(2, 9),
+      id: item.id || item._id?.toString() || Math.random().toString(36).substr(2, 9),
       title: item.title || 'Untitled Item',
       description: item.description || '',
       icon: item.icon,
@@ -188,28 +188,29 @@ class AnswersService {
         })) : [
           // Generate sample articles based on the section type
           {
-            id: `${item.id}-sample-1`,
+            id: `${item.id || item._id}-sample-1`,
             policyName: `${item.title} - Getting Started`,
             content: `This section contains helpful information about ${item.title?.toLowerCase() || 'this topic'}. Use ODIN to ask specific questions and get detailed answers.`,
             isExpanded: false
           },
           {
-            id: `${item.id}-sample-2`, 
+            id: `${item.id || item._id}-sample-2`, 
             policyName: `${item.title} - Best Practices`,
             content: `Learn about best practices and common procedures related to ${item.title?.toLowerCase() || 'this area'}. ODIN can provide more specific guidance based on your needs.`,
             isExpanded: false
           },
           {
-            id: `${item.id}-sample-3`,
+            id: `${item.id || item._id}-sample-3`,
             policyName: `${item.title} - Troubleshooting`,
             content: `Find solutions to common issues and troubleshooting steps for ${item.title?.toLowerCase() || 'this topic'}. Ask ODIN for help with specific problems.`,
             isExpanded: false
           }
         ],
-        learnMoreLink: item.learnMoreLink || `Contact: ${item.learnMoreLink}` || `Learn more about ${item.title}`
+        learnMoreLink: item.learnMoreLink || `Learn more about ${item.title}`
       }
     }));
 
+    console.log('🔄 AnswersService: Transformed items:', items.map(item => ({ id: item.id, title: item.title })));
     return { items };
   }
 
@@ -252,6 +253,44 @@ class AnswersService {
               }
             ],
             learnMoreLink: 'Contact: HR_Contact@agenticweaver.com'
+          }
+        },
+        {
+          id: 'A1970-2',
+          title: 'IT Support Guides',
+          description: 'Quick solutions and how-to guides for common IT issues within the company.',
+          data: {
+            title: 'IT Support Guides',
+            description: 'Quick solutions and how-to guides for common IT issues within the company.',
+            tryItYourself: {
+              scenario: 'Explore IT support guides to find solutions for common technical issues and get help with company systems.',
+              actions: [
+                'Ask ODIN questions about IT support',
+                'Get troubleshooting steps for common issues',
+                'Find guides for company systems and software'
+              ]
+            },
+            articles: [
+              {
+                id: 'it-guide-1',
+                policyName: 'Password Reset Procedures',
+                content: 'Step-by-step guide for resetting passwords across company systems...',
+                isExpanded: false
+              },
+              {
+                id: 'it-guide-2',
+                policyName: 'Software Installation Guide',
+                content: 'Instructions for installing approved software and requesting new applications...',
+                isExpanded: false
+              },
+              {
+                id: 'it-guide-3',
+                policyName: 'Network Troubleshooting',
+                content: 'Common network issues and solutions for connectivity problems...',
+                isExpanded: false
+              }
+            ],
+            learnMoreLink: 'Explore all IT Support Resources'
           }
         },
         {
