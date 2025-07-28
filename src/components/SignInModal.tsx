@@ -36,7 +36,22 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
         throw new Error(`Webhook responded with status: ${response.status}`);
       }
 
-      const data = await response.json();
+      // Read response as text first to handle empty responses
+      const responseText = await response.text();
+      
+      if (!responseText || responseText.trim() === '') {
+        console.error('Webhook returned empty response');
+        return false;
+      }
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse webhook response as JSON:', parseError);
+        return false;
+      }
+      
       console.log('User validation webhook response received');
       
       // Handle different response formats
