@@ -40,7 +40,7 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
       const responseText = await response.text();
       
       if (!responseText || responseText.trim() === '') {
-        console.error('Webhook returned empty response');
+        console.error('User validation webhook returned empty response. Please check webhook configuration.');
         return false;
       }
 
@@ -119,7 +119,11 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
         console.log('User authentication successful');
         onSignIn(email, password);
       } else {
-        setError('Invalid email or password. Please check your credentials and try again.');
+        if (isValidUser === false) {
+          setError('Invalid email or password. Please check your credentials and try again.');
+        } else {
+          setError('Authentication service unavailable. Please check webhook configuration or try again later.');
+        }
       }
       
       // Reset form on successful login
