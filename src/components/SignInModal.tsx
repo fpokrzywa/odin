@@ -237,8 +237,8 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
   };
 
   const handleDemoSignIn = () => {
-    setEmail('freddie@3cpublish.com');
-    setPassword('');
+    //setEmail('freddie@3cpublish.com');
+    //setPassword('Appdev2025!');
     setError('');
   };
 
