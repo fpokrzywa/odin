@@ -185,11 +185,14 @@ class AnswersService {
           ]
         },
         articles: item.articles && Array.isArray(item.articles) ? item.articles.map((article: any, articleIndex: number) => ({
-          id: article.id || `article-${articleIndex}`,
-          policyName: article.policyName || `Article ${articleIndex + 1}`,
-          content: article.content || `Sample content for ${article.policyName?.toLowerCase() || 'this article'}...`,
+          id: article.id || article._id || `article-${articleIndex}`,
+          policyName: article.policyName || article.title || article.name || `Article ${articleIndex + 1}`,
+          content: article.content || article.description || article.body || `Sample content for ${article.policyName?.toLowerCase() || 'this article'}...`,
           category: article.category,
-          isExpanded: false
+          isExpanded: false,
+          url: article.url,
+          lastUpdated: article.lastUpdated || article.updated_at,
+          author: article.author
         })) : [
           // Generate sample articles based on the section type
           {
