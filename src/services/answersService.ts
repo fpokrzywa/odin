@@ -162,9 +162,9 @@ class AnswersService {
       rawItems = [data];
     }
 
-    // Transform items to match our interface - handle actual webhook structure
+    // Transform items to match our interface - handle the actual webhook structure from n8n
     const items = rawItems.map((item: any) => ({
-      id: item.id || item._id?.$oid || Math.random().toString(36).substr(2, 9),
+      id: item.id || item._id || Math.random().toString(36).substr(2, 9),
       title: item.title || 'Untitled Item',
       description: item.description || '',
       icon: item.icon,
@@ -172,14 +172,14 @@ class AnswersService {
         title: item.title || 'Knowledge articles',
         description: item.description || 'Find relevant information across all business systems.',
         tryItYourself: {
-          scenario: item.tryItYourself?.scenario || `Explore ${item.title || 'this section'} to find helpful information and resources.`,
-          actions: item.tryItYourself?.actions || [
+          scenario: item.tryItYourself?.scenario || item.scenario || `Explore ${item.title || 'this section'} to find helpful information and resources.`,
+          actions: item.tryItYourself?.actions || item.actions || [
             `Ask ODIN questions about ${item.title?.toLowerCase() || 'this topic'}`,
             'Get instant answers and guidance',
             'Find relevant policies and procedures'
           ]
         },
-        articles: item.articles ? (item.articles || []).map((article: any, articleIndex: number) => ({
+        articles: item.articles && Array.isArray(item.articles) ? item.articles.map((article: any, articleIndex: number) => ({
           id: article.id || `article-${articleIndex}`,
           policyName: article.policyName || `Article ${articleIndex + 1}`,
           content: article.content || `Sample content for ${article.policyName?.toLowerCase() || 'this article'}...`,
@@ -206,7 +206,7 @@ class AnswersService {
             isExpanded: false
           }
         ],
-        learnMoreLink: item.learnMoreLink || `Learn more about ${item.title}`
+        learnMoreLink: item.learnMoreLink || `Contact: ${item.learnMoreLink}` || `Learn more about ${item.title}`
       }
     }));
 
@@ -217,58 +217,41 @@ class AnswersService {
     return {
       items: [
         {
-          id: 'knowledge-articles',
-          title: 'Knowledge articles',
-          description: 'Find answers to your questions',
+          id: 'A1970-1',
+          title: 'HR Policies',
+          description: 'Our policies provide a comprehensive and accessible guide to the organization\'s official guidelines, procedures, and expectations for employees and management.',
           data: {
-            title: 'Knowledge articles',
-            description: 'Moveworks quickly answers employee questions on any topic by finding relevant information across all the business systems.',
+            title: 'HR Policies',
+            description: 'Our policies provide a comprehensive and accessible guide to the organization\'s official guidelines, procedures, and expectations for employees and management.',
             tryItYourself: {
-              scenario: 'Imagine you are an employee at BannerTech. You are curious about company policies and benefits. Here\'s what you can do with Moveworks:',
+              scenario: 'Explore HR policies to find helpful information about company guidelines, procedures, and employee expectations.',
               actions: [
-                'Ask questions about the policies',
-                'Find information tailored to your needs. e.g. Can I take a two-week vacation based on my PTO balance?'
+                'Ask ODIN questions about HR policies',
+                'Get instant answers about company guidelines',
+                'Find relevant procedures and expectations'
               ]
             },
             articles: [
               {
-                id: 'us-leave',
-                policyName: 'US Leave Policies',
-                content: 'Sample content for us leave policies...',
+                id: 'hr-policy-1',
+                policyName: 'Employee Handbook',
+                content: 'Comprehensive guide covering all employee policies, procedures, and expectations...',
                 isExpanded: false
               },
               {
-                id: 'india-leave',
-                policyName: 'India Leave Policies',
-                content: 'Sample content for india leave policies...',
+                id: 'hr-policy-2',
+                policyName: 'Code of Conduct',
+                content: 'Guidelines for professional behavior and ethical standards...',
                 isExpanded: false
               },
               {
-                id: 'laptop-refresh',
-                policyName: 'BannerTech Laptop Refresh Policy',
-                content: 'Sample content for bannertech laptop refresh policy...',
-                isExpanded: false
-              },
-              {
-                id: 'troubleshooting-printers',
-                policyName: 'Troubleshooting Printers',
-                content: 'Sample content for troubleshooting printers...',
-                isExpanded: false
-              },
-              {
-                id: 'travel-expense',
-                policyName: 'Global Travel & Expense Policy',
-                content: 'Sample content for global travel & expense policy...',
-                isExpanded: false
-              },
-              {
-                id: 'workday-update',
-                policyName: 'How to Update Personal Information in Workday',
-                content: 'Sample content for how to update personal information in workday...',
+                id: 'hr-policy-3',
+                policyName: 'Benefits and Compensation',
+                content: 'Information about employee benefits, compensation structure, and related policies...',
                 isExpanded: false
               }
             ],
-            learnMoreLink: 'Learn more about Enterprise Search'
+            learnMoreLink: 'Contact: HR_Contact@agenticweaver.com'
           }
         },
         {

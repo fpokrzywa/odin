@@ -84,6 +84,9 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   function getIconForItem(itemId: string) {
     switch (itemId) {
+      case 'A1970-1':
+      case 'hr-policies':
+        return Users;
       case 'knowledge-articles':
         return BookOpen;
       case 'organization-chart':
