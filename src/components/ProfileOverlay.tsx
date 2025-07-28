@@ -72,7 +72,7 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
       // Map to consistent format
       const formattedCompanies = companiesData.map((company: any) => ({
         id: company.id || company._id || company.company_id || Math.random().toString(),
-        name: company.name || company.company_name || company.title || 'Unknown Company'
+        name: company['Company Name'] || company.name || company.company_name || company.title || 'Unknown Company'
       }));
 
       setCompanies(formattedCompanies.length > 0 ? formattedCompanies : [{ id: '1', name: 'Agentic Weaver' }]);
