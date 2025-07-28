@@ -200,11 +200,12 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
         
         // Map webhook user data to profile format
         const userProfile = {
-          name: user.firstname && user.lastname ? `${user.firstname} ${user.lastname}` : user.name || email.split('@')[0],
+          firstName: user.firstname || '',
+          lastName: user.lastname || '',
           email: user.email || user.id || email,
           role: user.role || 'User',
           department: user.department || 'General',
-          company: user.Company || user.company || 'Agentic Weaver',
+          company: user.Company || user.company || '',
           joinDate: user.joinDate || user.created_at || new Date().toISOString().split('T')[0],
           hasAcceptedGuidelines: user.hasAcceptedGuidelines !== undefined ? user.hasAcceptedGuidelines : false,
           isAdmin: user.isAdmin !== undefined ? user.isAdmin : (email === 'freddie@3cpublish.com'),

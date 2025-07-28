@@ -5,7 +5,8 @@ import { getCompanyBotName } from '../utils/companyConfig';
 import { openaiService, type Assistant } from '../services/openaiService';
 
 interface UserProfile {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   role: string;
   department: string;
@@ -24,7 +25,8 @@ interface ProfileOverlayProps {
 
 const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
   const [profile, setProfile] = useState<UserProfile>({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     role: '',
     department: '',
@@ -94,6 +96,15 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
       try {
         const parsedProfile = JSON.parse(savedProfile);
         console.log('ProfileOverlay: Parsed profile data:', parsedProfile);
+        
+        // Handle both old format (name) and new format (firstName/lastName)
+        if (parsedProfile.name && !parsedProfile.firstName && !parsedProfile.lastName) {
+          const nameParts = parsedProfile.name.split(' ');
+          parsedProfile.firstName = nameParts[0] || '';
+          parsedProfile.lastName = nameParts.slice(1).join(' ') || '';
+          delete parsedProfile.name;
+        }
+        
         setProfile(parsedProfile);
         setEditedProfile(parsedProfile);
         console.log('ProfileOverlay: Successfully loaded cached profile from localStorage');
@@ -242,16 +253,30 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
                   {isEditing ? (
                     <input
                       type="text"
-                      value={editedProfile.name}
-                      onChange={(e) => setEditedProfile({ ...editedProfile, name: e.target.value })}
+                      value={editedProfile.firstName}
+                      onChange={(e) => setEditedProfile({ ...editedProfile, firstName: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     />
                   ) : (
-                    <p className="text-gray-900">{profile.name}</p>
+                    <p className="text-gray-900">{profile.firstName}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={editedProfile.lastName}
+                      onChange={(e) => setEditedProfile({ ...editedProfile, lastName: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  ) : (
+                    <p className="text-gray-900">{profile.lastName}</p>
                   )}
                 </div>
 
@@ -302,7 +327,7 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
                   {isEditing ? (
                     <div className="flex items-center space-x-2">
                       <select
-                        value={editedProfile.company}
+                        value={editedProfile.company || ''}
                         onChange={(e) => setEditedProfile({ ...editedProfile, company: e.target.value })}
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         disabled={isLoadingCompanies}
@@ -327,7 +352,7 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
                       </button>
                     </div>
                   ) : (
-                    <p className="text-gray-900">{profile.company}</p>
+                    <p className="text-gray-900">{profile.company || 'Not specified'}</p>
                   )}
                 </div>
                 <div>
