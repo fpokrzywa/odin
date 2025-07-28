@@ -143,7 +143,6 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
           <div className="text-sm text-gray-400 mb-4">
             <p>Section ID: {activeSection}</p>
             <p>Debug: {debugInfo}</p>
-            <p>Assistant ID: {currentAssistantId || 'None (will use ODIN)'}</p>
             <p>Webhook configured: {answersService.isWebhookConfigured() ? 'Yes' : 'No'}</p>
             <p>Connection: {JSON.stringify(answersService.getConnectionInfo())}</p>
           </div>
@@ -313,12 +312,14 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         <div className="mt-8 p-4 bg-gray-100 rounded-lg text-sm text-gray-600">
           <p><strong>Debug Info:</strong> {debugInfo}</p>
           <p><strong>Section:</strong> {activeSection}</p>
+          <p><strong>Assistant ID:</strong> {currentAssistantId || 'None (will use ODIN)'}</p>
           <p><strong>Has Data:</strong> {answersData ? 'Yes' : 'No'}</p>
           {answersData && (
             <>
               <p><strong>Title:</strong> {answersData.title}</p>
               <p><strong>Articles Count:</strong> {answersData.articles?.length || 0}</p>
               <p><strong>Try It Yourself:</strong> {answersData.tryItYourself ? 'Yes' : 'No'}</p>
+              <p><strong>Assistant ID from Data:</strong> {answersData.assistantID || 'Not specified'}</p>
             </>
           )}
         </div>
