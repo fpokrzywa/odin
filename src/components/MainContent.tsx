@@ -68,6 +68,18 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
       if (matchedItem) {
         console.log('🎯 MainContent: Setting answers data:', matchedItem.data);
         setAnswersData(matchedItem.data);
+        
+        // Set the assistant ID for this section
+        const assistantId = matchedItem.data.assistantID;
+        setCurrentAssistantId(assistantId || null);
+        
+        // Notify parent component about assistant change
+        if (onAssistantChange && assistantId) {
+          // Try to find the assistant name from OpenAI assistants or use a default
+          const assistantName = `Assistant for ${matchedItem.title}`;
+          onAssistantChange(assistantId, assistantName);
+        }
+        
         setDebugInfo(`Successfully loaded: ${matchedItem.title}`);
         console.log('✅ MainContent: Successfully loaded data for section:', sectionId);
       } else {
