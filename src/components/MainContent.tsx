@@ -382,7 +382,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
 
   const getContentForSection = () => {
     // Check if this is a Find Answers section that should load from webhook
-    const findAnswersSections = ['A1970-1', 'A1970-2', 'knowledge-articles', 'organization-chart', 'conference-rooms', 'customer-accounts', 'expense-reports'];
+    const findAnswersSections = ['A1970-1', 'A1970-2', 'A1970-3', 'knowledge-articles', 'organization-chart', 'conference-rooms', 'customer-accounts', 'expense-reports'];
     
     console.log('🔍 MainContent: Checking if section should load from webhook:', activeSection, 'Is Find Answers?', findAnswersSections.includes(activeSection));
     

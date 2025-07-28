@@ -293,6 +293,56 @@ class AnswersService {
           }
         },
         {
+          id: 'A1970-3',
+          title: 'My Support Guides',
+          description: 'Quick solutions and how-to guides for common IT issues within the company.',
+          data: {
+            title: 'My Support Guides',
+            description: 'Quick solutions and how-to guides for common IT issues within the company.',
+            tryItYourself: {
+              scenario: 'Explore IT Support Guides to find helpful information and resources.',
+              actions: [
+                'Ask ODIN questions about IT support guides',
+                'Get instant answers and guidance',
+                'Find relevant policies and procedures'
+              ]
+            },
+            articles: [
+              {
+                id: 'article-1',
+                policyName: 'Password Reset Procedures',
+                content: 'Step-by-step guide for resetting passwords across company systems. This includes self-service options, security verification steps, and escalation procedures when automated reset fails.',
+                category: 'Security',
+                url: 'https://company.com/kb/password-reset',
+                lastUpdated: '2024-01-15T10:30:00Z',
+                author: 'IT Security Team',
+                isExpanded: false
+              },
+              {
+                id: 'article-2',
+                policyName: 'Software Installation Guide',
+                content: 'Instructions for installing approved software and requesting new applications. Covers standard software packages, approval workflows, and security requirements.',
+                category: 'Software',
+                url: 'https://company.com/kb/software-install',
+                lastUpdated: '2024-01-10T14:20:00Z',
+                author: 'IT Operations',
+                isExpanded: false
+              },
+              {
+                id: 'article-3',
+                policyName: 'Network Troubleshooting',
+                content: 'Common network issues and solutions for connectivity problems. Includes WiFi troubleshooting, VPN setup, and network diagnostics.',
+                category: 'Network',
+                url: 'https://company.com/kb/network-troubleshooting',
+                lastUpdated: '2024-01-08T09:15:00Z',
+                author: 'Network Team',
+                isExpanded: false
+              }
+            ],
+            learnMoreLink: 'Explore all IT Support Resources'
+          }
+        },
+        {
           id: 'organization-chart',
           title: 'Organization chart',
           description: 'View company organizational structure',

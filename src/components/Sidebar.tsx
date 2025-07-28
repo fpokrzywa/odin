@@ -88,6 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       case 'hr-policies':
         return Users;
       case 'A1970-2':
+      case 'A1970-3':
       case 'it-support-guides':
         return Headphones;
       case 'knowledge-articles':
