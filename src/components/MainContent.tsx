@@ -4,6 +4,7 @@ import { answersService, type AnswersData, type AnswerArticle } from '../service
 
 interface MainContentProps {
   activeSection: string;
+  onAssistantChange?: (assistantId: string, assistantName: string) => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {

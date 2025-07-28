@@ -21,6 +21,7 @@ export interface FindAnswersItem {
 export interface AnswersData {
   title: string;
   description: string;
+  assistantID?: string;
   tryItYourself: {
     scenario: string;
     actions: string[];
@@ -176,6 +177,7 @@ class AnswersService {
       data: {
         title: item.title || 'Knowledge articles',
         description: item.description || 'Find relevant information across all business systems.',
+        assistantID: item.assistantID || item.assistant_id || item.assistantId,
         tryItYourself: {
           scenario: item.scenario || item.tryItYourself?.scenario || `Explore ${item.title || 'this section'} to find helpful information and resources.`,
           actions: item.actions || item.tryItYourself?.actions || [
@@ -220,6 +222,7 @@ class AnswersService {
           id: 'A1970-1',
           title: 'HR Policies',
           description: 'Our policies provide a comprehensive and accessible guide to the organization\'s official guidelines, procedures, and expectations for employees and management.',
+          assistantID: 'asst_hr_policies_123',
           data: {
             title: 'HR Policies',
             description: 'Our policies provide a comprehensive and accessible guide to the organization\'s official guidelines, procedures, and expectations for employees and management.',
@@ -258,6 +261,7 @@ class AnswersService {
           id: 'A1970-2',
           title: 'IT Support Guides',
           description: 'Quick solutions and how-to guides for common IT issues within the company.',
+          assistantID: 'asst_it_support_456',
           data: {
             title: 'IT Support Guides',
             description: 'Quick solutions and how-to guides for common IT issues within the company.',
@@ -296,6 +300,7 @@ class AnswersService {
           id: 'A1970-3',
           title: 'My Support Guides',
           description: 'Quick solutions and how-to guides for common IT issues within the company.',
+          assistantID: 'asst_my_support_789',
           data: {
             title: 'My Support Guides',
             description: 'Quick solutions and how-to guides for common IT issues within the company.',
