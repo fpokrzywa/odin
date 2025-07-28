@@ -26,6 +26,7 @@ class ChatService {
   private shouldStopStreaming: boolean = false;
   private streamingCallbacks: Map<string, (chunk: string) => void> = new Map();
   private activeStreamingThreads: Set<string> = new Set();
+  private uploadedFiles: Map<string, string[]> = new Map(); // threadId -> fileIds
 
   constructor() {
     // Get API key from environment or localStorage
@@ -236,7 +237,8 @@ class ChatService {
   async sendMessageWithStreaming(
     message: string, 
     onChunk: (chunk: string) => void,
-    threadId?: string
+    threadId?: string,
+    files?: File[]
   ): Promise<ChatMessage> {
     const targetThreadId = threadId || this.currentThreadId;
     if (!targetThreadId) {
@@ -266,7 +268,7 @@ class ChatService {
 
     try {
       // Get response from OpenAI or simulation
-      const fullResponse = await this.getAssistantResponse(message, thread.assistantId, thread.assistantName);
+      const fullResponse = await this.getAssistantResponse(message, thread.assistantId, thread.assistantName, files);
       
       // Stream the response word by word
       await this.streamResponse(fullResponse, targetThreadId);
@@ -325,25 +327,57 @@ class ChatService {
     this.abortController = null;
   }
   
-  private async getAssistantResponse(userMessage: string, assistantId: string, assistantName: string): Promise<string> {
+  private async getAssistantResponse(userMessage: string, assistantId: string, assistantName: string, files?: File[]): Promise<string> {
     const currentApiKey = this.getApiKey();
     
     // If we have an API key and a real OpenAI assistant ID, try to use the real API
     if (currentApiKey && assistantId.startsWith('asst_')) {
       try {
-        return await this.sendMessageToOpenAIAssistant(userMessage, assistantId);
+        return await this.sendMessageToOpenAIAssistant(userMessage, assistantId, files);
       } catch (error) {
         console.warn('Failed to use OpenAI API, falling back to simulation:', error);
         // Fall back to simulation if API fails
-        return this.simulateAssistantResponse(userMessage, assistantName);
+        return this.simulateAssistantResponse(userMessage, assistantName, files);
       }
     }
     
     // Use simulation for non-OpenAI assistants or when no API key
-    return this.simulateAssistantResponse(userMessage, assistantName);
+    return this.simulateAssistantResponse(userMessage, assistantName, files);
   }
 
-  private async sendMessageToOpenAIAssistant(message: string, assistantId: string): Promise<string> {
+  private async uploadFileToOpenAI(file: File): Promise<string> {
+    const currentApiKey = this.getApiKey();
+    if (!currentApiKey) {
+      throw new Error('OpenAI API key not configured');
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('purpose', 'assistants');
+
+    try {
+      const response = await fetch(`${this.baseURL}/files`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${currentApiKey}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
+        throw new Error(error.error?.message || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      return result.id;
+    } catch (error) {
+      console.error('Error uploading file to OpenAI:', error);
+      throw error;
+    }
+  }
+
+  private async sendMessageToOpenAIAssistant(message: string, assistantId: string, files?: File[]): Promise<string> {
     try {
       // Create a thread
       const threadResponse = await this.makeRequest('/threads', {
@@ -353,13 +387,40 @@ class ChatService {
       
       const threadId = threadResponse.id;
       
-      // Add message to thread
+      // Upload files if provided
+      let fileIds: string[] = [];
+      if (files && files.length > 0) {
+        console.log('Uploading files to OpenAI:', files.map(f => f.name));
+        for (const file of files) {
+          try {
+            const fileId = await this.uploadFileToOpenAI(file);
+            fileIds.push(fileId);
+            console.log(`Uploaded file ${file.name} with ID: ${fileId}`);
+          } catch (error) {
+            console.error(`Failed to upload file ${file.name}:`, error);
+            // Continue with other files
+          }
+        }
+      }
+
+      // Prepare message content
+      const messageContent: any = {
+        role: 'user',
+        content: message
+      };
+
+      // Add file attachments if we have uploaded files
+      if (fileIds.length > 0) {
+        messageContent.attachments = fileIds.map(fileId => ({
+          file_id: fileId,
+          tools: [{ type: 'file_search' }]
+        }));
+      }
+
+      // Add message to thread with files
       await this.makeRequest(`/threads/${threadId}/messages`, {
         method: 'POST',
-        body: JSON.stringify({
-          role: 'user',
-          content: message
-        })
+        body: JSON.stringify(messageContent)
       });
       
       // Run the assistant
@@ -406,12 +467,19 @@ class ChatService {
     this.activeStreamingThreads.clear();
   }
 
-  private async simulateAssistantResponse(userMessage: string, assistantName: string): Promise<string> {
+  private async simulateAssistantResponse(userMessage: string, assistantName: string, files?: File[]): Promise<string> {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
 
+    // If files are provided, acknowledge them in the response
+    let fileAcknowledgment = '';
+    if (files && files.length > 0) {
+      const fileNames = files.map(f => f.name).join(', ');
+      fileAcknowledgment = `\n\n📎 **Files Received**: ${fileNames}\n\nI can see you've uploaded ${files.length} file${files.length > 1 ? 's' : ''}. While I'm in simulation mode, in a real OpenAI integration, I would be able to analyze and reference the content of these files in my responses.\n\n`;
+    }
+
     // Generate contextual responses based on assistant type and user input
-    return this.generateContextualResponse(assistantName, userMessage);
+    return fileAcknowledgment + this.generateContextualResponse(assistantName, userMessage);
   }
 
   private generateContextualResponse(assistantName: string, userMessage: string): string {

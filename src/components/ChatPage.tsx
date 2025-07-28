@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, HelpCircle, Mic, Send, Search, BarChart3, Image, Paperclip, Copy, Edit3, Bot, X } from 'lucide-react';
+import { MessageSquare, HelpCircle, Mic, Send, Search, BarChart3, Image, Paperclip, Copy, Edit3, Bot, X, Upload, File, Trash2 } from 'lucide-react';
 import { chatService, type ChatMessage, type ChatThread } from '../services/chatService';
 import PromptCatalog from './PromptCatalog';
 import { getCompanyBotName } from '../utils/companyConfig';
@@ -36,6 +36,10 @@ const ChatPage: React.FC<ChatPageProps> = ({
   const [pinnedAssistant, setPinnedAssistant] = useState<string | null>(null);
   const [showPromptCatalog, setShowPromptCatalog] = useState(false);
   const [mentionedAssistant, setMentionedAssistant] = useState<string | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [showFileUpload, setShowFileUpload] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Available assistants list
   const [availableAssistants, setAvailableAssistants] = useState<string[]>([]);
@@ -270,9 +274,12 @@ const ChatPage: React.FC<ChatPageProps> = ({
         console.log('📤 ChatPage: Sending message via streaming to thread:', targetThread.id);
         await chatService.sendMessageWithStreaming(message, (chunk) => {
           setStreamingMessage(chunk);
-        }, targetThread.id);
+        }, targetThread.id, uploadedFiles.length > 0 ? uploadedFiles : undefined);
         const updatedThread = chatService.getCurrentThread();
         setCurrentThread(updatedThread);
+        
+        // Clear uploaded files after sending
+        setUploadedFiles([]);
         console.log('✅ ChatPage: Message sent successfully');
       } catch (err) {
         console.error('❌ ChatPage: Error sending message:', err);
@@ -364,9 +371,12 @@ const ChatPage: React.FC<ChatPageProps> = ({
       try {
         await chatService.sendMessageWithStreaming(inputValue.trim(), (chunk) => {
           setStreamingMessage(chunk);
-        });
+        }, undefined, uploadedFiles.length > 0 ? uploadedFiles : undefined);
         const updatedThread = chatService.getCurrentThread();
         setCurrentThread(updatedThread);
+        
+        // Clear uploaded files after sending
+        setUploadedFiles([]);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to send message');
       } finally {
@@ -464,9 +474,12 @@ const ChatPage: React.FC<ChatPageProps> = ({
     try {
       await chatService.sendMessageWithStreaming(editingText.trim(), (chunk) => {
         setStreamingMessage(chunk);
-      });
+      }, undefined, uploadedFiles.length > 0 ? uploadedFiles : undefined);
       const refreshedThread = chatService.getCurrentThread();
       setCurrentThread(refreshedThread);
+      
+      // Clear uploaded files after sending
+      setUploadedFiles([]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send message');
     } finally {
@@ -496,6 +509,87 @@ const ChatPage: React.FC<ChatPageProps> = ({
     if (onOpenPromptCatalog) {
       onOpenPromptCatalog();
     }
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    const newFiles: File[] = [];
+
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        // Validate file size (max 512MB for OpenAI)
+        if (file.size > 512 * 1024 * 1024) {
+          alert(`File "${file.name}" is too large. Maximum size is 512MB.`);
+          continue;
+        }
+
+        // Validate file type (common document types)
+        const allowedTypes = [
+          'text/plain',
+          'text/markdown',
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'application/vnd.ms-excel',
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'text/csv',
+          'application/json',
+          'text/html',
+          'text/css',
+          'text/javascript',
+          'application/javascript',
+          'text/xml',
+          'application/xml'
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+          alert(`File type "${file.type}" is not supported. Please upload documents, text files, or code files.`);
+          continue;
+        }
+
+        newFiles.push(file);
+      }
+
+      setUploadedFiles(prev => [...prev, ...newFiles]);
+      console.log('Files uploaded:', newFiles.map(f => ({ name: f.name, size: f.size, type: f.type })));
+      
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      alert('Error uploading files. Please try again.');
+    } finally {
+      setIsUploading(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const getFileIcon = (fileType: string) => {
+    if (fileType.includes('pdf')) return '📄';
+    if (fileType.includes('word') || fileType.includes('document')) return '📝';
+    if (fileType.includes('excel') || fileType.includes('sheet') || fileType.includes('csv')) return '📊';
+    if (fileType.includes('image')) return '🖼️';
+    if (fileType.includes('text') || fileType.includes('plain')) return '📄';
+    if (fileType.includes('json') || fileType.includes('javascript') || fileType.includes('html') || fileType.includes('css')) return '💻';
+    return '📎';
   };
 
   if (!selectedAssistant) {
@@ -786,10 +880,32 @@ const ChatPage: React.FC<ChatPageProps> = ({
                   </button>
                 </div>
               )}
-              
+                onClick={() => {
+                  if (fileInputRef.current) {
+                    fileInputRef.current.click();
+                  }
+                }}
+                className="p-1 sm:p-2 text-gray-400 hover:text-orange-600 transition-colors flex-shrink-0 relative"
+                title="Upload files"
               <button className="p-1 sm:p-2 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0">
                 <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
+                {isUploading && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-3 h-3 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
               </button>
+              
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept=".txt,.md,.pdf,.doc,.docx,.xls,.xlsx,.csv,.json,.html,.css,.js,.xml"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              
               <input
                 ref={inputRef}
                 type="text"
@@ -824,6 +940,46 @@ const ChatPage: React.FC<ChatPageProps> = ({
                 )}
               </button>
             </div>
+            
+            {/* Uploaded Files Display */}
+            {uploadedFiles.length > 0 && (
+              <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700">
+                    Uploaded Files ({uploadedFiles.length})
+                  </span>
+                  <button
+                    onClick={() => setUploadedFiles([])}
+                    className="text-xs text-red-600 hover:text-red-700 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                </div>
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {uploadedFiles.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-white rounded border border-gray-200">
+                      <div className="flex items-center space-x-2 flex-1 min-w-0">
+                        <span className="text-lg">{getFileIcon(file.type)}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">{file.name}</p>
+                          <p className="text-xs text-gray-500">{formatFileSize(file.size)} • {file.type}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => removeFile(index)}
+                        className="p-1 text-gray-400 hover:text-red-600 transition-colors flex-shrink-0"
+                        title="Remove file"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-2 text-xs text-gray-500">
+                  Files will be sent to OpenAI for analysis and can be referenced in your conversation.
+                </div>
+              </div>
+            )}
             
             {/* Web Search Buttons - Mobile Responsive */}
             <div className="flex flex-wrap gap-1 sm:gap-2 mt-2 sm:mt-3 justify-start">
