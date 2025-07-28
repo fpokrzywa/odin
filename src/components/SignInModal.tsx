@@ -278,6 +278,7 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
         </div>
 
         {/* Demo credentials info */}
+        {/*
         <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between">
             <div>
@@ -292,7 +293,7 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
             </button>
           </div>
         </div>
-
+        */}
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Email field */}
