@@ -14,39 +14,6 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string>('');
 
-  const [availableAssistants, setAvailableAssistants] = useState<string[]>([]);
-  const [openaiAssistants, setOpenaiAssistants] = useState<any[]>([]);
-
-  // Load OpenAI assistants to get dynamic list
-  useEffect(() => {
-    const loadAssistants = async () => {
-      try {
-        const { openaiService } = await import('../services/openaiService');
-        const result = await openaiService.listAssistants();
-        console.log('MainContent: Loaded OpenAI assistants for @ mentions:', result.assistants);
-        if (result.assistants.length > 0) {
-          const convertedAssistants = result.assistants.map(assistant => 
-            openaiService.convertToInternalFormat(assistant)
-          );
-          setOpenaiAssistants(convertedAssistants);
-          // Only use OpenAI assistant names for @ mentions
-          const assistantNames = convertedAssistants.map(assistant => assistant.name);
-          setAvailableAssistants(assistantNames);
-          console.log('MainContent: Set available assistants for @ mentions:', assistantNames);
-        } else {
-          console.log('MainContent: No OpenAI assistants found');
-          setAvailableAssistants([]);
-        }
-      } catch (error) {
-        console.error('MainContent: Error loading assistants for @ mentions:', error);
-        // Clear assistants if loading fails
-        setAvailableAssistants([]);
-      }
-    };
-
-    loadAssistants();
-  }, []);
-
   // Load answers data when component mounts or when activeSection changes
   React.useEffect(() => {
     console.log('MainContent: activeSection changed to:', activeSection);
@@ -149,15 +116,16 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
     );
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !showAssistantDropdown) {
-      e.preventDefault(); // Prevent form submission
-      handleSend();
-    }
-  };
-
   const renderKnowledgeArticles = () => {
+    console.log('🎨 MainContent: renderKnowledgeArticles called with:', {
+      isLoading,
+      error,
+      answersData: !!answersData,
+      activeSection
+    });
+
     if (isLoading) {
+      console.log('🔄 MainContent: Showing loading state');
       return (
         <div className="text-center py-16">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
@@ -167,6 +135,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
     }
 
     if (error) {
+      console.log('❌ MainContent: Showing error state:', error);
       return (
         <div className="text-center py-16">
           <p className="text-gray-500 mb-4">{error}</p>
@@ -187,6 +156,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
     }
 
     if (!answersData) {
+      console.log('❌ MainContent: No answers data available');
       return (
         <div className="text-center py-16">
           <p className="text-gray-500 mb-4">No data available for this section</p>
@@ -372,36 +342,38 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
 
   const getContentForSection = () => {
     // Check if this is a Find Answers section that should load from webhook
-    const findAnswersSections = ['knowledge-articles', 'organization-chart', 'conference-rooms', 'customer-accounts', 'expense-reports'];
+    const findAnswersSections = ['A1970-1', 'A1970-2', 'knowledge-articles', 'organization-chart', 'conference-rooms', 'customer-accounts', 'expense-reports'];
     
-    // console.log('🆕 MainContent: Creating new thread for assistant:', assistantName);
+    console.log('🔍 MainContent: Checking if section should load from webhook:', activeSection, 'Is Find Answers?', findAnswersSections.includes(activeSection));
+    
     if (findAnswersSections.includes(activeSection)) {
+      console.log('✅ MainContent: Rendering knowledge articles for section:', activeSection);
       return renderKnowledgeArticles();
     } else {
-      // console.log('🔄 MainContent: Using existing thread for assistant:', assistantName);
+      console.log('❌ MainContent: Section not in Find Answers, rendering generic content:', activeSection);
     }
     
     // Handle other sections with static content
     switch (activeSection) {
-      case 'software-apps':
+      case 'get-software-apps':
         return renderGenericContent(
           'Get Software Apps',
           'Request and download approved software applications for your work.',
           Download
         );
-      case 'support-tickets':
+      case 'track-support-tickets':
         return renderGenericContent(
           'Support Tickets',
           'Track and update your IT support tickets and requests.',
-          Ticket
+          Headphones
         );
-      case 'email-groups':
+      case 'manage-email-groups':
         return renderGenericContent(
           'Email Groups',
           'Manage your email group memberships and distribution lists.',
           Mail
         );
-      case 'time-off':
+      case 'request-time-off':
         return renderGenericContent(
           'Request Time Off',
           'Submit and manage your vacation and time-off requests.',
@@ -414,16 +386,14 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
           Lock
         );
       default:
+        console.log('❓ MainContent: Unknown section, showing default content:', activeSection);
         return (
-          // console.log('📤 MainContent: Sending message via streaming to thread:', targetThread.id);
           <div className="text-center py-16">
             <div className="text-gray-500">
               <p className="mb-4">Loading content for: {activeSection}</p>
               <button
                 onClick={() => loadAnswersData(activeSection, true)}
-                // console.log('✅ MainContent: Message sent successfully');
                 className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
-                // console.error('❌ MainContent: Error sending message:', err);
               >
                 Retry Loading
               </button>
