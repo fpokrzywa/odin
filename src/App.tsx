@@ -313,13 +313,8 @@ function App() {
           activeSection === 'conference-rooms' || 
           activeSection === 'customer-accounts' || 
           activeSection === 'expense-reports' ||
-          activeSection === 'get-software-apps' ||
-          activeSection === 'track-support-tickets' ||
-          activeSection === 'manage-email-groups' ||
-          activeSection === 'request-time-off' ||
-          activeSection === 'reset-password' ||
-          // Handle any other dynamic sections from webhooks (Find Answers or Automate Tasks)
-          (activeSection && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection))) && (
+          // Handle any other dynamic sections from webhooks (Find Answers only)
+          (activeSection && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin', 'get-software-apps', 'track-support-tickets', 'manage-email-groups', 'request-time-off', 'reset-password'].includes(activeSection) && !activeSection.startsWith('AG'))) && (
           <>
             <MainContent 
               activeSection={activeSection} 
@@ -332,6 +327,23 @@ function App() {
               activeSection={activeSection}
             />
           </>
+        )}
+        {/* Automate Tasks sections with ChatPage only (no RightPanel) */}
+        {(activeSection === 'get-software-apps' ||
+          activeSection === 'track-support-tickets' ||
+          activeSection === 'manage-email-groups' ||
+          activeSection === 'request-time-off' ||
+          activeSection === 'reset-password' ||
+          // Handle any dynamic Automate Tasks sections from webhooks (starting with AG)
+          (activeSection && activeSection.startsWith('AG'))) && (
+          <div className="flex-1 flex">
+            <ChatPage 
+              selectedAssistant={{ name: 'ODIN', id: 'odin' }}
+              selectedPrompt=""
+              onPromptUsed={() => {}}
+              onOpenPromptCatalog={() => setActiveSection('prompt-catalog')}
+            />
+          </div>
         )}
       </div>
       
