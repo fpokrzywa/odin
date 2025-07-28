@@ -184,11 +184,6 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
       const parsedProfile = JSON.parse(savedProfile);
       setProfile(parsedProfile);
       setEditedProfile(parsedProfile);
-      
-      // Load fresh data from webhook if we have an email
-      if (parsedProfile.email) {
-        loadUserProfileFromWebhook(parsedProfile.email);
-      }
     }
   }, []);
 

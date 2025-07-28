@@ -115,6 +115,10 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
       
       if (isValidUser) {
         console.log('User authentication successful');
+        
+        // Load and cache user profile data from webhook
+        await loadAndCacheUserProfile(email);
+        
         onSignIn(email, password);
       } else {
         if (isValidUser === false) {
@@ -135,6 +139,92 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
       setError('Authentication failed. Please try again.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadAndCacheUserProfile = async (email: string) => {
+    try {
+      const webhookUrl = import.meta.env.VITE_N8N_GET_USERS_WEBHOOK_URL;
+      if (!webhookUrl) {
+        console.warn('VITE_N8N_GET_USERS_WEBHOOK_URL not configured for profile loading');
+        return;
+      }
+
+      // Add email as parameter to webhook URL
+      const webhookUrlWithParams = `${webhookUrl}?id=${encodeURIComponent(email)}`;
+      console.log('Loading user profile from webhook for caching:', webhookUrlWithParams);
+      
+      const response = await fetch(webhookUrlWithParams, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Webhook responded with status: ${response.status}`);
+      }
+
+      // Read response as text first to handle empty responses
+      const responseText = await response.text();
+      
+      if (!responseText || responseText.trim() === '') {
+        console.error('User profile webhook returned empty response for user:', email);
+        return;
+      }
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse user profile webhook response as JSON:', parseError);
+        return;
+      }
+      
+      console.log('User profile webhook response received for caching');
+      
+      // Handle single user response or array
+      let user;
+      if (Array.isArray(data)) {
+        // Array response - find matching user
+        user = data.find(u => u.id === email || u.email === email);
+      } else if (data && typeof data === 'object') {
+        // Single user object response
+        if (data.id === email || data.email === email) {
+          user = data;
+        }
+      }
+      
+      if (user) {
+        console.log('User profile loaded successfully from webhook for caching');
+        
+        // Map webhook user data to profile format
+        const userProfile = {
+          name: user.firstname && user.lastname ? `${user.firstname} ${user.lastname}` : user.name || email.split('@')[0],
+          email: user.email || user.id || email,
+          role: user.role || 'User',
+          department: user.department || 'General',
+          company: user.Company || user.company || 'Agentic Weaver',
+          joinDate: user.joinDate || user.created_at || new Date().toISOString().split('T')[0],
+          hasAcceptedGuidelines: user.hasAcceptedGuidelines !== undefined ? user.hasAcceptedGuidelines : false,
+          isAdmin: user.isAdmin !== undefined ? user.isAdmin : (email === 'freddie@3cpublish.com'),
+          lastLogin: new Date().toLocaleString(),
+          preferredAssistant: user.preferredAssistant || 'ODIN'
+        };
+        
+        // Cache to localStorage
+        localStorage.setItem('userProfile', JSON.stringify(userProfile));
+        console.log('User profile cached to localStorage');
+        
+        // Trigger storage event to notify other components
+        window.dispatchEvent(new Event('storage'));
+      } else {
+        console.log('User not found in webhook response for email:', email);
+      }
+
+    } catch (error) {
+      console.error('Error loading user profile from webhook for caching:', error);
+      // Don't throw error - just log it and continue with login
     }
   };
 
