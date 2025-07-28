@@ -312,7 +312,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         <div className="mt-8 p-4 bg-gray-100 rounded-lg text-sm text-gray-600">
           <p><strong>Debug Info:</strong> {debugInfo}</p>
           <p><strong>Section:</strong> {activeSection}</p>
-          <p><strong>Assistant ID:</strong> {currentAssistantId || 'None (will use ODIN)'}</p>
+          <p><strong>Assistant ID:</strong> {answersData?.assistantID || 'None (will use ODIN)'}</p>
           <p><strong>Has Data:</strong> {answersData ? 'Yes' : 'No'}</p>
           {answersData && (
             <>
