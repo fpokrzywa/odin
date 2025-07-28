@@ -44,6 +44,9 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
   const [isRefreshingAssistants, setIsRefreshingAssistants] = useState(false);
   const [companies, setCompanies] = useState<Array<{id: string, name: string}>>([]);
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const loadCompanies = async () => {
     setIsLoadingCompanies(true);
@@ -185,9 +188,74 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
     }
   }, [profile]);
 
-  const handleSave = () => {
-    setProfile(editedProfile);
-    setIsEditing(false);
+  const handleSave = async () => {
+    setIsSaving(true);
+    setSaveError(null);
+    setSaveSuccess(false);
+
+    try {
+      // Save to webhook if configured
+      const updateWebhookUrl = import.meta.env.VITE_N8N_UPDATE_USER_WEBHOOK_URL;
+      
+      if (updateWebhookUrl) {
+        console.log('💾 ProfileOverlay: Saving profile to webhook:', updateWebhookUrl);
+        
+        // Prepare data for webhook - map back to database format
+        const webhookData = {
+          id: profile.email, // Use email as ID
+          email: editedProfile.email,
+          firstname: editedProfile.firstName,
+          lastname: editedProfile.lastName,
+          role: editedProfile.role,
+          department: editedProfile.department,
+          Company: editedProfile.company,
+          // Keep existing fields that shouldn't be changed
+          active: "True",
+          password: undefined // Don't update password unless specifically changed
+        };
+
+        console.log('📤 ProfileOverlay: Sending webhook data:', webhookData);
+
+        const response = await fetch(updateWebhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ data: webhookData })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Webhook responded with status: ${response.status} - ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        console.log('✅ ProfileOverlay: Profile saved to webhook successfully:', result);
+        
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3000);
+      } else {
+        console.warn('⚠️ ProfileOverlay: VITE_N8N_UPDATE_USER_WEBHOOK_URL not configured, saving locally only');
+      }
+
+      // Update local state and cache
+      setProfile(editedProfile);
+      
+      // Update localStorage cache
+      localStorage.setItem('userProfile', JSON.stringify(editedProfile));
+      
+      // Trigger storage event to notify other components
+      window.dispatchEvent(new Event('storage'));
+      
+      setIsEditing(false);
+      
+      console.log('✅ ProfileOverlay: Profile updated successfully');
+      
+    } catch (error) {
+      console.error('❌ ProfileOverlay: Error saving profile:', error);
+      setSaveError(error instanceof Error ? error.message : 'Failed to save profile');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancel = () => {
@@ -399,17 +467,32 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
 
               {isEditing && (
                 <div className="flex items-center justify-end space-x-3 mt-4 pt-4 border-t border-gray-200">
+                  {saveError && (
+                    <div className="flex-1 text-sm text-red-600">
+                      Error: {saveError}
+                    </div>
+                  )}
+                  {saveSuccess && (
+                    <div className="flex-1 text-sm text-green-600">
+                      Profile saved successfully!
+                    </div>
+                  )}
                   <button
                     onClick={handleCancel}
                     className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                    disabled={isSaving}
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSave}
-                    className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors"
+                    className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                    disabled={isSaving}
                   >
-                    Save Changes
+                    {isSaving && (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    )}
+                    <span>{isSaving ? 'Saving...' : 'Save Changes'}</span>
                   </button>
                 </div>
               )}
