@@ -21,6 +21,7 @@ import {
   ChevronLeft
 } from 'lucide-react';
 import { answersService, type FindAnswersItem } from '../services/answersService';
+import { automationsService, type AutomateTasksItem } from '../services/automationsService';
 
 interface SidebarProps {
   activeSection: string;
@@ -48,6 +49,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [isUserExpanded, setIsUserExpanded] = useState(false);
   const [findAnswersItems, setFindAnswersItems] = useState<FindAnswersItem[]>([]);
   const [isLoadingFindAnswers, setIsLoadingFindAnswers] = useState(false);
+  const [automateTasksItems, setAutomateTasksItems] = useState<AutomateTasksItem[]>([]);
+  const [isLoadingAutomateTasks, setIsLoadingAutomateTasks] = useState(false);
 
   // Load Find Answers items from webhook
   useEffect(() => {
@@ -70,6 +73,27 @@ const Sidebar: React.FC<SidebarProps> = ({
     loadFindAnswersItems();
   }, []);
 
+  // Load Automate Tasks items from webhook
+  useEffect(() => {
+    const loadAutomateTasksItems = async () => {
+      setIsLoadingAutomateTasks(true);
+      try {
+        const response = await automationsService.getAutomateTasksItems();
+        setAutomateTasksItems(response.items);
+        console.log('📋 Sidebar: Loaded Automate Tasks items:', response.items.length);
+      } catch (error) {
+        console.error('❌ Sidebar: Error loading Automate Tasks items:', error);
+        // Fallback items will be used from the service
+        const fallbackResponse = await automationsService.getAutomateTasksItems();
+        setAutomateTasksItems(fallbackResponse.items);
+      } finally {
+        setIsLoadingAutomateTasks(false);
+      }
+    };
+
+    loadAutomateTasksItems();
+  }, []);
+
   const aiToolsItems = [
     { id: 'assistants', label: 'AI Assistants', icon: Bot },
     { id: 'prompt-catalog', label: 'Prompt Catalog', icon: BookOpen },
@@ -80,6 +104,13 @@ const Sidebar: React.FC<SidebarProps> = ({
     id: item.id,
     label: item.title,
     icon: getIconForItem(item.id)
+  }));
+
+  // Map automate tasks items to sidebar format with icons
+  const automateTasksMenuItems = automateTasksItems.map(item => ({
+    id: item.id,
+    label: item.title,
+    icon: getIconForAutomateTasksItem(item.id)
   }));
 
   function getIconForItem(itemId: string) {
@@ -106,13 +137,22 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   }
 
-  const automateTasksItems = [
-    { id: 'get-software-apps', label: 'Get software apps', icon: Download },
-    { id: 'track-support-tickets', label: 'Track and update support tickets', icon: Headphones },
-    { id: 'manage-email-groups', label: 'Manage email groups', icon: Mail },
-    { id: 'request-time-off', label: 'Request time off', icon: Clock },
-    { id: 'reset-password', label: 'Reset password', icon: Key },
-  ];
+  function getIconForAutomateTasksItem(itemId: string) {
+    switch (itemId) {
+      case 'get-software-apps':
+        return Download;
+      case 'track-support-tickets':
+        return Headphones;
+      case 'manage-email-groups':
+        return Mail;
+      case 'request-time-off':
+        return Clock;
+      case 'reset-password':
+        return Key;
+      default:
+        return Settings; // Default icon for webhook items
+    }
+  }
 
   const informationItems = [
     { id: 'resources', label: 'Resources', icon: BookOpen },
@@ -198,6 +238,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const handleAutomateTasksItemClick = (sectionId: string) => {
+    console.log('Automate Tasks item clicked:', sectionId);
+    console.log('🎯 Sidebar: Calling onSectionChange with:', sectionId);
+    console.log('🎯 Sidebar: Available Automate Tasks items:', automateTasksItems.map(item => ({ id: item.id, title: item.title })));
     if (!isAutomateTasksExpanded) {
       setIsAutomateTasksExpanded(true);
       setIsFindAnswersExpanded(false);
@@ -349,7 +392,10 @@ const Sidebar: React.FC<SidebarProps> = ({
           </button>
           {isAutomateTasksExpanded && (
             <ul className="space-y-1">
-              {automateTasksItems.map((item) => {
+              {isLoadingAutomateTasks ? (
+                <li className="px-3 py-2 text-slate-300 text-sm">Loading...</li>
+              ) : (
+                automateTasksMenuItems.map((item) => {
                 const Icon = item.icon;
                 return (
                   <li key={item.id}>
@@ -366,7 +412,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </button>
                   </li>
                 );
-              })}
+                })
+              )}
             </ul>
           )}
         </div>
