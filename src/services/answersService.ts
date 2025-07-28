@@ -5,6 +5,9 @@ export interface AnswerArticle {
   content: string;
   category?: string;
   isExpanded?: boolean;
+  url?: string;
+  lastUpdated?: string;
+  author?: string;
 }
 
 export interface FindAnswersItem {
@@ -22,6 +25,8 @@ export interface AnswersData {
     scenario: string;
     actions: string[];
   };
+  scenario?: string;
+  actions?: string[];
   articles: AnswerArticle[];
   learnMoreLink?: string;
 }
