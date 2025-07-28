@@ -42,6 +42,49 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
   const [companies, setCompanies] = useState<Array<{id: string, name: string}>>([]);
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(false);
 
+  const loadCompanies = async () => {
+    setIsLoadingCompanies(true);
+    try {
+      const webhookUrl = import.meta.env.VITE_N8N_COMPANY_WEBHOOK_URL;
+      if (!webhookUrl) {
+        // Fallback to default company if webhook URL is not configured
+        setCompanies([{ id: '1', name: 'Agentic Weaver' }]);
+        return;
+      }
+
+      const response = await fetch(`${webhookUrl}?id=all`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch companies');
+      }
+
+      const data = await response.json();
+      
+      // Handle different response formats
+      let companiesData = [];
+      if (Array.isArray(data)) {
+        companiesData = data;
+      } else if (data.companies && Array.isArray(data.companies)) {
+        companiesData = data.companies;
+      } else if (data.data && Array.isArray(data.data)) {
+        companiesData = data.data;
+      }
+
+      // Map to consistent format
+      const formattedCompanies = companiesData.map((company: any) => ({
+        id: company.id || company._id || company.company_id || Math.random().toString(),
+        name: company.name || company.company_name || company.title || 'Unknown Company'
+      }));
+
+      setCompanies(formattedCompanies.length > 0 ? formattedCompanies : [{ id: '1', name: 'Agentic Weaver' }]);
+    } catch (error) {
+      console.error('Error loading companies:', error);
+      // Fallback to default company on error
+      setCompanies([{ id: '1', name: 'Agentic Weaver' }]);
+    } finally {
+      setIsLoadingCompanies(false);
+    }
+  };
+
   // Load profile from localStorage on component mount
   useEffect(() => {
     const savedProfile = localStorage.getItem('userProfile');
