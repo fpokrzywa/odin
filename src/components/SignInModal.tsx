@@ -221,8 +221,11 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
         localStorage.setItem('userProfile', JSON.stringify(userProfile));
         console.log('💾 SignInModal: User profile cached to localStorage');
         
-        // Trigger storage event to notify other components
-        window.dispatchEvent(new Event('storage'));
+        // Small delay to ensure localStorage is written before triggering event
+        setTimeout(() => {
+          window.dispatchEvent(new Event('storage'));
+          console.log('📡 SignInModal: Storage event triggered');
+        }, 100);
       } else {
         console.log('❌ SignInModal: User not found in webhook response for email:', email);
       }

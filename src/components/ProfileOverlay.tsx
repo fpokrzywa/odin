@@ -91,33 +91,25 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
   // Load profile from localStorage on component mount
   useEffect(() => {
     const savedProfile = localStorage.getItem('userProfile');
-    console.log('🔍 ProfileOverlay: Loading profile from localStorage:', savedProfile);
+    console.log('🔍 ProfileOverlay: Loading profile from localStorage on mount:', savedProfile);
     if (savedProfile) {
       try {
         const parsedProfile = JSON.parse(savedProfile);
-        console.log('📋 ProfileOverlay: Parsed profile data:', parsedProfile);
+        console.log('📋 ProfileOverlay: Parsed profile data on mount:', parsedProfile);
         
-        // Handle both old format (name) and new format (firstName/lastName)
-        if (parsedProfile.name && !parsedProfile.firstName && !parsedProfile.lastName) {
-          const nameParts = parsedProfile.name.split(' ');
-          parsedProfile.firstName = nameParts[0] || '';
-          parsedProfile.lastName = nameParts.slice(1).join(' ') || '';
-          delete parsedProfile.name;
-          console.log('🔄 ProfileOverlay: Migrated old name format to firstName/lastName');
+        // Only update if we have actual data (not empty fields)
+        if (parsedProfile.firstName || parsedProfile.lastName || parsedProfile.email) {
+          console.log('✅ ProfileOverlay: Setting profile with valid data');
+          setProfile(parsedProfile);
+          setEditedProfile(parsedProfile);
+        } else {
+          console.log('⚠️ ProfileOverlay: Profile data is empty, keeping default state');
         }
-        
-        setProfile(parsedProfile);
-        setEditedProfile(parsedProfile);
-        console.log('✅ ProfileOverlay: Successfully set profile state:', parsedProfile);
       } catch (error) {
         console.error('❌ ProfileOverlay: Error parsing saved profile:', error);
-        // Keep default empty profile if parsing fails
       }
     } else {
       console.log('⚠️ ProfileOverlay: No saved profile found in localStorage');
-      
-      // Check if we have any data in localStorage at all
-      console.log('🔍 ProfileOverlay: All localStorage keys:', Object.keys(localStorage));
     }
   }, []);
 
@@ -125,6 +117,30 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     loadOpenAIAssistants();
     loadCompanies();
+  }, []);
+
+  // Listen for profile changes
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedProfile = localStorage.getItem('userProfile');
+      console.log('🔄 ProfileOverlay: Storage change detected, new profile:', savedProfile);
+      if (savedProfile) {
+        try {
+          const parsedProfile = JSON.parse(savedProfile);
+          // Only update if we have actual data
+          if (parsedProfile.firstName || parsedProfile.lastName || parsedProfile.email) {
+            console.log('✅ ProfileOverlay: Updating profile from storage change');
+            setProfile(parsedProfile);
+            setEditedProfile(parsedProfile);
+          }
+        } catch (error) {
+          console.error('❌ ProfileOverlay: Error parsing profile from storage change:', error);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   const loadOpenAIAssistants = async () => {
@@ -158,7 +174,15 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
 
   // Save profile to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('userProfile', JSON.stringify(profile));
+    // Only save if profile has actual data to prevent overwriting good data with empty data
+    if (profile.firstName || profile.lastName || profile.email) {
+      console.log('💾 ProfileOverlay: Saving profile to localStorage:', profile);
+      localStorage.setItem('userProfile', JSON.stringify(profile));
+      // Trigger storage event to notify other components
+      window.dispatchEvent(new Event('storage'));
+    } else {
+      console.log('⚠️ ProfileOverlay: Not saving empty profile data');
+    }
   }, [profile]);
 
   const handleSave = () => {
