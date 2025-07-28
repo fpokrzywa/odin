@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, ChevronRight, Sparkles, ArrowRight, Users, Video, CreditCard, Receipt, Download, Ticket, Mail, Calendar, Lock, RefreshCw } from 'lucide-react';
+import { ChevronDown, ChevronRight, Sparkles, ArrowRight, Users, Video, CreditCard, Receipt, Download, Ticket, Mail, Calendar, Lock, RefreshCw, HelpCircle } from 'lucide-react';
 import { answersService, type AnswersData, type AnswerArticle } from '../services/answersService';
 import { automationsService, type AutomationsData, type AutomationAgent } from '../services/automationsService';
 
@@ -361,9 +361,9 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         <div className="mt-8">
           <button
             onClick={() => setIsDebugExpanded(!isDebugExpanded)}
-            className="flex items-center space-x-2 text-sm text-gray-500 hover:text-gray-700 transition-colors mb-2"
+            className="flex items-center space-x-2 text-sm text-gray-400 hover:text-gray-600 transition-colors mb-2"
           >
-            <span>{isDebugExpanded ? '▼' : '▶'}</span>
+            <HelpCircle className="w-4 h-4" />
             <span>Debug Information</span>
           </button>
           
@@ -607,9 +607,9 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
         <div className="mt-8">
           <button
             onClick={() => setIsDebugExpanded(!isDebugExpanded)}
-            className="flex items-center space-x-2 text-sm text-gray-500 hover:text-gray-700 transition-colors mb-2"
+            className="flex items-center space-x-2 text-sm text-gray-400 hover:text-gray-600 transition-colors mb-2"
           >
-            <span>{isDebugExpanded ? '▼' : '▶'}</span>
+            <HelpCircle className="w-4 h-4" />
             <span>Debug Information</span>
           </button>
           
