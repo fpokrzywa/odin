@@ -865,7 +865,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
                 </div>
               )}
               
-              {/* Pinned Assistant Indicator */}
+              <button
               {pinnedAssistant && !mentionedAssistant && (
                 <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-full px-3 py-1 text-sm">
                   <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -887,7 +887,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
                 }}
                 className="p-1 sm:p-2 text-gray-400 hover:text-orange-600 transition-colors flex-shrink-0 relative"
                 title="Upload files"
-              <button className="p-1 sm:p-2 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0">
+              >
                 <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
                 {isUploading && (
                   <div className="absolute inset-0 flex items-center justify-center">
