@@ -186,6 +186,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const handleFindAnswersItemClick = (sectionId: string) => {
     console.log('Find Answers item clicked:', sectionId);
     console.log('🎯 Sidebar: Calling onSectionChange with:', sectionId);
+    console.log('🎯 Sidebar: Available Find Answers items:', findAnswersItems.map(item => ({ id: item.id, title: item.title })));
     if (!isFindAnswersExpanded) {
       setIsFindAnswersExpanded(true);
       setIsAutomateTasksExpanded(false);

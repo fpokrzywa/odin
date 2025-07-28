@@ -381,17 +381,24 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
   };
 
   const getContentForSection = () => {
-    // Check if this is a Find Answers section that should load from webhook
-    const findAnswersSections = ['A1970-1', 'A1970-2', 'A1970-3', 'knowledge-articles', 'organization-chart', 'conference-rooms', 'customer-accounts', 'expense-reports'];
+    // Check if this is a Find Answers section by checking if we have data for it
+    const hasAnswersData = !!answersData;
+    const isLoadingAnswersData = isLoading;
     
-    console.log('🔍 MainContent: Checking if section should load from webhook:', activeSection, 'Is Find Answers?', findAnswersSections.includes(activeSection));
+    console.log('🔍 MainContent: Checking section type:', {
+      activeSection,
+      hasAnswersData,
+      isLoadingAnswersData,
+      answersDataTitle: answersData?.title
+    });
     
-    if (findAnswersSections.includes(activeSection)) {
+    // If we have answers data or are currently loading it, treat as Find Answers section
+    if (hasAnswersData || isLoadingAnswersData) {
       console.log('✅ MainContent: Rendering knowledge articles for section:', activeSection);
       return renderKnowledgeArticles();
-    } else {
-      console.log('❌ MainContent: Section not in Find Answers, rendering generic content:', activeSection);
     }
+    
+    console.log('❌ MainContent: No answers data found, checking for static sections:', activeSection);
     
     // Handle other sections with static content
     switch (activeSection) {
