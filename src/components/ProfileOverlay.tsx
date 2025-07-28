@@ -9,6 +9,7 @@ interface UserProfile {
   email: string;
   role: string;
   department: string;
+  company: string;
   joinDate: string;
   hasAcceptedGuidelines: boolean;
   isAdmin: boolean;
@@ -52,6 +53,7 @@ const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ isOpen, onClose }) => {
   // Load OpenAI assistants
   useEffect(() => {
     loadOpenAIAssistants();
+    loadCompanies();
   }, []);
 
   const loadOpenAIAssistants = async () => {
