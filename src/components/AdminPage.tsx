@@ -94,8 +94,10 @@ const AdminPage: React.FC<AdminPageProps> = () => {
         throw new Error('VITE_N8N_GET_USERS_WEBHOOK_URL not configured');
       }
       
-      console.log('🔄 AdminPage: Fetching users directly from n8n webhook:', webhookUrl);
-      const response = await fetch(webhookUrl, {
+      // Add id=all parameter to webhook URL
+      const webhookUrlWithParams = `${webhookUrl}?id=all`;
+      console.log('🔄 AdminPage: Fetching all users from n8n webhook:', webhookUrlWithParams);
+      const response = await fetch(webhookUrlWithParams, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -106,7 +108,22 @@ const AdminPage: React.FC<AdminPageProps> = () => {
         throw new Error(`n8n webhook responded with status: ${response.status} - ${response.statusText}`);
       }
 
-      const data = await response.json();
+      // Read response as text first to handle empty responses
+      const responseText = await response.text();
+      
+      if (!responseText || responseText.trim() === '') {
+        console.error('User webhook returned empty response');
+        throw new Error('User webhook returned empty response');
+      }
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse webhook response as JSON:', parseError);
+        throw new Error('Invalid JSON response from user webhook');
+      }
+      
       console.log('📦 AdminPage: Raw user webhook response:', data);
       
       // Handle different response formats
@@ -118,11 +135,30 @@ const AdminPage: React.FC<AdminPageProps> = () => {
       } else if (data.data && Array.isArray(data.data)) {
         users = data.data;
       } else {
-        throw new Error('Invalid response format from n8n user webhook');
+        console.error('Invalid response format. Expected array or object with users/data property');
+        throw new Error('Invalid response format from n8n user webhook. Expected array or object with users/data property');
       }
 
       console.log(`✅ AdminPage: Successfully loaded ${users.length} users from n8n webhook`);
-      return users.filter(user => user != null);
+      
+      // Map webhook user data to expected User interface format
+      const mappedUsers = users
+        .filter(user => user != null)
+        .map((user: any) => ({
+          id: user.id || user._id || Math.random(),
+          email: user.email || user.id || '',
+          password_hash: user.password_hash || user.password || '',
+          first_name: user.first_name || user.firstname || '',
+          last_name: user.last_name || user.lastname || '',
+          role_id: user.role_id || (user.role === 'Admin' ? 1 : 2),
+          role_name: user.role_name || user.role || 'User',
+          is_active: user.is_active !== undefined ? user.is_active : true,
+          created_at: user.created_at || new Date().toISOString(),
+          updated_at: user.updated_at || new Date().toISOString(),
+          last_login: user.last_login || null
+        }));
+      
+      return mappedUsers;
     } catch (error) {
       console.error('❌ AdminPage: Error fetching users from n8n webhook:', error);
       throw error;
