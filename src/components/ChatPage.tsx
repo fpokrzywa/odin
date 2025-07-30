@@ -606,7 +606,9 @@ const ChatPage: React.FC<ChatPageProps> = ({
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-50">
+    <div className="flex-1 flex bg-gray-50">
+      {/* Main Chat Area */}
+      <div className={`flex flex-col transition-all duration-300 ${showHelpOverlay ? 'flex-1' : 'w-full'}`}>
       {/* Header - Mobile Responsive */}
       <div className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4">
         <div className="flex items-center justify-between">
@@ -996,31 +998,23 @@ const ChatPage: React.FC<ChatPageProps> = ({
               </button>
               <button className="flex items-center space-x-1 px-2 py-1 border border-gray-200 rounded-full text-gray-600 hover:bg-gray-50 transition-colors text-xs">
                 <Image className="w-3 h-3 text-gray-400" />
-                <button 
+                <span 
                   onClick={() => setShowHelpOverlay(true)}
-                  className="hidden sm:inline"
+                  className="hidden sm:inline cursor-pointer"
                 >
                   Help me with this
-                </button>
+                </span>
                 <span className="sm:hidden">Image</span>
               </button>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Prompt Catalog Modal */}
-      <PromptCatalog
-        isOpen={showPromptCatalog}
-        onClose={() => setShowPromptCatalog(false)}
-        onPromptSelect={handlePromptSelect}
-        onOpenFullCatalog={handleOpenFullCatalog}
-        selectedAssistant={selectedAssistant?.name}
-      />
+      </div>
 
       {/* Help Panel - Quarter of right panel */}
-      <div className={`fixed top-0 right-0 h-full w-1/4 bg-white bg-opacity-95 backdrop-blur-sm shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
-        showHelpOverlay ? 'translate-x-0' : 'translate-x-full'
+      <div className={`bg-white bg-opacity-95 backdrop-blur-sm border-l border-gray-200 transition-all duration-300 ease-in-out ${
+        showHelpOverlay ? 'w-1/4' : 'w-0 overflow-hidden'
       }`}>
         <div className="flex flex-col h-full">
           {/* Header */}
@@ -1109,6 +1103,15 @@ const ChatPage: React.FC<ChatPageProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Prompt Catalog Modal */}
+      <PromptCatalog
+        isOpen={showPromptCatalog}
+        onClose={() => setShowPromptCatalog(false)}
+        onPromptSelect={handlePromptSelect}
+        onOpenFullCatalog={handleOpenFullCatalog}
+        selectedAssistant={selectedAssistant?.name}
+      />
     </div>
   );
 };
