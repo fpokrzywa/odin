@@ -606,9 +606,9 @@ const ChatPage: React.FC<ChatPageProps> = ({
   }
 
   return (
-    <div className="flex-1 flex bg-gray-50">
+    <div className="flex-1 flex bg-gray-50 h-full">
       {/* Main Chat Area */}
-      <div className={`flex flex-col transition-all duration-300 ${showHelpOverlay ? 'flex-1' : 'w-full'}`}>
+      <div className={`flex flex-col transition-all duration-300 h-full ${showHelpOverlay ? 'flex-1' : 'w-full'}`}>
       {/* Header - Mobile Responsive */}
       <div className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4">
         <div className="flex items-center justify-between">
@@ -659,9 +659,9 @@ const ChatPage: React.FC<ChatPageProps> = ({
       </div>
       
       {/* Chat Messages Area */}
-      <div className="flex-1 flex flex-col px-3 sm:px-6 lg:px-8 py-4 sm:py-6 overflow-hidden">
+      <div className="flex-1 flex flex-col px-3 sm:px-6 lg:px-8 py-4 sm:py-6 overflow-hidden min-h-0">
         {currentThread && currentThread.messages.length > 0 ? (
-          <div ref={chatContainerRef} className="flex-1 overflow-y-auto mb-4 space-y-4">
+          <div ref={chatContainerRef} className="flex-1 overflow-y-auto mb-4 space-y-4 min-h-0">
             {currentThread.messages.map((message) => (
               <div
                 key={message.id}
