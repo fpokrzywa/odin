@@ -318,6 +318,7 @@ function App() {
           <>
             <MainContent 
               activeSection={activeSection} 
+              onClose={() => setActiveSection('assistants')}
             />
             <RightPanel 
               isExpanded={isMainContentCollapsed}
@@ -340,6 +341,7 @@ function App() {
           <div className="flex-1 flex">
             <MainContent 
               activeSection={activeSection} 
+              onClose={() => setActiveSection('assistants')}
             />
           </div>
         )}

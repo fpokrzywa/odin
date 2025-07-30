@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, ChevronRight, Sparkles, ArrowRight, Users, Video, CreditCard, Receipt, Download, Ticket, Mail, Calendar, Lock, RefreshCw, HelpCircle } from 'lucide-react';
+import { ChevronDown, ChevronRight, Sparkles, ArrowRight, Users, Video, CreditCard, Receipt, Download, Ticket, Mail, Calendar, Lock, RefreshCw, HelpCircle, X } from 'lucide-react';
 import { answersService, type AnswersData, type AnswerArticle } from '../services/answersService';
 import { automationsService, type AutomationsData, type AutomationAgent } from '../services/automationsService';
 
 interface MainContentProps {
   activeSection: string;
   onAssistantChange?: (assistantId: string, assistantName: string) => void;
+  onClose?: () => void;
 }
 
-const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
+const MainContent: React.FC<MainContentProps> = ({ activeSection, onClose }) => {
   const [expandedArticles, setExpandedArticles] = useState<string[]>([]);
   const [isDebugExpanded, setIsDebugExpanded] = useState(false);
   const [answersData, setAnswersData] = useState<AnswersData | null>(null);
@@ -260,17 +261,28 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
               {answersData.description}
             </p>
           </div>
-          <button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className={`flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 ml-4 ${
-              isRefreshing ? 'cursor-not-allowed' : ''
-            }`}
-            title="Refresh knowledge articles"
-          >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span className="text-sm">Refresh</span>
-          </button>
+          <div className="flex items-center space-x-2 ml-4">
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className={`flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 ${
+                isRefreshing ? 'cursor-not-allowed' : ''
+              }`}
+              title="Refresh knowledge articles"
+            >
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span className="text-sm">Refresh</span>
+            </button>
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-50"
+                title="Close panel"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Try it yourself section */}
@@ -485,17 +497,28 @@ const MainContent: React.FC<MainContentProps> = ({ activeSection }) => {
               {automationsData.description}
             </p>
           </div>
-          <button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className={`flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 ml-4 ${
-              isRefreshing ? 'cursor-not-allowed' : ''
-            }`}
-            title="Refresh automation tasks"
-          >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span className="text-sm">Refresh</span>
-          </button>
+          <div className="flex items-center space-x-2 ml-4">
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className={`flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 ${
+                isRefreshing ? 'cursor-not-allowed' : ''
+              }`}
+              title="Refresh automation tasks"
+            >
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span className="text-sm">Refresh</span>
+            </button>
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-50"
+                title="Close panel"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Try it yourself section */}
