@@ -75,6 +75,9 @@ function App() {
   const handleSectionChange = (section: string) => {
     setActiveSection(section);
     
+    // Show main content by default when switching to a new section
+    setShowMainContent(true);
+    
     // If the main content is collapsed, expand it when a nav item is clicked
     if (isMainContentCollapsed) {
       setIsMainContentCollapsed(false);
@@ -314,15 +317,39 @@ function App() {
           activeSection === 'customer-accounts' || 
           activeSection === 'expense-reports' ||
           // Handle any other dynamic sections from webhooks (Find Answers or Automate Tasks)
-          (activeSection && activeSection.startsWith('A1970-') && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection))) && (
+          (activeSection && activeSection.startsWith('A1970-') && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection))) && showMainContent && (
           <div className="flex-1 flex">
             <MainContent 
               activeSection={activeSection} 
-              onClose={() => setActiveSection('assistants')}
+              onClose={() => setShowMainContent(false)}
             />
             <RightPanel 
               isExpanded={isMainContentCollapsed}
               isFullScreen={isSidebarCollapsed}
+              onExpandAll={handleExpandAll}
+              user={user}
+              activeSection={activeSection}
+            />
+          </div>
+        )}
+        
+        {/* Right Panel Only (Chat) when center panel is closed */}
+        {(activeSection === 'knowledge-articles' || 
+          activeSection === 'it-support-guides' ||
+          activeSection === 'hr-onboarding-materials' ||
+          activeSection === 'marketing-guidelines' ||
+          activeSection === 'sales-playbooks' ||
+          activeSection === 'finance-accounting-procedures' ||
+          activeSection === 'organization-chart' || 
+          activeSection === 'conference-rooms' || 
+          activeSection === 'customer-accounts' || 
+          activeSection === 'expense-reports' ||
+          // Handle any other dynamic sections from webhooks (Find Answers or Automate Tasks)
+          (activeSection && activeSection.startsWith('A1970-') && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection))) && !showMainContent && (
+          <div className="flex-1">
+            <RightPanel 
+              isExpanded={true}
+              isFullScreen={true}
               onExpandAll={handleExpandAll}
               user={user}
               activeSection={activeSection}
@@ -337,11 +364,30 @@ function App() {
           activeSection === 'request-time-off' ||
           activeSection === 'reset-password' ||
           // Handle dynamic Automate Tasks sections from webhooks (AG prefix)
-          (activeSection && activeSection.startsWith('AG') && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection))) && (
+          (activeSection && activeSection.startsWith('AG') && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection))) && showMainContent && (
           <div className="flex-1 flex">
             <MainContent 
               activeSection={activeSection} 
-              onClose={() => setActiveSection('assistants')}
+              onClose={() => setShowMainContent(false)}
+            />
+          </div>
+        )}
+        
+        {/* Automate Tasks sections - Right Panel Only when center panel is closed */}
+        {(activeSection === 'get-software-apps' ||
+          activeSection === 'track-support-tickets' ||
+          activeSection === 'manage-email-groups' ||
+          activeSection === 'request-time-off' ||
+          activeSection === 'reset-password' ||
+          // Handle dynamic Automate Tasks sections from webhooks (AG prefix)
+          (activeSection && activeSection.startsWith('AG') && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection))) && !showMainContent && (
+          <div className="flex-1">
+            <RightPanel 
+              isExpanded={true}
+              isFullScreen={true}
+              onExpandAll={handleExpandAll}
+              user={user}
+              activeSection={activeSection}
             />
           </div>
         )}
