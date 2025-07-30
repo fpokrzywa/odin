@@ -195,7 +195,6 @@ const ChatPage: React.FC<ChatPageProps> = ({
      while (mentionEnd < inputValue.length && inputValue[mentionEnd] !== ' ') {
        mentionEnd++;
      }
-     return; // Don't process Enter when dropdown is open
      
       const beforeAt = inputValue.substring(0, atSymbolPosition);
       const afterMention = inputValue.substring(mentionEnd);
@@ -1113,52 +1112,6 @@ const ChatPage: React.FC<ChatPageProps> = ({
       onOpenFullCatalog={handleOpenFullCatalog}
       selectedAssistant={selectedAssistant?.name}
     />
-  );
-};
-                </div>
-              </div>
-
-              {/* Input Area */}
-              <div className="p-6 border-t border-gray-200 bg-white bg-opacity-80">
-                <div className="space-y-4">
-                  <label className="block text-sm font-medium text-gray-700">
-                    What do you need help with?
-                  </label>
-                  <textarea
-                    value={helpMessage}
-                    onChange={(e) => setHelpMessage(e.target.value)}
-                    placeholder="Describe what you're working on or what you need assistance with..."
-                    rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none bg-white bg-opacity-90"
-                  />
-                  <div className="flex items-center justify-between">
-                    <button
-                      onClick={() => setShowHelpOverlay(false)}
-                      className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (helpMessage.trim()) {
-                          setInputValue(helpMessage.trim());
-                          setHelpMessage('');
-                          setShowHelpOverlay(false);
-                        }
-                      }}
-                      disabled={!helpMessage.trim()}
-                      className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Ask for Help
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-    </div>
   );
 };
 
