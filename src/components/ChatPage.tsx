@@ -606,7 +606,8 @@ const ChatPage: React.FC<ChatPageProps> = ({
   }
 
   return (
-    <div className="flex-1 flex bg-gray-50">
+    <>
+      <div className="flex-1 flex bg-gray-50">
       {/* Main Chat Area */}
       <div className={`flex flex-col transition-all duration-300 ${showHelpOverlay ? 'flex-[3]' : 'flex-1'}`}>
       {/* Header - Mobile Responsive */}
@@ -1102,16 +1103,17 @@ const ChatPage: React.FC<ChatPageProps> = ({
           </div>
         </div>
       </div>
-    </div>
+      </div>
 
-    {/* Prompt Catalog Modal */}
-    <PromptCatalog
-      isOpen={showPromptCatalog}
-      onClose={() => setShowPromptCatalog(false)}
-      onPromptSelect={handlePromptSelect}
-      onOpenFullCatalog={handleOpenFullCatalog}
-      selectedAssistant={selectedAssistant?.name}
-    />
+      {/* Prompt Catalog Modal */}
+      <PromptCatalog
+        isOpen={showPromptCatalog}
+        onClose={() => setShowPromptCatalog(false)}
+        onPromptSelect={handlePromptSelect}
+        onOpenFullCatalog={handleOpenFullCatalog}
+        selectedAssistant={selectedAssistant?.name}
+      />
+    </>
   );
 };
 
