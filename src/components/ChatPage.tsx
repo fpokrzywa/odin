@@ -1019,110 +1019,98 @@ const ChatPage: React.FC<ChatPageProps> = ({
         selectedAssistant={selectedAssistant?.name}
       />
 
-      {/* Help Overlay Panel */}
-      {showHelpOverlay && (
-        <>
-          {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-20 z-40"
-            onClick={() => setShowHelpOverlay(false)}
-          />
-          
-          {/* Sliding Panel */}
-          <div className={`fixed top-0 right-0 h-full w-1/4 bg-white bg-opacity-95 backdrop-blur-sm shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
-            showHelpOverlay ? 'translate-x-0' : 'translate-x-full'
-          }`}>
-            <div className="flex flex-col h-full">
-              {/* Header */}
-              <div className="p-6 border-b border-gray-200 bg-white bg-opacity-80">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900">Help me with this</h3>
-                  <button
-                    onClick={() => setShowHelpOverlay(false)}
-                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-100"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
+      {/* Help Panel - Quarter of right panel */}
+      <div className={`fixed top-0 right-0 h-full w-1/4 bg-white bg-opacity-95 backdrop-blur-sm shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
+        showHelpOverlay ? 'translate-x-0' : 'translate-x-full'
+      }`}>
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="p-6 border-b border-gray-200 bg-white bg-opacity-80">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">Help me with this</h3>
+              <button
+                onClick={() => setShowHelpOverlay(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
 
-              {/* Content */}
-              <div className="flex-1 p-6 bg-white bg-opacity-60">
-                <div className="text-gray-700 space-y-4">
-                  <p className="text-sm leading-relaxed">
-                    Need help with something specific? Describe what you're working on and I'll provide targeted assistance.
-                  </p>
-                  
-                  <div className="space-y-3">
-                    <h4 className="font-medium text-gray-900">I can help you with:</h4>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-start">
-                        <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span>Analyzing documents or images</span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span>Explaining complex concepts</span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span>Brainstorming solutions</span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span>Writing and editing content</span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span>Research and fact-checking</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              {/* Input Area */}
-              <div className="p-6 border-t border-gray-200 bg-white bg-opacity-80">
-                <div className="space-y-4">
-                  <label className="block text-sm font-medium text-gray-700">
-                    What do you need help with?
-                  </label>
-                  <textarea
-                    value={helpMessage}
-                    onChange={(e) => setHelpMessage(e.target.value)}
-                    placeholder="Describe what you're working on or what you need assistance with..."
-                    rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none bg-white bg-opacity-90"
-                  />
-                  <div className="flex items-center justify-between">
-                    <button
-                      onClick={() => setShowHelpOverlay(false)}
-                      className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (helpMessage.trim()) {
-                          setInputValue(helpMessage.trim());
-                          setHelpMessage('');
-                          setShowHelpOverlay(false);
-                        }
-                      }}
-                      disabled={!helpMessage.trim()}
-                      className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Ask for Help
-                    </button>
-                  </div>
-                </div>
+          {/* Content */}
+          <div className="flex-1 p-6 bg-white bg-opacity-60">
+            <div className="text-gray-700 space-y-4">
+              <p className="text-sm leading-relaxed">
+                Need help with something specific? Describe what you're working on and I'll provide targeted assistance.
+              </p>
+              
+              <div className="space-y-3">
+                <h4 className="font-medium text-gray-900">I can help you with:</h4>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-start">
+                    <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span>Analyzing documents or images</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span>Explaining complex concepts</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span>Brainstorming solutions</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span>Writing and editing content</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span>Research and fact-checking</span>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
-        </>
-      )}
     </div>
   );
 };
 
+          {/* Input Area */}
+          <div className="p-6 border-t border-gray-200 bg-white bg-opacity-80">
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-gray-700">
+                What do you need help with?
+              </label>
+              <textarea
+                value={helpMessage}
+                onChange={(e) => setHelpMessage(e.target.value)}
+                placeholder="Describe what you're working on or what you need assistance with..."
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none bg-white bg-opacity-90"
+              />
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={() => setShowHelpOverlay(false)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    if (helpMessage.trim()) {
+                      setInputValue(helpMessage.trim());
+                      setHelpMessage('');
+                      setShowHelpOverlay(false);
+                    }
+                  }}
+                  disabled={!helpMessage.trim()}
+                  className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Ask for Help
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 export default ChatPage;
