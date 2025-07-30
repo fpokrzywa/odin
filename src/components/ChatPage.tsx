@@ -195,7 +195,6 @@ const ChatPage: React.FC<ChatPageProps> = ({
      while (mentionEnd < inputValue.length && inputValue[mentionEnd] !== ' ') {
        mentionEnd++;
      }
-     return; // Don't process Enter when dropdown is open
      
       const beforeAt = inputValue.substring(0, atSymbolPosition);
       const afterMention = inputValue.substring(mentionEnd);
@@ -1071,9 +1070,6 @@ const ChatPage: React.FC<ChatPageProps> = ({
               </div>
             </div>
           </div>
-    </div>
-  );
-};
 
           {/* Input Area */}
           <div className="p-6 border-t border-gray-200 bg-white bg-opacity-80">
@@ -1113,4 +1109,8 @@ const ChatPage: React.FC<ChatPageProps> = ({
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
 export default ChatPage;
