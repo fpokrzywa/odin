@@ -315,7 +315,7 @@ function App() {
           activeSection === 'expense-reports' ||
           // Handle any other dynamic sections from webhooks (Find Answers or Automate Tasks)
           (activeSection && activeSection.startsWith('A1970-') && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection))) && (
-          <>
+          <div className="flex-1 flex">
             <MainContent 
               activeSection={activeSection} 
               onClose={() => setActiveSection('assistants')}
@@ -327,7 +327,7 @@ function App() {
               user={user}
               activeSection={activeSection}
             />
-          </>
+          </div>
         )}
         
         {/* Automate Tasks sections with MainContent only */}

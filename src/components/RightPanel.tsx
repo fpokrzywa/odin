@@ -85,7 +85,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
   }
 
   return (
-    <div className={`${isExpanded ? 'flex-1' : 'flex-1'} bg-white border-l border-gray-200 h-screen flex flex-col relative`}>
+    <div className="flex-1 bg-white border-l border-gray-200 h-screen flex flex-col relative">
       {/* Header with Model Selector */}
       <div className="flex items-center justify-between p-4">
         {isFullScreen && onExpandAll && (
@@ -124,44 +124,44 @@ const RightPanel: React.FC<RightPanelProps> = ({
       </div>
       
       {/* Moveworks Branding */}
-      <div className={`${isExpanded ? 'p-16' : 'p-8'} text-center`}>
+      <div className="p-8 text-center">
         <div className="mb-6">
           <img 
             src="/aw_logo_v1_dark.png" 
             alt="Agentic Weaver Logo" 
-            className={`${isExpanded ? 'w-24 h-24' : 'w-16 h-16'} mx-auto mb-4 object-contain`}
+            className="w-16 h-16 mx-auto mb-4 object-contain"
           />
         </div>
         
-        <h2 className={`${isExpanded ? 'text-4xl' : 'text-2xl'} font-bold text-gray-900 mb-2`}>Agentic Weaver</h2>
-       <p className={`text-gray-700 ${isExpanded ? 'text-lg max-w-md mx-auto' : 'text-sm'} leading-relaxed`}>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Agentic Weaver</h2>
+       <p className="text-gray-700 text-sm leading-relaxed">
           {user ? `Welcome back, ${user.email.split('@')[0]}! ` : ''}Use sample resource on the left to experience AI transformation at work
         </p>
       </div>
 
       {/* Sample Prompts Section */}
-      <div className={`${isExpanded ? 'px-16 max-w-2xl mx-auto w-full' : 'px-6'} mb-6`}>
+      <div className="px-6 mb-6">
         <button
           onClick={() => setShowSamplePrompts(!showSamplePrompts)}
-         className={`w-full flex items-center justify-between ${isExpanded ? 'p-4 text-lg' : 'p-3'} bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors`}
+         className="w-full flex items-center justify-between p-3 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"
         >
          <span className="font-medium text-orange-900">Sample prompts</span>
           {showSamplePrompts ? (
-           <ChevronDown className={`${isExpanded ? 'w-5 h-5' : 'w-4 h-4'} text-orange-600`} />
+           <ChevronDown className="w-4 h-4 text-orange-600" />
           ) : (
-           <ChevronRight className={`${isExpanded ? 'w-5 h-5' : 'w-4 h-4'} text-orange-600`} />
+           <ChevronRight className="w-4 h-4 text-orange-600" />
           )}
         </button>
         
         {showSamplePrompts && (
           <div className="mt-3 space-y-2">
-           <div className={`${isExpanded ? 'p-4 text-base' : 'p-3 text-sm'} bg-white border border-orange-200 rounded text-gray-700 hover:bg-orange-50 cursor-pointer transition-colors`}>
+           <div className="p-3 text-sm bg-white border border-orange-200 rounded text-gray-700 hover:bg-orange-50 cursor-pointer transition-colors">
               "What is our vacation policy?"
             </div>
-           <div className={`${isExpanded ? 'p-4 text-base' : 'p-3 text-sm'} bg-white border border-orange-200 rounded text-gray-700 hover:bg-orange-50 cursor-pointer transition-colors`}>
+           <div className="p-3 text-sm bg-white border border-orange-200 rounded text-gray-700 hover:bg-orange-50 cursor-pointer transition-colors">
               "How do I request time off?"
             </div>
-           <div className={`${isExpanded ? 'p-4 text-base' : 'p-3 text-sm'} bg-white border border-orange-200 rounded text-gray-700 hover:bg-orange-50 cursor-pointer transition-colors`}>
+           <div className="p-3 text-sm bg-white border border-orange-200 rounded text-gray-700 hover:bg-orange-50 cursor-pointer transition-colors">
               "When can I get a laptop refresh?"
             </div>
           </div>
@@ -169,15 +169,15 @@ const RightPanel: React.FC<RightPanelProps> = ({
       </div>
 
       {/* Search Input */}
-      <div className={`${isExpanded ? 'px-16 max-w-2xl mx-auto w-full' : 'px-6'} mt-auto mb-8`}>
+      <div className="px-6 mt-auto mb-8">
         <div className="relative">
-          <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${isExpanded ? 'w-5 h-5' : 'w-4 h-4'} text-gray-400`} />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search for answers or give me an action"
-           className={`w-full ${isExpanded ? 'pl-12 pr-6 py-4 text-lg' : 'pl-10 pr-4 py-3'} border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all`}
+           className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
           />
         </div>
       </div>
