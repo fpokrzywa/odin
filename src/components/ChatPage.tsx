@@ -995,7 +995,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
               </button>
               <button className="flex items-center space-x-1 px-2 py-1 border border-gray-200 rounded-full text-gray-600 hover:bg-gray-50 transition-colors text-xs">
                 <Image className="w-3 h-3 text-gray-400" />
-                <span className="hidden sm:inline">Generate Image</span>
+                <span className="hidden sm:inline">Help me with this</span>
                 <span className="sm:hidden">Image</span>
               </button>
             </div>
