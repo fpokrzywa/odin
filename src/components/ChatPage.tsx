@@ -1013,12 +1013,14 @@ const ChatPage: React.FC<ChatPageProps> = ({
       </div>
 
       {/* Help Panel - Quarter of right panel */}
-      <div className={`bg-white bg-opacity-95 backdrop-blur-sm border-l border-gray-200 transition-all duration-300 ease-in-out ${
-        showHelpOverlay ? 'w-1/4 translate-x-0' : 'w-1/4 translate-x-full overflow-hidden'
+      <div className={`bg-white bg-opacity-95 backdrop-blur-sm border-l border-gray-200 transition-all duration-300 ease-in-out overflow-hidden ${
+        showHelpOverlay ? 'w-1/4' : 'w-0'
       }`}>
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-6 border-b border-gray-200 bg-white bg-opacity-80">
+          <div className={`p-6 border-b border-gray-200 bg-white bg-opacity-80 transition-opacity duration-300 ${
+            showHelpOverlay ? 'opacity-100' : 'opacity-0'
+          }`}>
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900">Help me with this</h3>
               <button
@@ -1031,7 +1033,9 @@ const ChatPage: React.FC<ChatPageProps> = ({
           </div>
 
           {/* Content */}
-          <div className="flex-1 p-6 bg-white bg-opacity-60">
+          <div className={`flex-1 p-6 bg-white bg-opacity-60 transition-opacity duration-300 ${
+            showHelpOverlay ? 'opacity-100' : 'opacity-0'
+          }`}>
             <div className="text-gray-700 space-y-4">
               <p className="text-sm leading-relaxed">
                 Need help with something specific? Describe what you're working on and I'll provide targeted assistance.
@@ -1066,7 +1070,9 @@ const ChatPage: React.FC<ChatPageProps> = ({
           </div>
 
           {/* Input Area */}
-          <div className="p-6 border-t border-gray-200 bg-white bg-opacity-80">
+          <div className={`p-6 border-t border-gray-200 bg-white bg-opacity-80 transition-opacity duration-300 ${
+            showHelpOverlay ? 'opacity-100' : 'opacity-0'
+          }`}>
             <div className="space-y-4">
               <label className="block text-sm font-medium text-gray-700">
                 What do you need help with?
