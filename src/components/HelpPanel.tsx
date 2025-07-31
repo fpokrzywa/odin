@@ -20,7 +20,7 @@ const HelpPanel: React.FC<HelpPanelProps> = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="h-full bg-white border-l border-gray-200 shadow-xl flex flex-col">
+    <div className="h-full bg-white border-l border-gray-200 shadow-xl flex flex-col animate-slide-in-right">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <div className="flex items-center space-x-2">

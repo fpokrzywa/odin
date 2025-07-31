@@ -607,9 +607,11 @@ const ChatPage: React.FC<ChatPageProps> = ({
   }
 
   return (
-    <div className={`flex flex-col bg-gray-50 transition-all duration-300 ease-in-out ${
-      showHelpPanel ? 'w-3/4' : 'flex-1'
-    }`}>
+    <div className="flex flex-1 bg-gray-50">
+      {/* Main Chat Panel */}
+      <div className={`flex flex-col transition-all duration-300 ease-in-out ${
+        showHelpPanel ? 'w-3/4' : 'flex-1'
+      }`}>
       {/* Header - Mobile Responsive */}
       <div className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4">
         <div className="flex items-center justify-between">
@@ -1009,6 +1011,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
           </div>
         </div>
       </div>
+      </div>
 
       {/* Prompt Catalog Modal */}
       <PromptCatalog
@@ -1019,10 +1022,9 @@ const ChatPage: React.FC<ChatPageProps> = ({
         selectedAssistant={selectedAssistant?.name}
       />
 
-      {/* Help Panel */}
-      {/* Help Panel - positioned as sibling to chat panel */}
+      {/* Help Panel - slides in from right */}
       {showHelpPanel && (
-        <div className="w-1/4 flex-shrink-0">
+        <div className="w-1/4 flex-shrink-0 transition-all duration-300 ease-in-out">
           <HelpPanel
             isOpen={showHelpPanel}
             onClose={() => setShowHelpPanel(false)}
