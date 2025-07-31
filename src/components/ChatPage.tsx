@@ -3,6 +3,7 @@ import { MessageSquare, HelpCircle, Mic, Send, Search, BarChart3, Image, Papercl
 import { chatService, type ChatMessage, type ChatThread } from '../services/chatService';
 import PromptCatalog from './PromptCatalog';
 import { getCompanyBotName } from '../utils/companyConfig';
+import HelpPanel from './HelpPanel';
 
 interface ChatPageProps {
   selectedAssistant: { name: string; id: string } | null;
@@ -40,6 +41,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [showFileUpload, setShowFileUpload] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [showHelpPanel, setShowHelpPanel] = useState(false);
 
   // Available assistants list
   const [availableAssistants, setAvailableAssistants] = useState<string[]>([]);
@@ -993,7 +995,10 @@ const ChatPage: React.FC<ChatPageProps> = ({
                 <BarChart3 className="w-3 h-3 text-gray-400" />
                 <span>Research</span>
               </button>
-              <button className="flex items-center space-x-1 px-2 py-1 border border-gray-200 rounded-full text-gray-600 hover:bg-gray-50 transition-colors text-xs">
+              <button 
+                onClick={() => setShowHelpPanel(true)}
+                className="flex items-center space-x-1 px-2 py-1 border border-gray-200 rounded-full text-gray-600 hover:bg-gray-50 transition-colors text-xs"
+              >
                 <Image className="w-3 h-3 text-gray-400" />
                 <span className="hidden sm:inline">Help me with this</span>
                 <span className="sm:hidden">Image</span>
@@ -1010,6 +1015,12 @@ const ChatPage: React.FC<ChatPageProps> = ({
         onPromptSelect={handlePromptSelect}
         onOpenFullCatalog={handleOpenFullCatalog}
         selectedAssistant={selectedAssistant?.name}
+      />
+
+      {/* Help Panel */}
+      <HelpPanel
+        isOpen={showHelpPanel}
+        onClose={() => setShowHelpPanel(false)}
       />
     </div>
   );
