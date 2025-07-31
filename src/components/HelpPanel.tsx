@@ -20,19 +20,7 @@ const HelpPanel: React.FC<HelpPanelProps> = ({ isOpen, onClose }) => {
   };
 
   return (
-    <>
-      {/* Backdrop */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-25 z-40"
-          onClick={onClose}
-        />
-      )}
-      
-      {/* Sliding Panel */}
-      <div className={`fixed top-0 right-0 h-full w-1/4 bg-white border-l border-gray-200 shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
-        isOpen ? 'translate-x-0' : 'translate-x-full'
-      }`}>
+    <div className="h-full bg-white border-l border-gray-200 shadow-xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <div className="flex items-center space-x-2">
@@ -111,8 +99,7 @@ const HelpPanel: React.FC<HelpPanelProps> = ({ isOpen, onClose }) => {
             </p>
           </div>
         </div>
-      </div>
-    </>
+    </div>
   );
 };
 
