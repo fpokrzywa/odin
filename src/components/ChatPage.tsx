@@ -1014,7 +1014,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
 
       {/* Help Panel - Quarter of right panel */}
       <div className={`bg-white bg-opacity-95 backdrop-blur-sm border-l border-gray-200 transition-all duration-300 ease-in-out ${
-        showHelpOverlay ? 'w-1/4' : 'w-0 overflow-hidden'
+        showHelpOverlay ? 'w-1/4 translate-x-0' : 'w-0 translate-x-full overflow-hidden'
       }`}>
         <div className="flex flex-col h-full">
           {/* Header */}
