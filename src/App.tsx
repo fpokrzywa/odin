@@ -346,7 +346,7 @@ function App() {
           activeSection === 'expense-reports' ||
           // Handle any other dynamic sections from webhooks (Find Answers or Automate Tasks)
           (activeSection && activeSection.startsWith('A1970-') && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection))) && !showMainContent && (
-          <div className="flex-1 h-full">
+          <div className="flex-1">
             <RightPanel 
               isExpanded={true}
               isFullScreen={true}
@@ -381,7 +381,7 @@ function App() {
           activeSection === 'reset-password' ||
           // Handle dynamic Automate Tasks sections from webhooks (AG prefix)
           (activeSection && activeSection.startsWith('AG') && !['assistants', 'prompt-catalog', 'chat', 'profile', 'settings', 'resources', 'guidelines', 'admin'].includes(activeSection))) && !showMainContent && (
-          <div className="flex-1 h-full">
+          <div className="flex-1">
             <RightPanel 
               isExpanded={true}
               isFullScreen={true}

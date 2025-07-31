@@ -73,7 +73,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
 
   if (isDynamicSection && currentAssistant) {
     return (
-      <div className="flex-1 flex h-full">
+      <div className="flex-1 flex">
         <ChatPage 
           selectedAssistant={currentAssistant}
           selectedPrompt=""
@@ -85,7 +85,7 @@ const RightPanel: React.FC<RightPanelProps> = ({
   }
 
   return (
-    <div className="flex-1 bg-white border-l border-gray-200 h-full flex flex-col relative">
+    <div className="flex-1 bg-white border-l border-gray-200 h-screen flex flex-col relative">
       {/* Header with Model Selector */}
       <div className="flex items-center justify-between p-4">
         {isFullScreen && onExpandAll && (
